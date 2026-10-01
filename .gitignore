@@ -1,14 +1,6 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
-build/
-
-# Coverage
-coverage/
-.nyc_output/
-
 # Test output
 test-output.txt
 

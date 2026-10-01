@@ -134,7 +134,7 @@ Not shown (1): Should the Accept and merge button text and the product docs desc
 - **Starting states.** It does not reliably describe a starting state the product can reach. After a fix for this, the starting-state check held in 1 of 3 regression runs on the same real inputs.
 - **Duration.** It cannot know how long a hand check takes. In 3 of 3 regression runs it guessed minutes for a check that took about 70 minutes to attempt, so it now says what a check needs and gives no duration.
 - **Reworded reply.** In 1 of 3 smoke runs on the invented example, the reply was reworded after the checker had passed the saved script, which broke a step rule.
-- **Loupe bug stories.** They have neither `## Requirements` nor `## Acceptance criteria`, so ISR calls them not ready.
+- **Loupe bug stories.** ISR reads stories with a Requirements or Acceptance criteria section; a Loupe bug report has neither, so ISR calls it not ready.
 
 The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes. Each run behind these points is in the [run log](docs/run-log.md).
 

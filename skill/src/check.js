@@ -224,11 +224,12 @@ function checkScript(lines, sections, { story, record }, add) {
   // Found in real run 1: a record with a skipped test, and a Verified by that said "43 of 43".
   if (record?.skipped) {
     const r = shape.record;
+    const said = record.skipped === 1 ? '1 test was skipped' : `${record.skipped} tests were skipped`;
     for (const item of sections.verified?.items ?? []) {
       const all = item.line.match(re(r.allPassed));
-      if (all) add(item.n, 'skipped-tests', 'skippedAllPassed', { n: record.skipped, text: all[0] });
+      if (all) add(item.n, 'skipped-tests', 'skippedAllPassed', { skipped: said, text: all[0] });
       else if (re(r.passedCount).test(item.line) && !re(fill(r.skippedCount, { n: record.skipped })).test(item.line)) {
-        add(item.n, 'skipped-tests', 'skippedNotSaid', { n: record.skipped });
+        add(item.n, 'skipped-tests', 'skippedNotSaid', { skipped: said });
       }
     }
   }

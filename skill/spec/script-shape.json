@@ -127,7 +127,7 @@
     "buildNotReadyBottom": "The record shows the build is not verified ({why}). Start the Bottom line with \"The build is not verified yet\".",
     "firstQuestion": "The story has a First question, so the first Confirm item is that question, with \"First question\" in its source, like \"(First question; Questions before building)\".",
     "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\".",
-    "skippedAllPassed": "The record says {n} tests were skipped, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",
-    "skippedNotSaid": "The record says {n} tests were skipped. A Verified by that counts passing tests also says how many were skipped."
+    "skippedAllPassed": "The record says {skipped}, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",
+    "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped."
   }
 }

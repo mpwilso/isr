@@ -10,7 +10,7 @@ Every acceptance criterion appears exactly once:
 - **Check by hand:** no automated check covered it, or covered only part of it. One check can cover several criteria; two checks never cover the same one.
 - **Not covered:** neither, with the reason, like "Criterion 5: moved to Confirm, since the story does not say what should happen."
 
-A check whose expected result the story does not define can't be run by hand. Ask it under Confirm instead, list the criterion under Not covered with "moved to Confirm", and set Type to Decision needed.
+A check whose expected result the story does not define at all can't be run by hand. Ask it under Confirm instead, list the criterion under Not covered with "moved to Confirm", and set Type to Decision needed.
 
 ## Ranking checks
 
@@ -25,7 +25,7 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
   - Never ask anyone to set up what the story, plan or record says is already in place.
   - When the check needs an engineer, a real build, a test project or a date that has to pass, say so in plain words, and say that the engineer should size it before anyone commits to it. Never give a duration; ISR can't know how long a check takes.
 - **Steps:** at most five, numbered, one short sentence each. A step that depends on time passing names who makes it pass and how, using only what the story or record says; if they say nothing, the step asks the engineer to make that date pass in the test environment and says the story does not say how.
-- **Expect:** what the tester should see, as the story states it. When the story leaves a detail to confirm, say it is not settled yet and point to the Confirm item.
+- **Expect:** what the tester should see, as the story states it. When the story defines the result but leaves one detail to confirm, keep the check, say that detail is not settled yet, and point to the Confirm item.
 - **Covers:** the criterion numbers.
 
 Use the story's own words for pages, systems and people. No file names, ticket ids, function names or code formatting. Use the test environment the story or record names, such as staging; if neither names one, write "a test environment".

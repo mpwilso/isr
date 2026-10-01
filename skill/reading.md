@@ -11,7 +11,9 @@ Read it by section name. These are the sections ISR uses, as Loupe writes them:
 
 If one of these sections is missing, name it under Not looked at, like "the story has no Assumed section". Never fill it in. Other lines, such as Confidence, Estimate and Before release, are context only.
 
-**Too thin to build from:** the story says "Not ready yet" at the top, or has no acceptance criteria. Write the not ready report from `templates/not-ready.md`: the four top lines, what is missing (at most five items) and a Next line that points back to the story tool. No script.
+**Too thin to build from:** any line of the story reads exactly "Call: Not ready yet" or "# Not ready yet", or the story has no acceptance criteria. Write the not ready report from `templates/not-ready.md`: the four top lines, what is missing (at most five items) and a Next line that points back to the story tool. No script.
+
+**A bug report:** when the story looks like a bug report, the first Missing item says so in plain words, and Next suggests asking Loupe, the story tool, for a story with requirements.
 
 ## The record
 

@@ -84,6 +84,13 @@ test('a record with skipped tests: Verified by gives both counts, never "N of N"
   assert.deepEqual(check(both, { story, record: skipped }), []);
 });
 
+test('the skipped-tests message says "1 test was skipped" for one, and the plural for more', () => {
+  // Found in the audit fixes: the message said "1 tests were skipped".
+  const message = (n) => check(good, { story, record: { notReady: null, skipped: n } })[0].message;
+  assert.match(message(1), /^The record says 1 test was skipped, so /);
+  assert.match(message(2), /^The record says 2 tests were skipped, so /);
+});
+
 test('a story with Requirements in place of Acceptance criteria is read the same way', () => {
   // Loupe's story format v2 writes "## Requirements", numbered; v1 stories keep "## Acceptance criteria".
   const v2 = readStory(read(`${FIX}/story-requirements.md`));
