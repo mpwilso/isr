@@ -48,6 +48,7 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 The reader never sees the story's section names, such as "Questions before building" or "Assumed".
 
 - The same thing found in several places is one line. Its source names at most two of them: pick the phrase that best tells the reader where the question came from. The first question keeps "the story asks this first" plus at most one more.
+- Every criterion with a "To confirm:" detail reaches Confirm, in an item whose source includes "criterion N leaves this open", even when the criterion is verified or checked by hand. If that item falls past the top five, its Not shown title ends with "(criterion N leaves this open)".
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
 - When the intent, plan or record already answers something the story lists as Unknown or asks under Questions before building, don't ask it cold. Say what the build chose and where it is recorded, ask whether that is right, and add "the build decided this" to the source.
 - A risk the plan or record says is undecided is a Confirm item, even when the story never mentions it, with the source "left open in the build's plan" or "raised in the build record".

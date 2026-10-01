@@ -34,6 +34,7 @@ export function readStory(text) {
     notReady: thin || criteria.length === 0,
     firstQuestion: re(shape.story.firstQuestion, 'm').test(text),
     criteria,
+    toConfirm: criteria.flatMap((line, i) => (re(shape.story.toConfirm).test(line) ? [i + 1] : [])),
     missing: [...(headings.length ? [] : [shape.story.criteria[0]]), ...shape.story.sections.filter((s) => !sections.has(s))],
   };
 }
@@ -302,6 +303,16 @@ function checkScript(lines, sections, { story, record }, add) {
     if (!source.split(shape.script.source.separator).includes(shape.script.firstQuestionSource)) {
       add(first?.n ?? sections.confirm?.line ?? 6, 'first-question', 'firstQuestion');
     }
+  }
+  // Found in regression 2 on the 40171b inputs: criterion 4's "To confirm" detail was never asked.
+  const confirm = sections.confirm;
+  const sources = [
+    ...(confirm?.items ?? []).map((i) => i.line.match(re(shape.script.source.pattern))?.[1] ?? ''),
+    ...(confirm?.notShown?.names ?? []),
+  ];
+  const asked = new Set(sources.flatMap((s) => [...s.matchAll(re(shape.script.toConfirmSource, 'g'))].map((m) => Number(m[1]))));
+  for (const n of story.toConfirm ?? []) {
+    if (!asked.has(n)) add(confirm?.line ?? 6, 'to-confirm', 'toConfirm', { n });
   }
   const total = story.criteria.length;
   const seen = new Map();

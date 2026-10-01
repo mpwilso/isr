@@ -53,7 +53,8 @@
       { "phrase": "left open in the build's plan", "from": "a risk the build's plan leaves undecided" },
       { "phrase": "raised in the build record", "from": "a risk the build record leaves undecided" }
     ],
-    "firstQuestionSource": "the story asks this first"
+    "firstQuestionSource": "the story asks this first",
+    "toConfirmSource": "\\bcriterion (\\d+) leaves this open\\b"
   },
 
   "notReady": {
@@ -86,6 +87,7 @@
   "story": {
     "criteria": ["Acceptance criteria", "Requirements"],
     "item": "^(?:- |\\d+\\. )",
+    "toConfirm": "\\bTo confirm:",
     "sections": ["Not included", "Known", "Unknown", "Assumed", "Questions before building"],
     "sectionWords": {
       "Acceptance criteria": "acceptance criteria",
@@ -158,6 +160,7 @@
     "noRecordSaid": "No build record was given. Say so under Not looked at, like \"no build record was given\".",
     "buildNotReadyType": "The record shows the build is not verified ({why}), so Type must be \"Decision needed\".",
     "buildNotReadyBottom": "The record shows the build is not verified ({why}). Start the Bottom line with \"The build is not verified yet\".",
+    "toConfirm": "Criterion {n} leaves a detail to confirm, so a Confirm item asks it with \"criterion {n} leaves this open\" in its source. If it is past the top five, its Not shown title ends with \"(criterion {n} leaves this open)\".",
     "firstQuestion": "The story has a First question, so the first Confirm item is that question, with \"the story asks this first\" in its source, like \"(the story asks this first; asked in the story)\".",
     "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\".",
     "skippedAllPassed": "The record says {skipped}, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",

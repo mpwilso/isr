@@ -59,3 +59,14 @@ Each entry names the note file it came from.
 - Several verified items rest on the plan, since the record only says the plan's tests passed. Reading the commit confirmed them this time.
 - What this does not show: any time saving, use by anyone but the builder, or a real run with the story written first.
 - Notes: `retro-run-2/story.md`, `retro-run-2/predictions.md`, `retro-run-2/record/`, `retro-run-2/run/script.md`.
+
+## Plain words for readers, and two regressions on the 40171b inputs, 2026-10-01
+
+- Why: four reader agents read the e9a55a script blind, each as one person: a product owner who is not technical, a QA tester, an engineer asked to size it, and a manager who doubts the tool. They come from the same family of model as ISR, did not see the story, and are not a human verdict. All four tripped on the same three things: criteria cited by number only, ISR's own source labels, and "Confirm (8)" over five shown items. Trust scores were 2, 2, 3 and 2 out of 5; all four said it was honest that nothing was verified, and none could act on it alone.
+- Changes: Covers lines name each criterion in plain words; Confirm sources use eight plain phrases, at most two per item; team words such as "blind checker" and "Second Eye" are banned in favor of "the automated reviewer"; capped lists say "(N, M shown)"; a criterion with a risk named against it in the record or plan can't go under Already verified, and the automated reviewer is never named as verifying behavior it did not test; every "To confirm" in a requirement must reach Confirm.
+- Running headless: the first attempt, in default mode, was denied reading the skill files through the link and denied mktemp. ISR returned an unshaped script labeled "Not checked". Cost $0.37. Later runs added `--permission-mode acceptEdits`, `--add-dir` for the skill folder and /tmp, and allowed mktemp, node and ls. That is not the setup of earlier runs.
+- Regression 1, cost $0.53, checker passed in 2 rounds: 2 verified, 3 to check by hand, 5 to confirm. One wrong item: criterion 3 was listed as verified by the tests and the automated reviewer, while the script's own first Confirm item repeated the reviewer's finding that the match is too loose. One Confirm source named seven places.
+- Regression 2, after the two-phrase cap and the named-risk rule, cost $0.66, checker passed in 1 round: 1 verified, 3 to check by hand, 6 to confirm (5 shown). Criterion 3 was back under Check by hand, sources named at most two places, and the reviewer was no longer named as a verifier. Gap: criterion 4's "To confirm" was not asked, which led to the new checker rule.
+- Variance: three runs on the same inputs put 3, 2 and 1 criteria under Already verified.
+- What this does not show: that a person finds the new wording clearer, or that the checker's new rules hold across other stories.
+- Notes: `blind-read-e9a55a/reads.md`, `retro-run-2-regress/`, `retro-run-2-regress-2/`.

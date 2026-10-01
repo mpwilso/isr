@@ -190,8 +190,25 @@ test('the command line: exit 1 with file and line on a problem, 2 on bad usage',
 test('a Confirm source names at most two places, and the first question keeps its phrase plus one', () => {
   // Found in the first regression after plain sources: one Confirm item ended with seven phrases.
   const first = (tail) => check(good.replace('(the story asks this first; criterion 3 leaves this open)', `(${tail})`), { story, record });
-  assert.deepEqual(first('the story asks this first'), []);
-  assert.deepEqual(first('the story asks this first; asked in the story'), []);
+  assert.deepEqual(first('the story asks this first; criterion 3 leaves this open'), []);
   assert.deepEqual(rules(first('the story asks this first; criterion 3 leaves this open; asked in the story')), ['source-count']);
+  const second = (tail) => check(good.replace('(open in the story)', `(${tail})`), { story, record });
+  assert.deepEqual(second('open in the story; asked in the story'), []);
+  assert.deepEqual(rules(second('open in the story; asked in the story; the story assumes this')), ['source-count']);
   assert.deepEqual(shape.script.source.max, 2);
+});
+
+test('every "To confirm" in a requirement reaches Confirm, shown or named in Not shown', () => {
+  // Found in regression 2 on the 40171b inputs: criterion 4's "To confirm" detail was never asked.
+  assert.deepEqual(story.toConfirm, [3]);
+  const asked = '(the story asks this first; criterion 3 leaves this open)';
+  const missing = good.replace(asked, '(the story asks this first; asked in the story)');
+  assert.deepEqual(rules(check(missing, { story, record })), ['to-confirm']);
+  const others = [3, 4, 5].map((n) => `- Is question ${n} answered yet? (open in the story)`).join('\n');
+  const hidden = (title) => missing
+    .replace('2 to confirm', '6 to confirm')
+    .replace('## Confirm (2)', '## Confirm (6, 5 shown)')
+    .replace('(open in the story)', `(open in the story)\n${others}\nNot shown (1): ${title}`);
+  assert.deepEqual(check(hidden('what an agent sees, and where (criterion 3 leaves this open)'), { story, record }), []);
+  assert.deepEqual(rules(check(hidden('what an agent sees, and where (criterion 3)'), { story, record })), ['to-confirm']);
 });
