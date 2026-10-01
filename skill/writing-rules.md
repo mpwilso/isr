@@ -20,7 +20,7 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
 
 - **Title:** a few words on what is checked.
 - **Risk:** the level, then "Why:" and one clause.
-- **Needs:** the account or data state the tester needs in place.
+- **Needs:** the account or data state the tester needs in place. When the check needs someone who can see billing, logs or staging data, Needs says "an engineer".
 - **Steps:** at most five, numbered, one short sentence each.
 - **Expect:** what the tester should see, as the story states it. When the story leaves a detail to confirm, say it is not settled yet and point to the Confirm item.
 - **Covers:** the criterion numbers.
@@ -33,7 +33,8 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 - The same thing found in two places is one line that names both sources.
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
-- Rank by how much the answer changes what the tester checks or what gets built. Questions about release timing or process come after those.
+- When the story has a First question line, the first Confirm item is that question, with "First question" in its source, like "(First question; Questions before building)". It uses one of the five slots.
+- Then order the rest: questions that change what a check by hand should expect, then questions that only matter if a check fails, then everything else.
 
 ## Lists and counts
 
@@ -46,7 +47,7 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 - **Type:** Recommendation, unless a check moved to Confirm or the build is not verified. Then Decision needed.
 - **Bottom line:** one sentence, with the counts and the one thing that matters most.
 - **Not looked at:** one sentence on what ISR could not see. Always the build itself, since ISR reads only text. Add a missing record, missing story sections, and gaps the record admits.
-- **Next:** one action for the product owner.
+- **Next:** one action for the product owner. Name a person only if the story names them.
 
 ## Words
 

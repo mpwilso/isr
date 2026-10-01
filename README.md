@@ -13,6 +13,6 @@ ISR is a skill for Claude Code. It reads a user story and the record of what the
 - `examples/pellwick/`: an invented story, build records, and the scripts ISR should write for them.
 - `scripts/test.sh`: every test. No test calls a model or the network.
 
-Status: Early. Milestone 1 in progress. Not ready to use.
+Status: Early. Milestone 1 works on invented example data and has not been tried on a real change.
 
 MIT license: [LICENSE](LICENSE).

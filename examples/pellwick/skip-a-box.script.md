@@ -13,11 +13,11 @@ Next: Give the two checks to a tester in staging, check 1 first.
 
 ### 1. No charge for a skipped box
 - Risk: High. Why: a wrong charge costs subscribers money, no automated check looked at billing, and the story lists billing for a moved box as unknown.
-- Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed.
+- Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
 - Steps:
   1. Skip the subscriber's next box from their account.
   2. Wait until the box's original ship date has passed in staging.
-  3. Look at the subscriber's charges for that date.
+  3. Ask the engineer for the subscriber's charges on that date.
 - Expect: no charge for the skipped box on its original ship date.
 - Covers: criterion 3.
 
@@ -27,13 +27,13 @@ Next: Give the two checks to a tester in staging, check 1 first.
 - Steps:
   1. Open the subscriber in Stockroom as an agent.
   2. Open their history.
-- Expect: a note that the customer skipped the box. Its exact wording, and whether it shows the date and time, are still open (Confirm 4).
+- Expect: a note that the customer skipped the box. Its exact wording, and whether it shows the date and time, are still open (Confirm 2).
 - Covers: criterion 4.
 
 ## Confirm (12)
+- Does skipping count as a payments change under the December freeze, since it affects charging? (First question; Questions before building)
+- What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4)
+- If billing does charge a skipped box, is fixing that part of this story or a separate one? (Questions before building)
 - After a skip, the build shows "Your next box is skipped" and the new delivery date, but the story left how the page shows the date to confirm. Is that what the page should say? (inferred by the build; criterion 1)
 - Which system decides the next regular delivery date, the web app or Stockroom, since they sometimes disagree? (Questions before building; the build's review raised it too)
-- Where does skipping sit: the account home page, the "change my box" page, or both? (Unknown)
-- What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4)
-- Does skipping count as a payments change under the December freeze? (Questions before building)
-Not shown (7): skipping a box whose payment already failed; whether a billing fix is part of this story; skipping the box after one already skipped; the cutoff passing while the page is open; what the page shows once the cutoff has passed; undoing a skip before the cutoff; changes to the cutoff while skipping is live
+Not shown (7): where skipping sits on the account; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; what the page shows once the cutoff has passed; undoing a skip before the cutoff; changes to the cutoff while skipping is live

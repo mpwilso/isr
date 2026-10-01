@@ -39,7 +39,8 @@
       "sentenceSplit": "(?<=[.!?])\\s+(?=[A-Z])",
       "risks": ["High", "Medium", "Low"]
     },
-    "movedToConfirm": "moved to Confirm"
+    "movedToConfirm": "moved to Confirm",
+    "firstQuestionSource": "\\([^()]*\\bFirst question\\b[^()]*\\)$"
   },
 
   "notReady": {
@@ -67,7 +68,8 @@
     "criteria": "Acceptance criteria",
     "item": "^(?:- |\\d+\\. )",
     "sections": ["Acceptance criteria", "Not included", "Known", "Unknown", "Assumed", "Questions before building"],
-    "notReady": "^(?:Call: Not ready yet|# Not ready yet)\\s*$"
+    "notReady": "^(?:Call: Not ready yet|# Not ready yet)\\s*$",
+    "firstQuestion": "^First question: (?!None)\\S"
   },
 
   "record": {
@@ -119,6 +121,7 @@
     "noRecordSaid": "No build record was given. Say so under Not looked at, like \"no build record was given\".",
     "buildNotReadyType": "The record shows the build is not verified ({why}), so Type must be \"Decision needed\".",
     "buildNotReadyBottom": "The record shows the build is not verified ({why}). Start the Bottom line with \"The build is not verified yet\".",
+    "firstQuestion": "The story has a First question, so the first Confirm item is that question, with \"First question\" in its source, like \"(First question; Questions before building)\".",
     "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\"."
   }
 }

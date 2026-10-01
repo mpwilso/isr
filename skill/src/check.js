@@ -27,6 +27,7 @@ export function readStory(text) {
   const thin = re(shape.story.notReady, 'm').test(text);
   return {
     notReady: thin || criteria.length === 0,
+    firstQuestion: re(shape.story.firstQuestion, 'm').test(text),
     criteria,
     missing: shape.story.sections.filter((s) => !sections.has(s)),
   };
@@ -250,6 +251,10 @@ function checkScript(lines, sections, { story, record }, add) {
   const notLookedAt = (lines[2] ?? '').toLowerCase();
   for (const section of story.missing) {
     if (!notLookedAt.includes(section.toLowerCase())) add(3, 'missing-sections', 'missingStorySection', { section });
+  }
+  if (story.firstQuestion) {
+    const first = sections.confirm?.items[0];
+    if (!first || !re(shape.script.firstQuestionSource).test(first.line)) add(first?.n ?? sections.confirm?.line ?? 6, 'first-question', 'firstQuestion');
   }
   const total = story.criteria.length;
   const seen = new Map();
