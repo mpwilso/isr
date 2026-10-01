@@ -19,7 +19,7 @@ You get one script, always in the same shape. It starts with four lines:
 
 - **Type:** Recommendation, or Decision needed.
 - **Bottom line:** one sentence, with the counts.
-- **Not looked at:** what ISR could not see, always including the build itself.
+- **Not looked at:** what ISR could not see. In a script, that always includes the build itself. In the not ready report, it is any build record, since there are no acceptance criteria to check it against.
 - **Next:** one action for the product owner.
 
 Then these sections:
@@ -61,7 +61,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    node skill/src/check.js script.md --story story.md --record record
    ```
 
-   Leave out `--record` when there is no record. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0.
+   Leave out `--record` when there is no record. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0. On bad usage, or a file it cannot read, it exits 2.
 
 ## What it must not do
 
