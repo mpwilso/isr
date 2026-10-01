@@ -136,7 +136,7 @@ Not shown (1): Should the Accept and merge button text and the product docs desc
 - **Reworded reply.** In 1 of 3 smoke runs on the invented example, the reply was reworded after the checker had passed the saved script, which broke a step rule.
 - **Loupe bug stories.** They have neither `## Requirements` nor `## Acceptance criteria`, so ISR calls them not ready.
 
-The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes.
+The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes. Each run behind these points is in the [run log](docs/run-log.md).
 
 ## Related tools
 
