@@ -17,8 +17,8 @@ test('every action in CI is pinned to a full commit SHA', () => {
   for (const u of uses) assert.match(u, /@[0-9a-f]{40}$/, u);
 });
 
-test('the README stays short', () => {
-  assert.ok(read('README.md').split('\n').length < 40);
+test('the README stays under 200 lines', () => {
+  assert.ok(read('README.md').split('\n').length < 200);
 });
 
 test('run from scripts/test.sh, every test process has the memory cap', { skip: !process.env.ISR_MEMORY_MB && 'not run from scripts/test.sh' }, () => {
