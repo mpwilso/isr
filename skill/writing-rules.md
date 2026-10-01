@@ -7,6 +7,8 @@ The checker catches some of these, not all.
 Every acceptance criterion appears exactly once:
 
 - **Already verified:** an automated check in the record covers it and passed. Write the outcome in business words, then "Verified by:" and what checked it, then "Criterion N." When the record says some tests were skipped, give both counts, like "43 passed and 1 skipped", never "43 of 43".
+  - "Verified by" names only checks the record says ran and passed. Never name the automated reviewer as verifying behavior when the record says it did not run the tests.
+  - A criterion can't go here when the build record or plan names a risk against it, such as a reviewer finding that a match is too loose. Put it under Check by hand. If the risk is a question for the business instead, ask it under Confirm and list the criterion under Not covered with "moved to Confirm".
 - **Check by hand:** no automated check covered it, or covered only part of it. One check can cover several criteria; two checks never cover the same one.
 - **Not covered:** neither, with the reason, like "Criterion 5: moved to Confirm, since the story does not say what should happen."
 
@@ -32,7 +34,7 @@ Use the story's own words for pages, systems and people. No file names, ticket i
 
 ## Confirm
 
-Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions before building, and outcomes the build inferred that the story never stated. Each item is a question for the business, ending with its source in parentheses, in plain words a reader outside the team understands. Use only these phrases, joined by "; " when there are several:
+Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions before building, and outcomes the build inferred that the story never stated. Each item is a question for the business, ending with its source in parentheses, in plain words a reader outside the team understands. Use only these phrases, at most two, joined by "; ":
 
 - "the story asks this first": the story's First question line.
 - "criterion N leaves this open": a "To confirm" detail in criterion N.
@@ -45,7 +47,7 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 The reader never sees the story's section names, such as "Questions before building" or "Assumed".
 
-- The same thing found in two places is one line that names both sources.
+- The same thing found in several places is one line. Its source names at most two of them: pick the phrase that best tells the reader where the question came from. The first question keeps "the story asks this first" plus at most one more.
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
 - When the intent, plan or record already answers something the story lists as Unknown or asks under Questions before building, don't ask it cold. Say what the build chose and where it is recorded, ask whether that is right, and add "the build decided this" to the source.
 - A risk the plan or record says is undecided is a Confirm item, even when the story never mentions it, with the source "left open in the build's plan" or "raised in the build record".
@@ -67,4 +69,4 @@ The reader never sees the story's section names, such as "Questions before build
 
 ## Words
 
-Plain words a product owner would use, and none of the team's own: call the record's blind checker "the automated reviewer". No em dashes, en dashes or double hyphens used as dashes. No verdict fields: no pass, fail, status, result, checkbox or sign-off.
+Plain words a product owner would use, and none of the team's own: call the record's blind checker, Second Eye, "the automated reviewer". No em dashes, en dashes or double hyphens used as dashes. No verdict fields: no pass, fail, status, result, checkbox or sign-off.

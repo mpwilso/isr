@@ -25,8 +25,8 @@ Next: Ask Theo and Sam whether a box created before 1 December keeps 72 hours, t
 - Both switches fall inside the December freeze dates. Does the freeze cover this change? (the story asks this first; asked in the story)
 - The build reads "from 1 December" as boxes that ship from 1 December, not changes made from that date, as its intent records. Is that right? (open in the story; the build decided this)
 - The build switches to 96 hours and back on its own, from a date range in its configuration, as its plan records. Should it, or should someone switch it by hand? (asked in the story; the build decided this)
-- The build gives a box created before 1 December that ships after it the 96 hour cutoff, as its intent records. Is that right, or should it keep 72 hours? (criterion 3 leaves this open; open in the story; the build decided this)
-- The build's plan has not decided whether to keep updating the cutoff stored on each box, so an agent in Stockroom may see 72 hours where the page shows 96. Should agents see the same cutoff as subscribers? (left open in the build's plan; raised in the build record; the story assumes this)
+- The build gives a box created before 1 December that ships after it the 96 hour cutoff, as its intent records. Is that right, or should it keep 72 hours? (criterion 3 leaves this open; the build decided this)
+- The build's plan has not decided whether to keep updating the cutoff stored on each box, so an agent in Stockroom may see 72 hours where the page shows 96. Should agents see the same cutoff as subscribers? (left open in the build's plan; the story assumes this)
 Not shown (3): the page open when the cutoff switches; the time of day and time zone of each switch; who tells agents about the 96 hour cutoff
 
 ## Not covered (1)

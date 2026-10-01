@@ -26,7 +26,7 @@ If one of these sections is missing, say so under Not looked at in plain words, 
 
 A Parallax task folder (`docs/tasks/ID/`) holds three files:
 
-- `record.md`: written only when the task was accepted. Found says how many tests passed, how many were skipped, and what the blind checker said. In the script, call the blind checker "the automated reviewer". Lines like "Second Eye didn't check:" and the Not looked at line say what nothing checked.
+- `record.md`: written only when the task was accepted. Found says how many tests passed, how many were skipped, and what the blind checker said. In the script, call the blind checker, Second Eye, "the automated reviewer". Lines like "Second Eye didn't check:" and the Not looked at line say what nothing checked.
 - `intent.md`: the numbered outcomes the build aimed at. `asked:` means the person asked for it. `inferred:` means the build added it.
 - `plan.md`: the steps, tests and risks. Its toml block maps each outcome to the tests that cover it (`covers`).
 

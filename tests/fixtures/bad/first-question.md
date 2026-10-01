@@ -21,7 +21,7 @@ Next: Decide what agents should see for a paused subscriber, then give check 1 t
 
 ## Confirm (2)
 - Should a pause end on its own after a set time? (open in the story)
-- What should an agent see in Stockroom when a subscriber has paused reminders, and where? (the story asks this first; criterion 3 leaves this open; asked in the story)
+- What should an agent see in Stockroom when a subscriber has paused reminders, and where? (the story asks this first; criterion 3 leaves this open)
 
 ## Not covered (1)
 - Criterion 3: moved to Confirm, since the story does not say what an agent should see.

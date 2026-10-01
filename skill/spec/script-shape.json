@@ -42,7 +42,7 @@
       "risks": ["High", "Medium", "Low"]
     },
     "movedToConfirm": "moved to Confirm",
-    "source": { "pattern": "\\(([^()]+)\\)$", "separator": "; " },
+    "source": { "pattern": "\\(([^()]+)\\)$", "separator": "; ", "max": 2 },
     "sources": [
       { "phrase": "the story asks this first", "from": "the story's First question line" },
       { "phrase": "criterion N leaves this open", "from": "a \"To confirm\" detail in criterion N" },
@@ -67,6 +67,7 @@
     "doubleHyphen": "(^|\\s)--(?=\\s|$)|\\w--\\w",
     "teamWords": [
       { "pattern": "\\bblind (?:checker|(?:code )?review)\\b", "flags": "i", "instead": "the automated reviewer" },
+      { "pattern": "\\bSecond Eye\\b", "flags": "i", "instead": "the automated reviewer" },
       { "pattern": "\\bQuestions before building\\b", "flags": "i", "instead": "a plain phrase, like \"asked in the story\"" },
       { "pattern": "\\bAssumed\\b", "flags": "", "instead": "a plain phrase, like \"the story assumes this\"" }
     ],
@@ -134,6 +135,7 @@
     "noCriterion": "Say which criterion this covers, like \"Criterion 2.\"",
     "coversName": "Name each criterion in a few plain words after its number, like \"Covers: criterion 4 (the clone fixes origin and git trust).\" For two: \"criterion 1 (...) and criterion 2 (...)\".",
     "confirmSource": "Say where this came from in plain words, using only these, joined by \"; \": {phrases}.",
+    "sourceCount": "This source names {count} places; the limit is {max}. Keep the one that best tells the reader where the question came from, plus \"the story asks this first\" on the first question.",
     "teamWords": "A reader outside the team won't know \"{found}\". Use {instead}.",
     "checkNumber": "Number the checks in order: expected \"### {expected}.\"",
     "checkField": "Check {n} is missing \"{label}\", or it is out of order. Each check has, in order: {order}.",

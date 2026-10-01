@@ -21,7 +21,7 @@ The build team ran these on Monday.
 - Covers: criterion 2 (shipping emails still arrive).
 
 ## Confirm (2)
-- What should an agent see in Stockroom when a subscriber has paused reminders, and where? (the story asks this first; criterion 3 leaves this open; asked in the story)
+- What should an agent see in Stockroom when a subscriber has paused reminders, and where? (the story asks this first; criterion 3 leaves this open)
 - Should a pause end on its own after a set time? (open in the story)
 
 ## Not covered (1)

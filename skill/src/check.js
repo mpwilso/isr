@@ -224,9 +224,12 @@ function checkScript(lines, sections, { story, record }, add) {
   for (const item of sections.confirm?.items ?? []) {
     const source = item.line.match(re(shape.script.source.pattern))?.[1];
     if (!source) continue; // item-shape reports a missing source
-    if (!source.split(shape.script.source.separator).every((part) => phrases.some((p) => sourcePattern(p).test(part)))) {
+    const parts = source.split(shape.script.source.separator);
+    if (!parts.every((part) => phrases.some((p) => sourcePattern(p).test(part)))) {
       add(item.n, 'confirm-source', 'confirmSource', { phrases: phrases.map((p) => `"${p}"`).join(', ') });
     }
+    // Found in the first regression after plain sources: one item ended with seven phrases.
+    if (parts.length > shape.script.source.max) add(item.n, 'source-count', 'sourceCount', { count: parts.length, max: shape.script.source.max });
   }
 
   for (const key of ['verified', 'notCovered']) {

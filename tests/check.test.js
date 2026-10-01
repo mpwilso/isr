@@ -165,13 +165,15 @@ test('Confirm sources use only the plain phrases in the shape file', () => {
 });
 
 test('the first Confirm item says the story asks it first', () => {
-  const old = good.replace('(the story asks this first; criterion 3 leaves this open; asked in the story)', '(First question; criterion 3 leaves this open; asked in the story)');
+  const old = good.replace('(the story asks this first; criterion 3 leaves this open)', '(First question; criterion 3 leaves this open)');
   assert.deepEqual(rules(check(old, { story, record })), ['confirm-source', 'first-question']);
 });
 
-test('the record\'s blind checker is called the automated reviewer', () => {
+test('the record\'s blind checker, Second Eye, is called the automated reviewer', () => {
   const said = (words) => check(good.replace('the build itself,', `the build itself and what ${words} did not see,`), { story, record });
-  for (const words of ['the blind checker', 'the Blind Checker', 'a blind code review']) assert.deepEqual(rules(said(words)), ['team-words'], words);
+  for (const words of ['the blind checker', 'the Blind Checker', 'a blind code review', 'Second Eye', 'Second Eye, the automated reviewer,']) {
+    assert.deepEqual(rules(said(words)), ['team-words'], words);
+  }
   assert.deepEqual(said('the automated reviewer'), []);
 });
 
@@ -183,4 +185,13 @@ test('the command line: exit 1 with file and line on a problem, 2 on bad usage',
   const missing = spawnSync('node', [CHECKER, 'no-such-file.md'], { encoding: 'utf8' });
   assert.equal(missing.status, 2);
   assert.match(missing.stderr, /^Not checked: /);
+});
+
+test('a Confirm source names at most two places, and the first question keeps its phrase plus one', () => {
+  // Found in the first regression after plain sources: one Confirm item ended with seven phrases.
+  const first = (tail) => check(good.replace('(the story asks this first; criterion 3 leaves this open)', `(${tail})`), { story, record });
+  assert.deepEqual(first('the story asks this first'), []);
+  assert.deepEqual(first('the story asks this first; asked in the story'), []);
+  assert.deepEqual(rules(first('the story asks this first; criterion 3 leaves this open; asked in the story')), ['source-count']);
+  assert.deepEqual(shape.script.source.max, 2);
 });
