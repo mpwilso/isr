@@ -1,7 +1,7 @@
 Type: Decision needed
 Bottom line: The build is not verified yet, so hold the by-hand checks until it is; 0 verified, 4 to check by hand, 12 to confirm.
 Not looked at: the build's test results and review, since its task folder has no record, which means it never reached its ready state; the build itself.
-Next: Ask the developers to finish verifying the build, then give these checks to a tester.
+Next: Hold these checks until the build is verified, then ask Sam to run check 1 and give checks 2 to 4 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account
 
@@ -15,7 +15,7 @@ None. The build has no record of passing its tests yet.
 - Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
 - Steps:
   1. Skip the subscriber's next box from their account.
-  2. Wait until the box's original ship date has passed in staging.
+  2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
   3. Ask the engineer for the subscriber's charges on that date.
 - Expect: no charge for the skipped box on its original ship date.
 - Covers: criterion 3.

@@ -21,7 +21,7 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
 - **Title:** a few words on what is checked.
 - **Risk:** the level, then "Why:" and one clause.
 - **Needs:** the account or data state the tester needs in place. When the check needs someone who can see billing, logs or staging data, Needs says "an engineer".
-- **Steps:** at most five, numbered, one short sentence each.
+- **Steps:** at most five, numbered, one short sentence each. A step that depends on time passing names who makes it pass and how, using only what the story or record says; if they say nothing, the step asks the engineer to make that date pass in the test environment and says the story does not say how.
 - **Expect:** what the tester should see, as the story states it. When the story leaves a detail to confirm, say it is not settled yet and point to the Confirm item.
 - **Covers:** the criterion numbers.
 

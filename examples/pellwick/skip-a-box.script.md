@@ -1,7 +1,7 @@
 Type: Recommendation
 Bottom line: 2 verified, 2 to check by hand, 12 to confirm; nothing has checked that a skipped box is not charged, so check 1 matters most.
 Not looked at: the build itself, since ISR read only the story and the build record and takes the record's word on what its tests cover.
-Next: Give the two checks to a tester in staging, check 1 first.
+Next: Ask Sam to run check 1 in staging, then give check 2 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account
 
@@ -16,7 +16,7 @@ Next: Give the two checks to a tester in staging, check 1 first.
 - Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
 - Steps:
   1. Skip the subscriber's next box from their account.
-  2. Wait until the box's original ship date has passed in staging.
+  2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
   3. Ask the engineer for the subscriber's charges on that date.
 - Expect: no charge for the skipped box on its original ship date.
 - Covers: criterion 3.

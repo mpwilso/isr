@@ -1,7 +1,7 @@
 Type: Recommendation
 Bottom line: 0 verified, 4 to check by hand, 12 to confirm; with no build record, every criterion needs a person to check it.
 Not looked at: no build record was given, so nothing counts as verified, and ISR did not look at the build itself.
-Next: Ask the developers for the build record before testing, since it may already cover some of these checks.
+Next: Ask Sam to run check 1 in staging, then give checks 2 to 4 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account
 
@@ -15,7 +15,7 @@ None. No build record was given.
 - Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
 - Steps:
   1. Skip the subscriber's next box from their account.
-  2. Wait until the box's original ship date has passed in staging.
+  2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
   3. Ask the engineer for the subscriber's charges on that date.
 - Expect: no charge for the skipped box on its original ship date.
 - Covers: criterion 3.
