@@ -1,6 +1,6 @@
 # ISR
 
-Status: Early. Tried on one real change, in one run, judged by the person who built it, and once more on an older change after the fact. No time saving has been shown.
+Status: Early. Tried on one real change, in one run, judged by the person who built it, and on two older changes after the fact. No time saving has been shown.
 
 ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 

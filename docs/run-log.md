@@ -45,3 +45,17 @@ Each entry names the note file it came from.
 - Predictions hit: the fresh-distro check was marked High with an engineer sizing it and no durations, and the Node minimum question came first under Confirm. Predicted miss: ISR put 0 under Already verified, because the record shows only 22 tests, not the full suite.
 - What this does not show: any time saving, or that the script helps anyone but the person who built the change.
 - Notes: `retro-run-1/run/story.md`, `retro-run-1/run/record/`, `retro-run-1/run/script.md`.
+
+## After-the-fact run on an older Parallax task (40171b), 2026-10-01
+
+- This is an after-the-fact run, not a clean test, and the first run under the run protocol in Matt's notes. Loupe wrote the story in a fresh claude.ai chat from the task's build request. The record is Parallax's task 40171b. The advisor knew the record when predicting and judging.
+- No baseline: Matt chose to skip it, so this run says nothing about time saved.
+- Inputs: story 7893 bytes; record files 2957, 4407 and 1967 bytes, copied byte for byte.
+- Run: skill at b7344bd, in Claude Code on claude-opus-5-5. Cost $0.56. About 3 minutes by Claude Code's wall clock, which includes reopening the session to read the cost. ISR ran the checker twice: the first run flagged the Not shown count, and the second passed on Node 22.23.3.
+- Result: Type Recommendation, 3 verified, 2 to check by hand (both Medium), 8 to confirm (5 shown, 3 not shown).
+- Predictions, written before the story and the run: hits on the Type, the number verified, the first question, tightening the bare "namespace" match, and the hint wording and heading name. ISR also kept the web card as a check by hand even though the browser test passed, because nobody read the web card code, which was the careful call. Miss: Not looked at did not say the tests were the plan's two files and not the full suite; the e9a55a run did say so.
+- Hand check, reading only, against the commit that landed the task (c6b512d): the four tests the plan named exist, the matching words match Confirm 1, the hint wording matches Confirm 3, and the heading "Allow user namespaces" exists in docs/wsl.md. No wrong items found. The two checks by hand were not attempted; they need an engineer and a test environment.
+- Judgment: ISR made the bare "namespace" match its headline and a Medium check. The blind checker in the record called that risk small. Low or a Confirm item would have fit better. This is a difference of judgment, not an error.
+- Several verified items rest on the plan, since the record only says the plan's tests passed. Reading the commit confirmed them this time.
+- What this does not show: any time saving, use by anyone but the builder, or a real run with the story written first.
+- Notes: `retro-run-2/story.md`, `retro-run-2/predictions.md`, `retro-run-2/record/`, `retro-run-2/run/script.md`.
