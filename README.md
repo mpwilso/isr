@@ -63,12 +63,18 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
 
    Leave out `--record` when there is no record. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0.
 
-## What it never does
+## What it must not do
 
-- Pass or fail acceptance, or write any verdict, result or sign-off.
+The checker rejects a script that has:
+
+- A verdict, result, status or sign-off field, or a checkbox, below the four top lines.
+
+The skill is told not to do these, and the checker cannot catch them:
+
+- Pass or fail acceptance.
 - Edit the story or the record. It writes its script to a temporary folder unless you ask for a copy.
 - Write a hand check whose expected result the story does not define. It asks about it under Confirm instead.
-- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it.
+- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The rule has been checked on one smoke run on the invented example and one run on the real change's inputs only.
 - Run tests, start an app, open a browser or touch any environment.
 
 ## An example
