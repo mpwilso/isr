@@ -43,6 +43,11 @@ for (const [what, dash] of [['an em dash', String.fromCodePoint(0x2014)], ['an e
   });
 }
 
+test('a script with Type: FYI is rejected on line 1', () => {
+  const fyi = good.replace('Type: Decision needed', 'Type: FYI');
+  assert.deepEqual(check(fyi, { story, record }).filter((p) => p.rule === 'top-lines').map((p) => p.line), [1]);
+});
+
 test('with a story and no record, the no record rules apply', () => {
   const problems = check(good, { story });
   assert.deepEqual(rules(problems), ['no-record']);

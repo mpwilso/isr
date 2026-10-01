@@ -1,6 +1,6 @@
 {
   "top": [
-    { "pattern": "^Type: (Decision needed|Recommendation|FYI)$", "message": "Line 1 must read \"Type: Decision needed\", \"Type: Recommendation\" or \"Type: FYI\"." },
+    { "pattern": "^Type: (Decision needed|Recommendation)$", "message": "Line 1 must read \"Type: Decision needed\" or \"Type: Recommendation\"." },
     { "pattern": "^Bottom line: \\S", "message": "Line 2 must start with \"Bottom line: \", one sentence." },
     { "pattern": "^Not looked at: \\S", "message": "Line 3 must start with \"Not looked at: \", what ISR could not see." },
     { "pattern": "^Next: \\S", "message": "Line 4 must start with \"Next: \", one action for the product owner." }
