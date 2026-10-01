@@ -21,13 +21,13 @@ ISR is a skill that runs in Claude Code. It writes a script and nothing more; it
    - Check by hand: only what no automated check covered, ranked by risk, each with what the tester needs in place, a few short steps and the expected result.
    - Confirm: guessed details, unknowns and assumptions from the story, and anything the build inferred that the story never stated.
 4. Every acceptance criterion in the story appears exactly once: verified, by hand, or named as not covered. When a list runs past five items, the script shows the top five and names the rest.
-5. A person reviews the script before anyone uses it.
-6. Records each result with evidence, traced to the story.
-7. Classifies a failed check as a build mistake, a requirements gap or a wrong assumption, and says where the lesson should go: a new eval case for the build tool, or the story tool's team context.
+5. A person reviews the script before anyone uses it. Not built yet.
+6. Records each result with evidence, traced to the story. Not built yet.
+7. Classifies a failed check as a build mistake, a requirements gap or a wrong assumption, and says where the lesson should go: a new eval case for the build tool, or the story tool's team context. Not built yet.
 
 It prepares acceptance. It never passes it; a person always makes that call.
 
-## Later: after release
+## Later: after release (not built)
 
 Take a production failure, with its root cause from the team's incident tools, trace it to the change and the story, and classify it the same three ways. Blameless, and facts kept apart from inferences and unknowns. Not designed yet; it needs real failures to design against.
 
@@ -38,7 +38,7 @@ Type, Bottom line, Not looked at, Next; then what was verified, what to check by
 ## Never
 
 - Pass acceptance on anyone's behalf.
-- Touch production. Read-only, lower environments for anything it runs.
+- Run tests, start an app, open a browser or touch any environment, production included.
 - Blame a person. Findings describe conditions and gaps.
 - State a guess as a fact. Unknowns stay unknown.
 - Keep secrets, credentials or customer data.
