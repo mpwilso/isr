@@ -44,3 +44,4 @@ Each entry names the note file it came from.
 - Misses: the record's point about the order of the unset commands did not appear in the script; only its matching risk did, under Not shown. The em dash nit also went under Not shown rather than becoming a check.
 - Predictions hit: the fresh-distro check was marked High with an engineer sizing it and no durations, and the Node minimum question came first under Confirm. Predicted miss: ISR put 0 under Already verified, because the record shows only 22 tests, not the full suite.
 - What this does not show: any time saving, or that the script helps anyone but the person who built the change.
+- Notes: `retro-run-1/run/story.md`, `retro-run-1/run/record/`, `retro-run-1/run/script.md`.

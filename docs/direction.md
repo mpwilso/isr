@@ -2,8 +2,6 @@
 
 ISR is reconnaissance before and after release. Before release, it turns what the story asked and what the build already proved into a short acceptance script, so the people accepting a change check only what a person needs to. After release, it traces failures back to the story and says whether the code, the requirement or an assumption was wrong.
 
-ISR here means intelligence, surveillance and reconnaissance, not Incremental Static Regeneration.
-
 It is not a test management tool, a test runner or an incident tool. Teams keep theirs. ISR's script is plain Markdown that can be pasted into whatever they already use.
 
 ## Who it's for
