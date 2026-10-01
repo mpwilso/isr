@@ -4,8 +4,6 @@ Status: Early. Tried on one real change, in one run, judged by the person who bu
 
 ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
-ISR here means intelligence, surveillance and reconnaissance, not Incremental Static Regeneration.
-
 ## The problem it addresses
 
 When a change lands, whoever accepts it has to work out what the build already showed and what still needs a person. ISR reads the story and the build record and writes that down: what automated checks verified, what to check by hand, and what the business still has to confirm.
@@ -47,6 +45,8 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    cp -r isr/skill YOUR_PROJECT/.claude/skills/isr
    ```
 
+   Installing by copy was checked only as far as Claude Code listing the skill; the full run was last done with the skill folder symlinked, not copied.
+
 2. Put the story and the task folder in the project, open Claude Code there, and ask in plain words. For example:
 
    ```
@@ -73,7 +73,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
 
 ## An example
 
-This is the script from the one real run. It does not pass today's checker: it was written by an earlier version, before the heading and effort changes (today's checker flags its "43 of 43", since the record says 1 test was skipped).
+This is the script from the one real run. It does not pass today's checker: it was written by an earlier version, before the heading and effort changes (today's checker flags its "43 of 43", since the record says 1 test was skipped). Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
 
 The story's acceptance criteria, shortened, and numbered as the script uses them:
 
