@@ -33,7 +33,7 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 - The same thing found in two places is one line that names both sources.
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
-- Rank by how much the answer changes what gets tested or built.
+- Rank by how much the answer changes what the tester checks or what gets built. Questions about release timing or process come after those.
 
 ## Lists and counts
 
@@ -45,7 +45,7 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 - **Type:** Recommendation, unless a check moved to Confirm or the build is not verified. Then Decision needed.
 - **Bottom line:** one sentence, with the counts and the one thing that matters most.
-- **Not looked at:** what ISR could not see. Always the build itself, since ISR reads only text. Add a missing record, missing story sections, and gaps the record admits.
+- **Not looked at:** one sentence on what ISR could not see. Always the build itself, since ISR reads only text. Add a missing record, missing story sections, and gaps the record admits.
 - **Next:** one action for the product owner.
 
 ## Words

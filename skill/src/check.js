@@ -3,7 +3,7 @@
 // With --story it also checks that every acceptance criterion appears exactly once.
 // With --story and no --record, it holds the script to the rules for "no record was given".
 // Prints one line per problem and exits 1, or prints "Checked with Node VERSION." and exits 0.
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -289,4 +289,5 @@ export function main(args) {
   return 0;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) process.exitCode = main(process.argv.slice(2));
+// realpath, so the checker also runs when the skill folder is a symlink.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) process.exitCode = main(process.argv.slice(2));

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { shape } from '../skill/src/check.js';
@@ -39,6 +39,18 @@ test('a copy of just the skill folder checks a script on its own', () => {
     cpSync('skill', join(dir, 'isr'), { recursive: true });
     const ex = resolve('examples/pellwick');
     const out = execFileSync('node', ['isr/src/check.js', `${ex}/skip-a-box.script.md`, '--story', `${ex}/skip-a-box.story.md`, '--record', `${ex}/skip-a-box.record`], { cwd: dir, encoding: 'utf8' });
+    assert.match(out, /^Checked with Node /);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the checker still runs when the skill folder is a symlink', () => {
+  // Found in smoke run 1: through a symlinked skill folder the checker printed nothing and exited 0.
+  const dir = mkdtempSync(join(tmpdir(), 'isr-link-'));
+  try {
+    symlinkSync(resolve('skill'), join(dir, 'isr'));
+    const out = execFileSync('node', ['isr/src/check.js', resolve('tests/fixtures/good.script.md')], { cwd: dir, encoding: 'utf8' });
     assert.match(out, /^Checked with Node /);
   } finally {
     rmSync(dir, { recursive: true, force: true });
