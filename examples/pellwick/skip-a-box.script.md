@@ -13,7 +13,7 @@ Next: Ask Sam to run check 1 in staging, then give check 2 to a tester.
 
 ### 1. No charge for a skipped box
 - Risk: High. Why: a wrong charge costs subscribers money, no automated check looked at billing, and the story lists billing for a moved box as unknown.
-- Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
+- Needs: a subscriber in staging whose next box's cutoff has not passed, and an engineer who can see billing in staging. This takes more than a few minutes, since the engineer has to make a ship date pass in staging and read billing; likely under an hour, a guess.
 - Steps:
   1. Skip the subscriber's next box from their account.
   2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
@@ -35,5 +35,5 @@ Next: Ask Sam to run check 1 in staging, then give check 2 to a tester.
 - What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4)
 - If billing does charge a skipped box, is fixing that part of this story or a separate one? (Questions before building)
 - After a skip, the build shows "Your next box is skipped" and the new delivery date, but the story left how the page shows the date to confirm. Is that what the page should say? (inferred by the build; criterion 1)
-- Which system decides the next regular delivery date, the web app or Stockroom, since they sometimes disagree? (Questions before building; the build's review raised it too)
-Not shown (7): where skipping sits on the account; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; what the page shows once the cutoff has passed; undoing a skip before the cutoff; changes to the cutoff while skipping is live
+- The build takes the next regular delivery date from the web app, as its plan records, though the web app and Stockroom sometimes disagree. Is the web app the right source? (Questions before building; inferred by the build)
+Not shown (7): where skipping sits, which the build put on the account page; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; what the page shows once the cutoff has passed; undoing a skip before the cutoff; changes to the cutoff while skipping is live

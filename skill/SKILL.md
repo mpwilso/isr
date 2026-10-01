@@ -24,7 +24,7 @@ ISR writes one acceptance script for a change: what the build already verified, 
    - The build record: a task folder, a file or pasted text, if the user gave or pointed to one. Don't go looking for one, and don't ask; with none, go on without it.
    - Make a temporary folder, and save any pasted text there, so the checker can read it.
 2. **Read the story** by section name, as `SKILL/reading.md` says. If it is too thin to build from, write the not ready report from `SKILL/templates/not-ready.md`, and no script. Go to step 5.
-3. **Read the record**, as `SKILL/reading.md` says: what passed, what nothing checked, what the build inferred, and whether the build reached its ready state.
+3. **Read the record**, as `SKILL/reading.md` says: what passed and what was skipped, what nothing checked, what the build inferred or decided, which risks it left undecided, and whether the build reached its ready state.
 4. **Write the script** in the shape of `SKILL/templates/acceptance-script.md`, following `SKILL/writing-rules.md`. Save it as `acceptance-script.md` in the temporary folder. Save a copy into the project only if the user asks.
 5. **Run the checker:**
    ```

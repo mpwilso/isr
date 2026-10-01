@@ -66,6 +66,19 @@ test('a build that did not reach ready: Type and Bottom line must say so', () =>
   }
 });
 
+test('a record with skipped tests: Verified by gives both counts, never "N of N"', () => {
+  // Found in real run 1: the record said 43 passed and 1 skipped, and the script said "43 of 43".
+  const skipped = readRecord(`${FIX}/record-skipped.md`);
+  assert.equal(skipped.skipped, 1);
+  assert.equal(record.skipped, 0);
+  assert.equal(readRecord(`${EX}/holiday-cutoff.record`).skipped, 2);
+  assert.deepEqual(rules(check(good, { story, record: skipped })), ['skipped-tests']);
+  const passing = good.replace('6 of 6 passing', '6 passing');
+  assert.deepEqual(rules(check(passing, { story, record: skipped })), ['skipped-tests']);
+  const both = good.replace('6 of 6 passing', '6 passed and 1 skipped');
+  assert.deepEqual(check(both, { story, record: skipped }), []);
+});
+
 test('a story too thin to build from gets the not ready report, not a script', () => {
   const thin = readStory(read(`${EX}/export-notes.story.md`));
   assert.ok(thin.notReady);

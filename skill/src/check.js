@@ -37,18 +37,19 @@ export function readStory(text) {
 export function readRecord(path) {
   if (statSync(path).isDirectory()) {
     const file = join(path, shape.record.folderFile);
-    if (!existsSync(file)) return { notReady: `the task folder has no ${shape.record.folderFile}` };
+    if (!existsSync(file)) return { notReady: `the task folder has no ${shape.record.folderFile}`, skipped: 0 };
     path = file;
   }
   const text = readFileSync(path, 'utf8');
+  const skipped = Math.max(0, ...[...text.matchAll(re(shape.record.skipped, 'g'))].map((m) => Number(m[1])));
   for (const pattern of shape.record.notReady) {
     const m = text.match(re(pattern, 'm'));
-    if (m) return { notReady: `the record says "${m[0]}"` };
+    if (m) return { notReady: `the record says "${m[0]}"`, skipped };
   }
   for (const m of text.matchAll(re(shape.record.passedOf, 'g'))) {
-    if (Number(m[1]) < Number(m[2])) return { notReady: `the record says "${m[0]}"` };
+    if (Number(m[1]) < Number(m[2])) return { notReady: `the record says "${m[0]}"`, skipped };
   }
-  return { notReady: null };
+  return { notReady: null, skipped };
 }
 
 export function check(text, { story = null, record = null } = {}) {
@@ -215,6 +216,18 @@ function checkScript(lines, sections, { story, record }, add) {
       const found = refs(name);
       if (!found.length) add(shown.line, 'item-shape', 'noCriterion');
       for (const n of found) covered.push([n, shown.line]);
+    }
+  }
+
+  // Found in real run 1: a record with a skipped test, and a Verified by that said "43 of 43".
+  if (record?.skipped) {
+    const r = shape.record;
+    for (const item of sections.verified?.items ?? []) {
+      const all = item.line.match(re(r.allPassed));
+      if (all) add(item.n, 'skipped-tests', 'skippedAllPassed', { n: record.skipped, text: all[0] });
+      else if (re(r.passedCount).test(item.line) && !re(fill(r.skippedCount, { n: record.skipped })).test(item.line)) {
+        add(item.n, 'skipped-tests', 'skippedNotSaid', { n: record.skipped });
+      }
     }
   }
 

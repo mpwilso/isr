@@ -6,7 +6,7 @@ The checker catches some of these, not all.
 
 Every acceptance criterion appears exactly once:
 
-- **Already verified:** an automated check in the record covers it and passed. Write the outcome in business words, then "Verified by:" and what checked it, then "Criterion N."
+- **Already verified:** an automated check in the record covers it and passed. Write the outcome in business words, then "Verified by:" and what checked it, then "Criterion N." When the record says some tests were skipped, give both counts, like "43 passed and 1 skipped", never "43 of 43".
 - **Check by hand:** no automated check covered it, or covered only part of it. One check can cover several criteria; two checks never cover the same one.
 - **Not covered:** neither, with the reason, like "Criterion 5: moved to Confirm, since the story does not say what should happen."
 
@@ -21,6 +21,9 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
 - **Title:** a few words on what is checked.
 - **Risk:** the level, then "Why:" and one clause.
 - **Needs:** the account or data state the tester needs in place. When the check needs someone who can see billing, logs or staging data, Needs says "an engineer".
+  - Describe the starting state only with what the story or record establishes, and as the product shows it, like "a box that shows on the change my box page" rather than a state behind the scenes. If you can't tell that the state can be reached, say an engineer should confirm how.
+  - Never ask anyone to set up what the story, plan or record says is already in place.
+  - When the check takes more than a few minutes, say so in plain words: what makes it long, like a test project, a real build or a date that has to pass, and roughly how long. Label the time as a guess unless the story or record gives it.
 - **Steps:** at most five, numbered, one short sentence each. A step that depends on time passing names who makes it pass and how, using only what the story or record says; if they say nothing, the step asks the engineer to make that date pass in the test environment and says the story does not say how.
 - **Expect:** what the tester should see, as the story states it. When the story leaves a detail to confirm, say it is not settled yet and point to the Confirm item.
 - **Covers:** the criterion numbers.
@@ -33,8 +36,10 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 - The same thing found in two places is one line that names both sources.
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
-- When the story has a First question line, the first Confirm item is that question, with "First question" in its source, like "(First question; Questions before building)". It uses one of the five slots.
-- Then order the rest: questions that change what a check by hand should expect, then questions that only matter if a check fails, then everything else.
+- When the intent, plan or record already answers something the story lists as Unknown or asks under Questions before building, don't ask it cold. Say what the build chose and where it is recorded, ask whether that is right, and add "inferred by the build" to the source.
+- A risk the plan or record says is undecided is a Confirm item, even when the story never mentions it, with the source "the build's plan" or "the build record".
+- When the story has a First question line, the first Confirm item is that question, with "First question" in its source, like "(First question; Questions before building)". It uses one of the five slots. If the build already answered it, the item still comes first, in the build's choice form above.
+- Then order the rest: questions that change what a check by hand should expect, then questions that only matter if a check fails and risks the build left undecided, then everything else.
 
 ## Lists and counts
 

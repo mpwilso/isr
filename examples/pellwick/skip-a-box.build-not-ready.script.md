@@ -12,7 +12,7 @@ None. The build has no record of passing its tests yet.
 
 ### 1. No charge for a skipped box
 - Risk: High. Why: a wrong charge costs subscribers money, and the story lists billing for a moved box as unknown.
-- Needs: a subscriber in staging with a card on file and a next box whose cutoff has not passed, and an engineer who can see billing in staging.
+- Needs: a subscriber in staging whose next box's cutoff has not passed, and an engineer who can see billing in staging. This takes more than a few minutes, since the engineer has to make a ship date pass in staging and read billing; likely under an hour, a guess.
 - Steps:
   1. Skip the subscriber's next box from their account.
   2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
@@ -51,7 +51,7 @@ None. The build has no record of passing its tests yet.
 ## Confirm (12)
 - Does skipping count as a payments change under the December freeze, since it affects charging? (First question; Questions before building)
 - After a skip, the build shows "Your next box is skipped" and the new delivery date, but the story left how the page shows the date to confirm. Is that what the page should say? (inferred by the build; criterion 1)
-- Which system decides the next regular delivery date, the web app or Stockroom, since they sometimes disagree? (Questions before building; the build's plan raised it too)
+- The build takes the next regular delivery date from the web app, as its plan records, though the web app and Stockroom sometimes disagree. Is the web app the right source? (Questions before building; inferred by the build)
 - What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4)
 - What should the page show once the cutoff has passed? (criterion 2)
-Not shown (7): whether a billing fix is part of this story; where skipping sits on the account; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; undoing a skip before the cutoff; changes to the cutoff while skipping is live
+Not shown (7): whether a billing fix is part of this story; where skipping sits, which the build put on the account page; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; undoing a skip before the cutoff; changes to the cutoff while skipping is live
