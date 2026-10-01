@@ -70,3 +70,15 @@ Each entry names the note file it came from.
 - Variance: three runs on the same inputs put 3, 2 and 1 criteria under Already verified.
 - What this does not show: that a person finds the new wording clearer, or that the checker's new rules hold across other stories.
 - Notes: `blind-read-e9a55a/reads.md`, `retro-run-2-regress/`, `retro-run-2-regress-2/`.
+
+## Three runs with the rules held fixed, on the 40171b inputs, 2026-10-01
+
+- Why: to separate variation from the model from variation caused by rule changes. Earlier runs on these inputs put 3, 2 and 1 criteria under Already verified, but the rules changed between them.
+- Setup: master 026a514, the same story and record copied byte for byte into three folders, the README prompt word for word, and the same permission flags as the regressions.
+- Cost: $0.47, $0.47 and $0.56, $1.50 in total. Each run's checker passed in one round.
+- Agreed in all three: Type Recommendation; the first question and its source; the five Confirm questions shown; three checks by hand; criterion 1 and criterion 3 under Check by hand; criterion 5 under Already verified.
+- Differed: criterion 2 was verified in run 2 and checked by hand in runs 1 and 3, although the plan names a risk against that step in the WSL guide; risk levels (criterion 1 High once and Medium twice, criterion 4 from Medium to Low); how criteria were grouped into checks; the order of Confirm items; and which items fell under Not shown.
+- Verified counts: 1, 2 and 1. Most of the earlier spread of 3, 2 and 1 came from rule changes.
+- Wrong item: run 2 said the build's plan states something about the error wording that the plan does not say; the plan says the wording likely comes from the agent runtime. Counting the first regression, two of the last five runs on these inputs had a wrong item, both about where a claim came from.
+- Decision: no new rules from these inputs. Five runs on one story risk fitting rules to that story. The next evidence should come from a different story.
+- Notes: `variance-40171b/run-1`, `run-2` and `run-3`.
