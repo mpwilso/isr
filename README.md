@@ -1,12 +1,23 @@
 # ISR
 
+Writes the acceptance script for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.
+
 Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 12 runs. Every result is in the run log, including the misses.
 
-ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
+ISR is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
 ## The problem it addresses
 
 When a change lands, whoever accepts it has to work out what the build already showed and what still needs a person. ISR reads the story and the build record and writes that down: what automated checks verified, what to check by hand, and what the business still has to confirm.
+
+## How I tested it
+
+- Wrote predictions before runs and scored the script against them.
+- Checked the script's claims against the commit that actually landed.
+- Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
+- Measured how much runs vary with the rules held fixed: three runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
+- Counted wrong items: two of the last five runs on the same inputs credited a claim to the wrong source. One led to a new rule; the other was logged and left, so the rules don't get fitted to one story.
+- Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 ## What you give it and what you get
 
@@ -33,6 +44,74 @@ Every criterion in the story appears exactly once: under Already verified, Check
 
 If the story is too thin to build from, ISR writes a short not ready report instead of a script.
 
+## An example
+
+This is the script from a run on a real Parallax change, task 40171b, which adds a hint to error cards when the sandbox can't start; it was written by the current rules, its story and record are in [examples/parallax-40171b/](examples/parallax-40171b/), and the original record is also public in the Parallax repo at [docs/tasks/40171b/](https://github.com/mpwilso/parallax/tree/master/docs/tasks/40171b).
+
+The story's requirements, shortened, and numbered as the script uses them:
+
+1. When the sandbox can't start, the error card adds a one or two line hint to run `parallax doctor`, under the real problem.
+2. If the error mentions namespaces or bwrap, the hint also points to the user-namespace step in the WSL guide, which gets a findable heading.
+3. An error that isn't a sandbox start failure gets no hint.
+4. `parallax show` and the web card show the same hint, and the card's options, question and retry behavior stay as they are.
+5. A test covers both cases: a namespace or bwrap error shows both pointers, and another sandbox start error shows only the `parallax doctor` line.
+
+```text
+Type: Recommendation
+Bottom line: 1 verified, 3 to check by hand, 8 to confirm; the most important thing is that the build spots a sandbox start failure only by key words in the error text, and the automated reviewer found that any error mentioning "namespace" also gets the hint.
+Not looked at: ISR did not see the build itself, the record says the automated reviewer did not run the tests or see how the web card reads the extra lines or how the card shape checks treat them, and nobody looked at what wording real sandbox start failures produce beyond the one example.
+Next: Answer the first Confirm question on how a sandbox start failure should be recognized, then ask an engineer to size the three checks by hand.
+
+# Acceptance script: Add a doctor hint to Parallax error cards when the sandbox won't start
+
+## Already verified (1)
+- Automated tests cover both cases: a namespace or bwrap error shows both pointers, and another sandbox start error shows only the parallax doctor line. Verified by: the build's automated tests, 42 of 42 passed. Criterion 5.
+
+## Check by hand (3)
+
+### 1. A real sandbox start failure shows the hint
+- Risk: Medium. Why: the tests used a typed copy of the example error, so it is not known whether real sandbox start failures use wording the build recognizes.
+- Needs: an engineer, and a test machine where the sandbox can't start because user namespaces are blocked, as the WSL guide describes for Ubuntu 24.04; the engineer should confirm how to set this up and size it before anyone commits to it.
+- Steps:
+  1. Ask the engineer to run a task on that machine so it stops because the sandbox won't start.
+  2. Run parallax show for that task.
+  3. Read the card's bottom line and the lines under the error.
+  4. Follow the pointer to the WSL guide in the docs.
+- Expect: the bottom line still leads with the real problem, and the card adds one or two lines: one says to run parallax doctor, and for a namespace or bwrap error one points to the user-namespace step, which has a heading you can find in the guide. The heading name and the exact wording are not settled yet; see the second and fourth Confirm items.
+- Covers: criterion 1 (a sandbox start failure gets a one or two line doctor hint under the real problem) and criterion 2 (namespace or bwrap errors also point to a findable user-namespace step in the guide).
+
+### 2. Other errors get no hint
+- Risk: Medium. Why: a test showed one unrelated error gets no hint, but the automated reviewer found that any error mentioning "namespace", even from another tool, would get one.
+- Needs: an engineer who can make a task stop on an error that is not a sandbox start failure; the engineer should confirm how and size it before anyone commits to it.
+- Steps:
+  1. Ask the engineer to make a task stop on an ordinary error unrelated to the sandbox.
+  2. Run parallax show for that task and read the card.
+  3. Ask the engineer to make a task stop on an unrelated error whose text mentions a namespace.
+  4. Run parallax show for that task and read the card.
+- Expect: both cards look as they do today, with no parallax doctor line and no pointer to the guide. If the second card shows a hint, see the fifth Confirm item.
+- Covers: criterion 3 (errors that are not sandbox start failures get no hint).
+
+### 3. The web card matches and the card's behavior is unchanged
+- Risk: Low. Why: a browser test checked that the hint appears in the web card, but nobody looked at how the web view lays out the extra lines, and the automated reviewer could not confirm how it reads them.
+- Needs: the task from check 1, stopped because the sandbox won't start, and access to the web view.
+- Steps:
+  1. Run parallax show for the task and note the hint lines.
+  2. Open the same task's card in the web view.
+  3. Compare the hint, question, options and default option with parallax show and with a card from before this change.
+  4. Retry the task so the same error repeats.
+- Expect: the web card shows the same hint as parallax show, laid out cleanly; the question, options and default option are the same as today; and the task is dropped after the repeated error, as it is today. Whether the web card needed its own change is not settled yet; see the third Confirm item.
+- Covers: criterion 4 (parallax show and the web card show the same hint, and the card's options, question and retry behavior stay as they are).
+
+## Confirm (8, 5 shown)
+- The build treats an error as a sandbox start failure when its text contains "sandbox runtime", "srt:", "bwrap" or "namespace", so a failure worded any other way gets no hint; is that the right way to recognize it? (the story asks this first; the build decided this)
+- The build named the new heading in the WSL guide "Allow user namespaces"; is that the name you want? (criterion 2 leaves this open; the build decided this)
+- The build relies on the web card picking up the hint from the parallax show text and made no change to the web view itself; is that right, or does the web card need its own change? (criterion 4 leaves this open; the build decided this)
+- The build's hint reads "Run parallax doctor to find the cause." and, for namespace or bwrap errors, "For the user-namespace step, see "Allow user namespaces" in docs/wsl.md."; is that the wording you want? (asked in the story; the build decided this)
+- The automated reviewer suggested matching only "user namespace" or "create new namespace" so unrelated errors that mention a namespace get no hint; should the match be tightened before release? (raised in the build record)
+
+Not shown (3): links that pointed at the old user-namespace step in the guide; whether tasks that stopped before this change show the hint; whether the error text alone is enough to spot a sandbox failure without changing what is logged
+```
+
 ## How to use it
 
 You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothing else, and no network.
@@ -45,7 +124,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    cp -r isr/skill YOUR_PROJECT/.claude/skills/isr
    ```
 
-   Installing by copy was checked only as far as Claude Code listing the skill; the full run was last done with the skill folder symlinked, not copied.
+   Installing by copy has been checked only as far as Claude Code listing the skill.
 
 2. Put the story and the task folder in the project, open Claude Code there, and ask in plain words. For example:
 
@@ -74,86 +153,22 @@ The skill is told not to do these, and the checker cannot catch them:
 - Pass or fail acceptance.
 - Edit the story or the record. It writes its script to a temporary folder unless you ask for a copy.
 - Write a hand check whose expected result the story does not define. It asks about it under Confirm instead.
-- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The earlier wording of this rule was checked on one smoke run and one run on the real change's inputs; the current wording has been checked on one smoke run and one run on an older change, and neither gave a duration.
+- Give a duration for a hand check; instead it says what the check needs and that the engineer should size it.
 - Run tests, start an app, open a browser or touch any environment.
-
-## An example
-
-This is the script from the first real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. Today's checker rejects it even on its own: its Covers line gives only a number, its Confirm sources use the story's section names, it says "the blind checker", and its Confirm heading does not say how many are shown. The record for this run is not included here. With it, the checker also flags the "43 of 43", because the record says 1 test was skipped. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
-
-The story's acceptance criteria, shortened, and numbered as the script uses them:
-
-1. A task whose base is still the tip of master fast-forwards as it does today.
-2. A task whose base has moved: Parallax merges master into the task, re-runs the pre-merge test gate, and lands it on the first click if the gate passes.
-3. Merging master in hits a conflict: nothing is merged, and Parallax says so.
-4. The gate fails after master is merged in: nothing is merged.
-5. A task merged this way shows as merged afterward.
-
-```text
-Type: Recommendation
-Bottom line: 4 verified, 1 to check by hand, 6 to confirm; the one thing that matters most is that the build's tests used a stand-in for the pre-merge test gate, so nobody has yet seen the real suite run on the merged code before a moved-base task lands.
-Not looked at: The build itself, the Parallax code behind the gate and the merged check, which the blind checker also did not see or run, and the two minor risks the record admits: any merge error is reported as a conflict, and a refused final step can leave the task branch moved.
-Next: Get Matt's answer to the first question, which commit is recorded as tested, before running the check by hand.
-
-# Acceptance script: Let Accept and merge land a task whose base has moved
-
-## Already verified (4)
-- When the task's base is still the tip of master, Accept and merge fast-forwards as it does today. Verified by: the existing fast-forward tests, part of the 43 of 43 plan tests that passed. Criterion 1.
-- When merging master into the task hits a conflict, nothing is merged, master and the task stay as they were, and Parallax answers with a conflict message. Verified by: the conflict tests, run directly and through the server. Criterion 3.
-- When the gate fails after master is merged in, nothing is merged and master and the task stay as they were. Verified by: the gate failure test. Criterion 4.
-- A task landed this way shows as merged, and a rebased or cherry-picked copy does not. Verified by: the moved-base landing test and the merged-rule guard test. Criterion 5.
-
-## Check by hand (1)
-
-### 1. A moved-base task lands on one click with the real gate
-- Risk: High. Why: the tests checked the merge and the landing with a stand-in for the gate, and the blind checker could not confirm the real suite runs on the merged code, so untested code could reach master.
-- Needs: an engineer, to set the pre-merge test gate to the whole suite and read the ledger; a project in a test environment with a task accepted and not yet merged.
-- Steps:
-  1. Add a commit to master that does not touch the task's files.
-  2. Choose Accept and merge once.
-  3. Watch what Parallax shows until the run ends.
-  4. Ask the engineer which commit the gate ran on and what it reported.
-- Expect: Parallax merges master into the task, the gate runs the whole suite, and the task lands on that first click with no second confirmation. What you see while it runs is not settled yet, see Confirm item 2. Which commit the gate tests is not settled yet, see Confirm item 1.
-- Covers: criterion 2.
-
-## Confirm (6)
-- The gate tests the commit made by merging master into the task, but Parallax records the accepted commit as the one tested. Should it record the merge commit as the tested one? (First question; Questions before building; criterion 2; Unknown)
-- What should the developer see while master is merged in and the gate runs? (criterion 2; Unknown; Questions before building)
-- Does the whole suite the pre-merge gate runs include the task's saved tests? (Assumed; Questions before building)
-- When the merge hits a conflict, what should Parallax show, and what should the developer do next? (criterion 3; Unknown; Questions before building)
-- If the update or the gate fails, should Parallax keep the updated branch or discard it, and what should the task show? The build discards it. (criterion 4; Unknown; Questions before building)
-
-Not shown (1): Should the Accept and merge button text and the product docs describe both paths, fast-forward and merging master in?
-```
-
-## How I tested it
-
-- Wrote predictions before runs and scored the script against them.
-- Checked the script's claims against the commit that actually landed.
-- Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
-- Measured how much runs vary with the rules held fixed: three runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
-- Counted wrong items: two of the last five runs on the same inputs credited a claim to the wrong source. One led to a new rule; the other was logged and left, so the rules don't get fitted to one story.
-- Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 ## Known limits
 
-- **No check by hand run to the end.** On the first real change, an attempt at the check by hand took about 70 minutes and did not get far enough to run it. The checks by hand from the two older changes were not attempted.
-- **Claude Code only.** It has been tested in Claude Code and nowhere else.
-- **Starting states.** It does not reliably describe a starting state the product can reach. After a fix for this, the starting-state check held in 1 of 3 regression runs on the same real inputs.
-- **Duration.** It cannot know how long a hand check takes. In 3 of 3 regression runs it guessed minutes for a check that took about 70 minutes to attempt, so it now says what a check needs and gives no duration.
-- **Reworded reply.** In 1 of 3 smoke runs on the invented example, the reply was reworded after the checker had passed the saved script, which broke a step rule.
-- **Loupe bug stories.** ISR reads stories with a Requirements or Acceptance criteria section; a Loupe bug report has neither, so ISR calls it not ready.
-- **Fixes checked on the same inputs.** The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes.
+- No check by hand has been run to the end yet.
+- Tested in Claude Code only.
+- Loupe bug reports have no criteria section, so ISR calls them not ready.
 - Not shown yet: use by a team, or a time saving. Those need real users.
 
-## Related tools
-
-- [Loupe](https://github.com/mpwilso/loupe) writes the story.
-- [Parallax](https://github.com/mpwilso/parallax) runs the agents and keeps the record.
+The rest, run by run, is in [docs/run-log.md](docs/run-log.md).
 
 ## What's here
 
 - `skill/`: the skill, self-contained. `skill/spec/script-shape.json` holds the script's shape as data, and `skill/src/check.js` enforces it.
+- `examples/parallax-40171b/`: the README example's story, record and script, copied byte for byte from a real run; a test runs the checker on them.
 - `examples/pellwick/`: invented stories, build records, and the scripts ISR should write for them. Pellwick is an invented company.
 - `scripts/test.sh`: every test.
 

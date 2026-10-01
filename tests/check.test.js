@@ -24,6 +24,13 @@ for (const file of readdirSync(EX).filter((f) => f.endsWith('.script.md'))) {
   });
 }
 
+// The README example: a real run's script, kept byte for byte with its story and record.
+test('the README example, examples/parallax-40171b, passes the checker against its story and record', () => {
+  const dir = 'examples/parallax-40171b';
+  const args = [CHECKER, `${dir}/script.md`, '--story', `${dir}/story.md`, '--record', `${dir}/record`];
+  assert.match(execFileSync('node', args, { encoding: 'utf8' }), /^Checked with Node \d+\.\d+\.\d+\.\n$/);
+});
+
 test('the good fixture passes', () => {
   assert.deepEqual(check(good, { story, record }), []);
 });

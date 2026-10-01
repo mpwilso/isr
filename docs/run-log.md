@@ -9,12 +9,14 @@ Each entry names the note file it came from.
 - Run: ISR on one real change, the Parallax change that lets Accept and merge land a task whose base has moved.
 - Input: the story for that change, and the record of Parallax task 786e71. That record says 43 plan tests passed and 1 was skipped, Second Eye, the blind checker, passed it, 7 files changed, and the build cost an estimated $2.63 of a $5.00 cap.
 - Result: a script with 4 verified, 1 to check by hand and 6 to confirm, shown in the README. The builder judged it. An attempt at the hand check took about 70 minutes and $1.47 and did not get far enough to run it.
+- README: this script was the README example until the README switched to the 40171b script in `examples/parallax-40171b/`.
 - Notes: `real-run-1/run/record/record.md`, `real-run-1/run/script.md`, `real-run-1/after.txt`.
 
 ## Regression on the real-run inputs, 3 runs
 
 - Run: ISR after the first fixes, three times, with the same request and inputs as real run 1.
 - Result: four of six checks held in all three runs. The starting-state check held in 1 of 3. All three guessed minutes for the gate run in the hand check, against the about 70 minutes the real attempt took (`real-run-1/after.txt` line 13), so the effort was understated in 3 of 3. Cost: $0.54, $0.52 and $0.59.
+- What this does not show: that the fixes hold on other inputs. These runs reused the inputs that exposed the problems, so they show only whether a fix held on those inputs.
 - Notes: `report-m2.md`.
 
 ## Smoke runs on the invented example, 3 runs
