@@ -23,13 +23,15 @@ export function readStory(text) {
       if (current) sections.set(current, []);
     } else if (current) sections.get(current).push(line);
   }
-  const criteria = (sections.get(shape.story.criteria) ?? []).filter((l) => re(shape.story.item).test(l));
+  // Loupe's v1 stories say "Acceptance criteria"; its v2 stories say "Requirements". Either counts.
+  const headings = shape.story.criteria.filter((s) => sections.has(s));
+  const criteria = headings.flatMap((s) => sections.get(s)).filter((l) => re(shape.story.item).test(l));
   const thin = re(shape.story.notReady, 'm').test(text);
   return {
     notReady: thin || criteria.length === 0,
     firstQuestion: re(shape.story.firstQuestion, 'm').test(text),
     criteria,
-    missing: shape.story.sections.filter((s) => !sections.has(s)),
+    missing: [...(headings.length ? [] : [shape.story.criteria[0]]), ...shape.story.sections.filter((s) => !sections.has(s))],
   };
 }
 

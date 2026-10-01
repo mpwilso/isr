@@ -79,6 +79,20 @@ test('a record with skipped tests: Verified by gives both counts, never "N of N"
   assert.deepEqual(check(both, { story, record: skipped }), []);
 });
 
+test('a story with Requirements in place of Acceptance criteria is read the same way', () => {
+  // Loupe's story format v2 writes "## Requirements", numbered; v1 stories keep "## Acceptance criteria".
+  const v2 = readStory(read(`${FIX}/story-requirements.md`));
+  assert.equal(v2.notReady, false);
+  assert.equal(v2.criteria.length, 3);
+  assert.deepEqual(v2.missing, []);
+  assert.deepEqual(check(good, { story: v2, record }), []);
+  // Every requirement still appears exactly once.
+  const twice = good.replace('- Covers: criterion 2.', '- Covers: criteria 1 and 2.');
+  assert.deepEqual(rules(check(twice, { story: v2, record })), ['coverage-duplicate']);
+  const gone = good.replace(/\n## Not covered[\s\S]*$/, '\n').replace(', 1 not covered', '');
+  assert.deepEqual(rules(check(gone, { story: v2, record })), ['coverage-missing']);
+});
+
 test('a story too thin to build from gets the not ready report, not a script', () => {
   const thin = readStory(read(`${EX}/export-notes.story.md`));
   assert.ok(thin.notReady);

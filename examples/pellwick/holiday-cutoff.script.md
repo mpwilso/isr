@@ -12,7 +12,7 @@ Next: Ask Theo and Sam whether a box created before 1 December keeps 72 hours, t
 
 ### 1. The page shows 96 hours over the holidays and 72 after
 - Risk: High. Why: a wrong cutoff lets subscribers change boxes the warehouse has already packed, and the build's tests used a stand-in clock, so nothing checked the page against real dates.
-- Needs: an engineer, and two subscribers in staging: one whose box on the "change my box" page ships between 1 December and 4 January, and one whose box ships on or after 5 January. The story and record do not say how staging gets boxes with those ship dates, so the engineer should confirm how first. The holiday dates come with the build, so nothing needs setting. This takes more than a few minutes, since it needs the build in staging and boxes with holiday ship dates; likely under an hour, a guess.
+- Needs: an engineer, and two subscribers in staging: one whose box on the "change my box" page ships between 1 December and 4 January, and one whose box ships on or after 5 January. The story and record do not say how staging gets boxes with those ship dates, so the engineer should confirm how first. The holiday dates come with the build, so nothing needs setting. It needs the build in staging and boxes with holiday ship dates, so the engineer should size it before anyone commits to it.
 - Steps:
   1. Open the first subscriber's "change my box" page.
   2. Read the cutoff it shows.

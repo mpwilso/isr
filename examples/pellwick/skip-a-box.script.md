@@ -13,7 +13,7 @@ Next: Ask Sam to run check 1 in staging, then give check 2 to a tester.
 
 ### 1. No charge for a skipped box
 - Risk: High. Why: a wrong charge costs subscribers money, no automated check looked at billing, and the story lists billing for a moved box as unknown.
-- Needs: a subscriber in staging whose next box's cutoff has not passed, and an engineer who can see billing in staging. This takes more than a few minutes, since the engineer has to make a ship date pass in staging and read billing; likely under an hour, a guess.
+- Needs: a subscriber in staging whose next box's cutoff has not passed, and an engineer who can see billing in staging. It needs the engineer to make a ship date pass in staging and read billing, so the engineer should size it before anyone commits to it.
 - Steps:
   1. Skip the subscriber's next box from their account.
   2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.

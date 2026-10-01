@@ -65,9 +65,9 @@
   },
 
   "story": {
-    "criteria": "Acceptance criteria",
+    "criteria": ["Acceptance criteria", "Requirements"],
     "item": "^(?:- |\\d+\\. )",
-    "sections": ["Acceptance criteria", "Not included", "Known", "Unknown", "Assumed", "Questions before building"],
+    "sections": ["Not included", "Known", "Unknown", "Assumed", "Questions before building"],
     "notReady": "^(?:Call: Not ready yet|# Not ready yet)\\s*$",
     "firstQuestion": "^First question: (?!None)\\S"
   },
