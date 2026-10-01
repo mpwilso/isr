@@ -23,7 +23,7 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
 - **Needs:** the account or data state the tester needs in place. When the check needs someone who can see billing, logs or staging data, Needs says "an engineer".
   - Describe the starting state only with what the story or record establishes, and as the product shows it, like "a box that shows on the change my box page" rather than a state behind the scenes. If you can't tell that the state can be reached, say an engineer should confirm how.
   - Never ask anyone to set up what the story, plan or record says is already in place.
-  - When the check needs more than a few minutes, say in plain words what it needs, like a test project, a real build, a date that has to pass or an engineer, and that the engineer should size it before anyone commits to it. Never give a duration; ISR can't know how long a check takes.
+  - When the check needs an engineer, a real build, a test project or a date that has to pass, say so in plain words, and say that the engineer should size it before anyone commits to it. Never give a duration; ISR can't know how long a check takes.
 - **Steps:** at most five, numbered, one short sentence each. A step that depends on time passing names who makes it pass and how, using only what the story or record says; if they say nothing, the step asks the engineer to make that date pass in the test environment and says the story does not say how.
 - **Expect:** what the tester should see, as the story states it. When the story leaves a detail to confirm, say it is not settled yet and point to the Confirm item.
 - **Covers:** the criterion numbers.
