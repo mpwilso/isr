@@ -79,7 +79,7 @@ The skill is told not to do these, and the checker cannot catch them:
 
 ## An example
 
-This is the script from the one real run. It does not pass today's checker: it was written by an earlier version, before the heading and effort changes (today's checker flags its "43 of 43", since the record says 1 test was skipped). Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
+This is the script from the one real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. The record for this run is not included here. With it, today's checker flags the "43 of 43", because the record says 1 test was skipped. Without it, the script passes when checked on its own; checked against the story with no record, it fails the no record rules, since it lists items as verified. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
 
 The story's acceptance criteria, shortened, and numbered as the script uses them:
 
