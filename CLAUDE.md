@@ -4,8 +4,8 @@ ISR is a skill that prepares the people who accept a software change. Read docs/
 
 ## Rules
 
-- Clean room. This is a personal project. Do not use names, code, prompts, structure or wording from any employer or work tool. Design every feature from scratch in ISR's own terms. If you are unsure whether something resembles a work tool, stop and ask Matt.
-- Never edit, commit to or check out branches in the Loupe or Parallax repos. Read them only, at master, with git show and git ls-tree.
+- Clean room. ISR is a personal project and original work. Bring nothing in from another organization's tools or internal material: no names, code, prompts, structure or wording. Design every feature from scratch in ISR's own terms. If you are unsure whether something resembles another organization's tool or material, stop and ask the owner, Matt Wilson.
+- [Loupe](https://github.com/mpwilso/loupe) writes the stories ISR reads, and [Parallax](https://github.com/mpwilso/parallax) runs the build agents and keeps the records ISR reads; both are separate repos. Never edit, commit to or check out branches in them. Read them only, at master, with git show and git ls-tree. For anything else from them, ask the owner.
 - No em dashes, en dashes or double hyphens used as dashes, anywhere. Plain, human wording.
 - Less is more, in docs, output, README and code. A reader should get the gist in 30 seconds. If something can be cut, cut it.
 - The report shape is law. Every script ISR produces has the same shape every time. The shape lives in the skill's shape file as data, and the template and checker follow it.
