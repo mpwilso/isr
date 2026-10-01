@@ -1,6 +1,6 @@
 # ISR
 
-Status: Early. Tried on one real change, in one run, judged by the person who built it, and on two older changes after the fact. No time saving has been shown.
+Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 12 runs. Every result is in the run log, including the misses.
 
 ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
@@ -53,7 +53,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    Here is a story (story.md) and the build record (the record folder). What should the product owner check by hand?
    ```
 
-   ISR writes the script in a temporary folder, runs its checker, and replies with the script. Ask it to save a copy if you want one in the project.
+   ISR writes the script in a temporary folder, runs its checker, and replies with the script. Ask it to save a copy if you want one in the project. The checker is there because a model's output changes from run to run, so plain code checks the script's shape and hard rules instead of trusting the model to.
 
 3. To check a script yourself, from the root of this repo:
 
@@ -74,12 +74,12 @@ The skill is told not to do these, and the checker cannot catch them:
 - Pass or fail acceptance.
 - Edit the story or the record. It writes its script to a temporary folder unless you ask for a copy.
 - Write a hand check whose expected result the story does not define. It asks about it under Confirm instead.
-- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The earlier wording of this rule was checked on one smoke run and one run on the real change's inputs; the current wording has been checked on one smoke run only.
+- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The earlier wording of this rule was checked on one smoke run and one run on the real change's inputs; the current wording has been checked on one smoke run and one run on an older change, and neither gave a duration.
 - Run tests, start an app, open a browser or touch any environment.
 
 ## An example
 
-This is the script from the one real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. Today's checker rejects it even on its own: its Covers line gives only a number, its Confirm sources use the story's section names, it says "the blind checker", and its Confirm heading does not say how many are shown. The record for this run is not included here. With it, the checker also flags the "43 of 43", because the record says 1 test was skipped. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
+This is the script from the first real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. Today's checker rejects it even on its own: its Covers line gives only a number, its Confirm sources use the story's section names, it says "the blind checker", and its Confirm heading does not say how many are shown. The record for this run is not included here. With it, the checker also flags the "43 of 43", because the record says 1 test was skipped. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
 
 The story's acceptance criteria, shortened, and numbered as the script uses them:
 
@@ -126,18 +126,25 @@ Next: Get Matt's answer to the first question, which commit is recorded as teste
 Not shown (1): Should the Accept and merge button text and the product docs describe both paths, fast-forward and merging master in?
 ```
 
-## Status and known limits
+## How I tested it
 
-- **One real change.** ISR has been tried on one real change: the Parallax change that lets Accept and merge land a task whose base has moved, where before it only fast-forwarded. That was one real run, and the person who built ISR also judged it. In the first real run, the change was not run by hand after it landed (see [docs/run-log.md](docs/run-log.md)).
-- **No time saving shown.** Nothing here measures time saved.
+- Wrote predictions before runs and scored the script against them.
+- Checked the script's claims against the commit that actually landed.
+- Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
+- Measured how much runs vary with the rules held fixed: three runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
+- Counted wrong items: two of the last five runs on the same inputs credited a claim to the wrong source. One led to a new rule; the other was logged and left, so the rules don't get fitted to one story.
+- Full detail, run by run: [docs/run-log.md](docs/run-log.md).
+
+## Known limits
+
+- **No check by hand run to the end.** On the first real change, an attempt at the check by hand took about 70 minutes and did not get far enough to run it. The checks by hand from the two older changes were not attempted.
 - **Claude Code only.** It has been tested in Claude Code and nowhere else.
 - **Starting states.** It does not reliably describe a starting state the product can reach. After a fix for this, the starting-state check held in 1 of 3 regression runs on the same real inputs.
 - **Duration.** It cannot know how long a hand check takes. In 3 of 3 regression runs it guessed minutes for a check that took about 70 minutes to attempt, so it now says what a check needs and gives no duration.
 - **Reworded reply.** In 1 of 3 smoke runs on the invented example, the reply was reworded after the checker had passed the saved script, which broke a step rule.
 - **Loupe bug stories.** ISR reads stories with a Requirements or Acceptance criteria section; a Loupe bug report has neither, so ISR calls it not ready.
-- **Runs vary.** With the rules held fixed, three runs on the same story and record agreed on the Type, the first question, the five Confirm questions shown and four of five criteria. They differed on one criterion (verified once, checked by hand twice) and on risk levels. One of the three runs also gave a claim the wrong source. Read a script as one careful reading, not the only one.
-
-The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes. Each run behind these points is in the [run log](docs/run-log.md).
+- **Fixes checked on the same inputs.** The regression runs reused the inputs that exposed these problems, so they show whether a fix held on those inputs, not that it generalizes.
+- Not shown yet: use by a team, or a time saving. Those need real users.
 
 ## Related tools
 
