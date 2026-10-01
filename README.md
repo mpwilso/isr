@@ -74,7 +74,7 @@ The skill is told not to do these, and the checker cannot catch them:
 - Pass or fail acceptance.
 - Edit the story or the record. It writes its script to a temporary folder unless you ask for a copy.
 - Write a hand check whose expected result the story does not define. It asks about it under Confirm instead.
-- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The rule has been checked on one smoke run on the invented example and one run on the real change's inputs only.
+- Give a duration for a hand check. It says what the check needs, like a test project, a real build or an engineer, and that the engineer should size it. Giving a duration was the failure in 3 of 3 regression runs before this rule. The earlier wording of this rule was checked on one smoke run and one run on the real change's inputs; the current wording has been checked on one smoke run only.
 - Run tests, start an app, open a browser or touch any environment.
 
 ## An example

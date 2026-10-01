@@ -1,6 +1,6 @@
-This log was written from the builder's own notes after the runs; the raw outputs are not kept in this repo.
-
 # Run log
+
+This log was written from the builder's own notes after the runs; the raw outputs are not kept in this repo.
 
 Each entry names the note file it came from.
 
@@ -28,3 +28,9 @@ Each entry names the note file it came from.
 - Run: ISR after it accepted `## Requirements` and stopped stating durations, once on the Pellwick skip-a-box inputs and once on the real-run inputs.
 - Result: neither gave a duration, and both replies passed the checker. The real-input run still asked for a starting state the product does not allow. Cost: $0.42 and $0.55.
 - Notes: `report-m2b.md`.
+
+## Smoke run after the writing-rules change, 1 run
+
+- Run: ISR after the writing-rules change to the duration sentence, once on the Pellwick skip-a-box inputs, with the README example request.
+- Result: no duration given. The run's own checker failed once ("Not shown (7)" named 9 items) and then passed. The reply equalled the saved script and passed the checker as returned. Cost: $0.44.
+- Notes: `audit-smoke/smoke-1.jsonl`, `audit-smoke/smoke-1.reply.md`, `audit-smoke/smoke-1.saved-script.md`.
