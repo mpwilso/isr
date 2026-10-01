@@ -128,7 +128,7 @@ Not shown (1): Should the Accept and merge button text and the product docs desc
 
 ## Status and known limits
 
-- **One real change.** ISR has been tried on one real change: the Parallax change that lets Accept and merge land a task whose base has moved, where before it only fast-forwarded. That was one real run, and the person who built ISR also judged it.
+- **One real change.** ISR has been tried on one real change: the Parallax change that lets Accept and merge land a task whose base has moved, where before it only fast-forwarded. That was one real run, and the person who built ISR also judged it. In the first real run, the change was not run by hand after it landed (see [docs/run-log.md](docs/run-log.md)).
 - **No time saving shown.** Nothing here measures time saved.
 - **Claude Code only.** It has been tested in Claude Code and nowhere else.
 - **Starting states.** It does not reliably describe a starting state the product can reach. After a fix for this, the starting-state check held in 1 of 3 regression runs on the same real inputs.

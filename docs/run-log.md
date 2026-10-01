@@ -34,3 +34,13 @@ Each entry names the note file it came from.
 - Run: ISR after the writing-rules change to the duration sentence, once on the Pellwick skip-a-box inputs, with the README example request.
 - Result: no duration given. The run's own checker failed once ("Not shown (7)" named 9 items) and then passed. The reply equalled the saved script and passed the checker as returned. Cost: $0.44.
 - Notes: `audit-smoke/smoke-1.jsonl`, `audit-smoke/smoke-1.reply.md`, `audit-smoke/smoke-1.saved-script.md`.
+
+## Retrospective run on an older Parallax task (e9a55a), 2026-10-01
+
+- This is a retrospective run, not a clean test. The story was written by Loupe after the build, from the build request. The record is Parallax's task e9a55a. Matt knew the record when judging the output.
+- Inputs: story 9089 bytes, record files 5210, 6973 and 2286 bytes, copied byte for byte.
+- Result: the checker passed on Node 22.23.3 after one round of fixes, which cleared three wording issues. The script reads: Type Recommendation, 0 verified, 4 to check by hand, 8 to confirm (5 shown, 3 not shown). Cost: not recorded.
+- Hand check, reading only, against the commit that landed the task (efec592): confirmed the added em dash, in the macOS and Linux sentence, and that the sentence now points to step 6, the clone step; confirmed the new test arranges an existing approval key; confirmed the hardening step and the Harden WSL section never say who runs them after the switch to the new user. The three fresh-distro checks were not attempted; they need a clean machine and an engineer to size them.
+- Misses: the record's point about the order of the unset commands did not appear in the script; only its matching risk did, under Not shown. The em dash nit also went under Not shown rather than becoming a check.
+- Predictions hit: the fresh-distro check was marked High with an engineer sizing it and no durations, and the Node minimum question came first under Confirm. Predicted miss: ISR put 0 under Already verified, because the record shows only 22 tests, not the full suite.
+- What this does not show: any time saving, or that the script helps anyone but the person who built the change.
