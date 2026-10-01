@@ -22,7 +22,9 @@ test('the README stays short', () => {
 });
 
 test('run from scripts/test.sh, every test process has the memory cap', { skip: !process.env.ISR_MEMORY_MB && 'not run from scripts/test.sh' }, () => {
+  // The heap limit adds the young generation to the cap: 560 MB on Node 22.23 and 704 MB on Node 24.21 for a 512 MB cap.
+  // Uncapped, it is several times larger.
   const limitMb = getHeapStatistics().heap_size_limit / 1024 / 1024;
   const capMb = Number(process.env.ISR_MEMORY_MB);
-  assert.ok(limitMb <= capMb * 1.1, `heap limit ${Math.round(limitMb)} MB, cap ${capMb} MB`);
+  assert.ok(limitMb < capMb * 1.5, `heap limit ${Math.round(limitMb)} MB, cap ${capMb} MB`);
 });
