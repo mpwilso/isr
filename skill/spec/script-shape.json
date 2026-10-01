@@ -1,0 +1,124 @@
+{
+  "top": [
+    { "pattern": "^Type: (Decision needed|Recommendation|FYI)$", "message": "Line 1 must read \"Type: Decision needed\", \"Type: Recommendation\" or \"Type: FYI\"." },
+    { "pattern": "^Bottom line: \\S", "message": "Line 2 must start with \"Bottom line: \", one sentence." },
+    { "pattern": "^Not looked at: \\S", "message": "Line 3 must start with \"Not looked at: \", what ISR could not see." },
+    { "pattern": "^Next: \\S", "message": "Line 4 must start with \"Next: \", one action for the product owner." }
+  ],
+  "maxItems": 5,
+  "none": "^None\\.",
+  "notShown": { "pattern": "^Not shown \\((\\d+)\\): (.+)$", "separator": "; " },
+  "criterionRef": "\\bcriteri(?:on|a) (\\d+(?:(?:,? and |, )\\d+)*)",
+
+  "script": {
+    "title": "^# Acceptance script: \\S",
+    "counts": "\\b(\\d+) verified, (\\d+) to check by hand, (\\d+) to confirm(?:, (\\d+) not covered)?\\b",
+    "sections": [
+      { "key": "verified", "heading": "Already verified", "required": true, "criteria": true,
+        "item": "^- .+ Verified by: \\S",
+        "itemMessage": "Each Already verified item says the outcome, then \"Verified by:\" and what checked it, from the record." },
+      { "key": "byHand", "heading": "Check by hand", "required": true, "criteria": true, "checks": true },
+      { "key": "confirm", "heading": "Confirm", "required": true,
+        "item": "^- .*\\?.*\\([^()]+\\)$",
+        "itemMessage": "Each Confirm item asks a question and ends with where it came from in parentheses, like \"(Unknown)\" or \"(inferred by the build)\"." },
+      { "key": "notCovered", "heading": "Not covered", "required": false, "criteria": true,
+        "item": "^- Criteri(?:on|a) \\d[^:]*: \\S",
+        "itemMessage": "Each Not covered item reads \"Criterion N: the reason\"." }
+    ],
+    "check": {
+      "title": "^### (\\d+)\\. \\S",
+      "fields": [
+        { "label": "Risk", "pattern": "^- Risk: (High|Medium|Low)\\. Why: \\S" },
+        { "label": "Needs", "pattern": "^- Needs: \\S" },
+        { "label": "Steps", "pattern": "^- Steps:$" },
+        { "label": "Expect", "pattern": "^- Expect: \\S" },
+        { "label": "Covers", "pattern": "^- Covers: criteri(?:on|a) \\d" }
+      ],
+      "step": "^   ?(\\d+)\\. \\S",
+      "maxSteps": 5,
+      "sentenceSplit": "(?<=[.!?])\\s+(?=[A-Z])",
+      "risks": ["High", "Medium", "Low"]
+    },
+    "movedToConfirm": "moved to Confirm"
+  },
+
+  "notReady": {
+    "title": "^# Not ready for acceptance: \\S",
+    "section": "Missing",
+    "next": "\\bstory tool\\b"
+  },
+
+  "banned": {
+    "dashes": [[8210, "figure dash"], [8211, "en dash"], [8212, "em dash"], [8213, "horizontal bar"]],
+    "doubleHyphen": "(^|\\s)--(?=\\s|$)|\\w--\\w",
+    "verdict": "^(?:- |\\d+\\. )?\\**(?:result|status|verdict|pass|passed|fail|failed|accepted|approved|sign[- ]?off|signed off|tested by|date tested)\\**\\s*:|\\[[ xX]\\]",
+    "businessWords": {
+      "fields": "^(?:- (?:Needs|Expect):|   ?\\d+\\. )",
+      "patterns": [
+        { "pattern": "\\b[\\w-]+\\.(?:md|js|ts|py|json|ya?ml|toml|html|css|sql|sh|rb|go|java)\\b", "what": "a file name" },
+        { "pattern": "\\b[A-Z][A-Z0-9]+-\\d+\\b|(?:^|\\s)#\\d+\\b", "what": "a ticket id" },
+        { "pattern": "\\b\\w+\\(\\)|\\b[a-z]+_[a-z_]+\\b|\\b[a-z]+[A-Z]\\w*\\b", "what": "a function or code name" },
+        { "pattern": "`", "what": "code formatting" }
+      ]
+    }
+  },
+
+  "story": {
+    "criteria": "Acceptance criteria",
+    "item": "^(?:- |\\d+\\. )",
+    "sections": ["Acceptance criteria", "Not included", "Known", "Unknown", "Assumed", "Questions before building"],
+    "notReady": "^(?:Call: Not ready yet|# Not ready yet)\\s*$"
+  },
+
+  "record": {
+    "folderFile": "record.md",
+    "notReady": ["^Type: Decision needed", "the blind checker, failed it"],
+    "passedOf": "\\b(\\d+) of (\\d+) plan tests passed",
+    "bottomLine": "^Bottom line: The build is not verified yet\\b",
+    "type": "Decision needed"
+  },
+  "noRecord": "\\bno (?:build )?record\\b",
+
+  "messages": {
+    "layout": "Leave line 5 blank, and put a blank line before every heading.",
+    "title": "Line 6 must be the title: \"# Acceptance script: \" and the story's title, or \"# Not ready for acceptance: \" and what the story is about.",
+    "stray": "This line doesn't belong here. Each section holds only its items, \"None.\" or one \"Not shown (N):\" line.",
+    "unknownSection": "\"{heading}\" is not a section. The sections, in order: {order}.",
+    "duplicateSection": "\"{heading}\" appears more than once.",
+    "outOfOrder": "\"{heading}\" is out of order. The sections, in order: {order}.",
+    "missingSection": "The \"{heading}\" section is missing. Write it with \"None.\" if it has no items.",
+    "headingCount": "Write the heading with its count, like \"## {heading} (3)\".",
+    "headerCount": "{heading} says ({said}), but it shows {shown} and hides {hidden}.",
+    "notShownCount": "\"Not shown ({said})\" names {named} items.",
+    "noneMixed": "{heading} has items, so it can't also say \"None.\"",
+    "noneWithCount": "{heading} says \"None.\", so its count must be (0).",
+    "empty": "{heading} is empty. List its items, or write \"None.\"",
+    "bottomCounts": "The Bottom line must give the counts: \"N verified, N to check by hand, N to confirm\", plus \", N not covered\" when Not covered is there.",
+    "bottomMismatch": "The Bottom line says {said} {what}, but the section says {count}.",
+    "tooMany": "{heading} shows {count} items. Show the top {max} and name the rest in one line: \"Not shown (N): title; title\".",
+    "hiddenTooSoon": "{heading} hides items while showing only {count}. Show {max} before hiding any.",
+    "noCriterion": "Say which criterion this covers, like \"Criterion 2.\"",
+    "checkNumber": "Number the checks in order: expected \"### {expected}.\"",
+    "checkField": "Check {n} is missing \"{label}\", or it is out of order. Each check has, in order: {order}.",
+    "noSteps": "Check {n} has no steps.",
+    "tooManySteps": "Check {n} has {count} steps; the limit is {max}.",
+    "longStep": "Each step is one short sentence.",
+    "riskOrder": "Checks rank by risk: a {risk} check can't come after a {before} one.",
+    "verdict": "Remove this verdict or result field. ISR never records results; a person does, later.",
+    "dash": "Remove the {name}. Use a comma, a colon or a new sentence.",
+    "doubleHyphen": "Remove the double hyphen used as a dash. Use a comma, a colon or a new sentence.",
+    "businessWords": "Use business words for the tester: this looks like {what}.",
+    "coverageMissing": "Criterion {n} is missing. Every criterion appears once: Already verified, Check by hand or Not covered.",
+    "coverageDuplicate": "Criterion {n} appears more than once. It belongs in one place only.",
+    "coverageUnknown": "The story has no criterion {n}; it has {count}.",
+    "missingStorySection": "The story has no {section} section. Say so under Not looked at.",
+    "storyNotReady": "The story is not ready to build from, so write the not ready report, not a script.",
+    "storyReady": "The story has acceptance criteria, so write the acceptance script.",
+    "notReadyNext": "Next must point back to the story tool.",
+    "noRecordVerified": "No build record was given, so nothing counts as verified. Already verified must be (0).",
+    "noRecordSaid": "No build record was given. Say so under Not looked at, like \"no build record was given\".",
+    "buildNotReadyType": "The record shows the build is not verified ({why}), so Type must be \"Decision needed\".",
+    "buildNotReadyBottom": "The record shows the build is not verified ({why}). Start the Bottom line with \"The build is not verified yet\".",
+    "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\"."
+  }
+}
