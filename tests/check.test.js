@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { check, readRecord, readStory } from '../skill/src/check.js';
+import { check, readRecord, readStory, shape } from '../skill/src/check.js';
 
 const CHECKER = 'skill/src/check.js';
 const read = (path) => readFileSync(path, 'utf8');
@@ -58,8 +58,11 @@ test('a story section that is missing must be named under Not looked at', () => 
   const thin = readStory(read(`${FIX}/story.md`).replace(/## Assumed\n.*\n\n/, ''));
   assert.deepEqual(thin.missing, ['Assumed']);
   assert.deepEqual(rules(check(good, { story: thin, record })), ['missing-sections']);
-  const said = good.replace('Not looked at: the build itself', 'Not looked at: the story has no Assumed section; the build itself');
+  const said = good.replace('Not looked at: the build itself', 'Not looked at: the story has no assumptions; the build itself');
   assert.deepEqual(check(said, { story: thin, record }), []);
+  // Found in the blind read of the e9a55a script: readers outside the team did not know the story's section names.
+  const named = good.replace('Not looked at: the build itself', 'Not looked at: the story has no Assumed section; the build itself');
+  assert.deepEqual(rules(check(named, { story: thin, record })), ['missing-sections', 'team-words']);
 });
 
 test('a build that did not reach ready: Type and Bottom line must say so', () => {
@@ -99,7 +102,7 @@ test('a story with Requirements in place of Acceptance criteria is read the same
   assert.deepEqual(v2.missing, []);
   assert.deepEqual(check(good, { story: v2, record }), []);
   // Every requirement still appears exactly once.
-  const twice = good.replace('- Covers: criterion 2.', '- Covers: criteria 1 and 2.');
+  const twice = good.replace('- Covers: criterion 2 (shipping emails still arrive).', '- Covers: criterion 1 (no reminder emails) and criterion 2 (shipping emails still arrive).');
   assert.deepEqual(rules(check(twice, { story: v2, record })), ['coverage-duplicate']);
   const gone = good.replace(/\n## Not covered[\s\S]*$/, '\n').replace(', 1 not covered', '');
   assert.deepEqual(rules(check(gone, { story: v2, record })), ['coverage-missing']);
@@ -114,7 +117,7 @@ test('a story too thin to build from gets the not ready report, not a script', (
 test('criteria hidden under Not shown still count toward coverage', () => {
   const criteria = Array.from({ length: 6 }, (_, i) => `- Given case ${i + 1}, when it happens, then it works.`).join('\n');
   const six = readStory(`# Six\n\n## Acceptance criteria\n${criteria}\n\n## Not included\nNone.\n\n## Known\n- A fact. (test)\n\n## Unknown\nNone.\n\n## Assumed\n- A guess.\n\n## Questions before building\nNone.\n`);
-  const checkBlock = (n) => `\n### ${n}. Case ${n}\n- Risk: Low. Why: invented.\n- Needs: an account.\n- Steps:\n  1. Do the thing.\n- Expect: it works.\n- Covers: criterion ${n}.\n`;
+  const checkBlock = (n) => `\n### ${n}. Case ${n}\n- Risk: Low. Why: invented.\n- Needs: an account.\n- Steps:\n  1. Do the thing.\n- Expect: it works.\n- Covers: criterion ${n} (case ${n} works).\n`;
   const script = [
     'Type: Recommendation',
     'Bottom line: 0 verified, 6 to check by hand, 0 to confirm; invented.',
@@ -126,7 +129,7 @@ test('criteria hidden under Not shown still count toward coverage', () => {
     '## Already verified (0)',
     'None.',
     '',
-    '## Check by hand (6)',
+    '## Check by hand (6, 5 shown)',
     [1, 2, 3, 4, 5].map(checkBlock).join(''),
     'Not shown (1): case six (criterion 6)',
     '',
@@ -135,6 +138,41 @@ test('criteria hidden under Not shown still count toward coverage', () => {
   ].join('\n');
   assert.deepEqual(check(script, { story: six }), []);
   assert.deepEqual(rules(check(script.replace('(criterion 6)', ''), { story: six })), ['coverage-missing', 'item-shape']);
+  // Found in the blind read of the e9a55a script: "Confirm (8)" over five items read as three missing.
+  for (const heading of ['## Check by hand (6)', '## Check by hand (6, 4 shown)']) {
+    assert.deepEqual(rules(check(script.replace('## Check by hand (6, 5 shown)', heading), { story: six })), ['shown-count'], heading);
+  }
+});
+
+test('a Covers line names each criterion in plain words after its number', () => {
+  // Found in the blind read of the e9a55a script: all four readers listed "criterion 3" as a word they did not understand.
+  const two = (covers) => check(good.replace('- Covers: criterion 2 (shipping emails still arrive).', covers), { record });
+  assert.deepEqual(rules(two('- Covers: criteria 2 and 3.')), ['covers-name']);
+  assert.deepEqual(rules(two('- Covers: criterion 2 (shipping emails still arrive) and criterion 3.')), ['covers-name']);
+  assert.deepEqual(two('- Covers: criterion 2 (shipping emails still arrive) and criterion 3 (agents can tell).'), []);
+});
+
+test('Confirm sources use only the plain phrases in the shape file', () => {
+  // Found in the blind read of the e9a55a script: readers did not know "Questions before building", "Assumed" or "inferred by the build".
+  const source = (text) => check(good.replace('(open in the story)', `(${text})`), { story, record });
+  for (const s of shape.script.sources) assert.deepEqual(source(s.phrase.replace(/\bN\b/, '3')), [], s.phrase);
+  for (const old of ['Unknown', 'inferred by the build', 'criterion 3', "the build's plan", 'the build record']) {
+    assert.deepEqual(rules(source(old)), ['confirm-source'], old);
+  }
+  assert.deepEqual(rules(source('Assumed')), ['confirm-source', 'team-words']);
+  assert.deepEqual(rules(source('Questions before building')), ['confirm-source', 'team-words']);
+  assert.deepEqual(rules(source('open in the story; Unknown')), ['confirm-source']);
+});
+
+test('the first Confirm item says the story asks it first', () => {
+  const old = good.replace('(the story asks this first; criterion 3 leaves this open; asked in the story)', '(First question; criterion 3 leaves this open; asked in the story)');
+  assert.deepEqual(rules(check(old, { story, record })), ['confirm-source', 'first-question']);
+});
+
+test('the record\'s blind checker is called the automated reviewer', () => {
+  const said = (words) => check(good.replace('the build itself,', `the build itself and what ${words} did not see,`), { story, record });
+  for (const words of ['the blind checker', 'the Blind Checker', 'a blind code review']) assert.deepEqual(rules(said(words)), ['team-words'], words);
+  assert.deepEqual(said('the automated reviewer'), []);
 });
 
 test('the command line: exit 1 with file and line on a problem, 2 on bad usage', () => {

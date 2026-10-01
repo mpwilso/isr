@@ -9,6 +9,7 @@
   "none": "^None\\.",
   "notShown": { "pattern": "^Not shown \\((\\d+)\\): (.+)$", "separator": "; " },
   "criterionRef": "\\bcriteri(?:on|a) (\\d+(?:(?:,? and |, )\\d+)*)",
+  "heading": "^## (.+?)(?: \\((\\d+)(?:, (\\d+) shown)?\\))?$",
 
   "script": {
     "title": "^# Acceptance script: \\S",
@@ -20,7 +21,7 @@
       { "key": "byHand", "heading": "Check by hand", "required": true, "criteria": true, "checks": true },
       { "key": "confirm", "heading": "Confirm", "required": true,
         "item": "^- .*\\?.*\\([^()]+\\)$",
-        "itemMessage": "Each Confirm item asks a question and ends with where it came from in parentheses, like \"(Unknown)\" or \"(inferred by the build)\"." },
+        "itemMessage": "Each Confirm item asks a question and ends with where it came from in parentheses, like \"(open in the story)\" or \"(the build decided this)\"." },
       { "key": "notCovered", "heading": "Not covered", "required": false, "criteria": true,
         "item": "^- Criteri(?:on|a) \\d[^:]*: \\S",
         "itemMessage": "Each Not covered item reads \"Criterion N: the reason\"." }
@@ -34,13 +35,25 @@
         { "label": "Expect", "pattern": "^- Expect: \\S" },
         { "label": "Covers", "pattern": "^- Covers: criteri(?:on|a) \\d" }
       ],
+      "coversNamed": "^- Covers: criterion \\d+ \\([^()]+\\)(?:(?:, | and |, and )criterion \\d+ \\([^()]+\\))*\\.$",
       "step": "^   ?(\\d+)\\. \\S",
       "maxSteps": 5,
       "sentenceSplit": "(?<=[.!?])\\s+(?=[A-Z])",
       "risks": ["High", "Medium", "Low"]
     },
     "movedToConfirm": "moved to Confirm",
-    "firstQuestionSource": "\\([^()]*\\bFirst question\\b[^()]*\\)$"
+    "source": { "pattern": "\\(([^()]+)\\)$", "separator": "; " },
+    "sources": [
+      { "phrase": "the story asks this first", "from": "the story's First question line" },
+      { "phrase": "criterion N leaves this open", "from": "a \"To confirm\" detail in criterion N" },
+      { "phrase": "open in the story", "from": "the story's Unknown section" },
+      { "phrase": "asked in the story", "from": "the story's Questions before building section" },
+      { "phrase": "the story assumes this", "from": "the story's Assumed section" },
+      { "phrase": "the build decided this", "from": "an outcome the build inferred, or a choice its intent, plan or record records" },
+      { "phrase": "left open in the build's plan", "from": "a risk the build's plan leaves undecided" },
+      { "phrase": "raised in the build record", "from": "a risk the build record leaves undecided" }
+    ],
+    "firstQuestionSource": "the story asks this first"
   },
 
   "notReady": {
@@ -52,6 +65,11 @@
   "banned": {
     "dashes": [[8210, "figure dash"], [8211, "en dash"], [8212, "em dash"], [8213, "horizontal bar"]],
     "doubleHyphen": "(^|\\s)--(?=\\s|$)|\\w--\\w",
+    "teamWords": [
+      { "pattern": "\\bblind (?:checker|(?:code )?review)\\b", "flags": "i", "instead": "the automated reviewer" },
+      { "pattern": "\\bQuestions before building\\b", "flags": "i", "instead": "a plain phrase, like \"asked in the story\"" },
+      { "pattern": "\\bAssumed\\b", "flags": "", "instead": "a plain phrase, like \"the story assumes this\"" }
+    ],
     "verdict": "^(?:- |\\d+\\. )?\\**(?:result|status|verdict|pass|passed|fail|failed|accepted|approved|sign[- ]?off|signed off|tested by|date tested)\\**\\s*:|\\[[ xX]\\]",
     "businessWords": {
       "fields": "^(?:- (?:Needs|Expect):|   ?\\d+\\. )",
@@ -68,6 +86,14 @@
     "criteria": ["Acceptance criteria", "Requirements"],
     "item": "^(?:- |\\d+\\. )",
     "sections": ["Not included", "Known", "Unknown", "Assumed", "Questions before building"],
+    "sectionWords": {
+      "Acceptance criteria": "acceptance criteria",
+      "Not included": "list of what is left out",
+      "Known": "known facts",
+      "Unknown": "unknowns",
+      "Assumed": "assumptions",
+      "Questions before building": "open questions"
+    },
     "notReady": "^(?:Call: Not ready yet|# Not ready yet)\\s*$",
     "firstQuestion": "^First question: (?!None)\\S"
   },
@@ -94,6 +120,8 @@
     "outOfOrder": "\"{heading}\" is out of order. The sections, in order: {order}.",
     "missingSection": "The \"{heading}\" section is missing. Write it with \"None.\" if it has no items.",
     "headingCount": "Write the heading with its count, like \"## {heading} (3)\".",
+    "headingShown": "{heading} hides {hidden}, so the heading says how many it shows: \"## {heading} ({said}, {shown} shown)\".",
+    "headingNoneHidden": "{heading} hides nothing, so the heading gives only the count: \"## {heading} ({said})\".",
     "headerCount": "{heading} says ({said}), but it shows {shown} and hides {hidden}.",
     "notShownCount": "\"Not shown ({said})\" names {named} items.",
     "noneMixed": "{heading} has items, so it can't also say \"None.\"",
@@ -104,6 +132,9 @@
     "tooMany": "{heading} shows {count} items. Show the top {max} and name the rest in one line: \"Not shown (N): title; title\".",
     "hiddenTooSoon": "{heading} hides items while showing only {count}. Show {max} before hiding any.",
     "noCriterion": "Say which criterion this covers, like \"Criterion 2.\"",
+    "coversName": "Name each criterion in a few plain words after its number, like \"Covers: criterion 4 (the clone fixes origin and git trust).\" For two: \"criterion 1 (...) and criterion 2 (...)\".",
+    "confirmSource": "Say where this came from in plain words, using only these, joined by \"; \": {phrases}.",
+    "teamWords": "A reader outside the team won't know \"{found}\". Use {instead}.",
     "checkNumber": "Number the checks in order: expected \"### {expected}.\"",
     "checkField": "Check {n} is missing \"{label}\", or it is out of order. Each check has, in order: {order}.",
     "noSteps": "Check {n} has no steps.",
@@ -117,7 +148,7 @@
     "coverageMissing": "Criterion {n} is missing. Every criterion appears once: Already verified, Check by hand or Not covered.",
     "coverageDuplicate": "Criterion {n} appears more than once. It belongs in one place only.",
     "coverageUnknown": "The story has no criterion {n}; it has {count}.",
-    "missingStorySection": "The story has no {section} section. Say so under Not looked at.",
+    "missingStorySection": "The story has no {section} section. Say so under Not looked at in plain words, like \"the story has no {words}\".",
     "storyNotReady": "The story is not ready to build from, so write the not ready report, not a script.",
     "storyReady": "The story has acceptance criteria, so write the acceptance script.",
     "notReadyNext": "Next must point back to the story tool.",
@@ -125,7 +156,7 @@
     "noRecordSaid": "No build record was given. Say so under Not looked at, like \"no build record was given\".",
     "buildNotReadyType": "The record shows the build is not verified ({why}), so Type must be \"Decision needed\".",
     "buildNotReadyBottom": "The record shows the build is not verified ({why}). Start the Bottom line with \"The build is not verified yet\".",
-    "firstQuestion": "The story has a First question, so the first Confirm item is that question, with \"First question\" in its source, like \"(First question; Questions before building)\".",
+    "firstQuestion": "The story has a First question, so the first Confirm item is that question, with \"the story asks this first\" in its source, like \"(the story asks this first; asked in the story)\".",
     "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\".",
     "skippedAllPassed": "The record says {skipped}, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",
     "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped."

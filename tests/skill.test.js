@@ -67,6 +67,19 @@ test('the script template follows the shape file', () => {
   assert.deepEqual(labels.filter((l) => l !== 'Criterion'), shape.script.check.fields.map((f) => f.label));
 });
 
+test('the writing rules list every Confirm source phrase in the shape file, and no other', () => {
+  const rules = read('skill/writing-rules.md');
+  const listed = [...rules.matchAll(/^- "([^"]+)": /gm)].map((m) => m[1]);
+  assert.deepEqual(listed, shape.script.sources.map((s) => s.phrase));
+});
+
+test('the reading guide, writing rules and template use the shape file\'s plain words', () => {
+  const reading = read('skill/reading.md');
+  for (const section of shape.story.sections) assert.ok(reading.includes(`"the story has no ${shape.story.sectionWords[section]}"`), section);
+  assert.ok(read('skill/writing-rules.md').includes('"the automated reviewer"'));
+  assert.match(read('skill/templates/acceptance-script.md'), /^- Covers: criterion \[N\] \(\[[^\]]+\]\)\.$/m);
+});
+
 test('the not ready template follows the shape file', () => {
   const lines = read('skill/templates/not-ready.md').split('\n');
   assert.ok(lines[5].startsWith(shape.notReady.title.slice(1, -3)));

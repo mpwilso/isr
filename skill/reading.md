@@ -9,7 +9,14 @@ Read it by section name. These are the sections ISR uses, as Loupe writes them:
 - **Acceptance criteria**, or **Requirements** in newer Loupe stories. Both are read the same way. One criterion per list item, numbered 1, 2, 3 in the order they appear. A detail after "To confirm:" is a guess the story wants confirmed.
 - **Not included, Known, Unknown, Assumed, Questions before building.** Sources for Confirm and for ranking.
 
-If one of these sections is missing, name it under Not looked at, like "the story has no Assumed section". Never fill it in. Other lines, such as Confidence, Estimate and Before release, are context only.
+If one of these sections is missing, say so under Not looked at in plain words, not by its section name. Never fill it in. Use these words:
+
+- Not included: "the story has no list of what is left out"
+- Known: "the story has no known facts"
+- Unknown: "the story has no unknowns"
+- Assumed: "the story has no assumptions"
+- Questions before building: "the story has no open questions"
+ Other lines, such as Confidence, Estimate and Before release, are context only.
 
 **Too thin to build from:** any line of the story reads exactly "Call: Not ready yet" or "# Not ready yet", or the story has no acceptance criteria. Write the not ready report from `templates/not-ready.md`: the four top lines, what is missing (at most five items) and a Next line that points back to the story tool. No script.
 
@@ -19,7 +26,7 @@ If one of these sections is missing, name it under Not looked at, like "the stor
 
 A Parallax task folder (`docs/tasks/ID/`) holds three files:
 
-- `record.md`: written only when the task was accepted. Found says how many tests passed, how many were skipped, and what the blind checker said. Lines like "Second Eye didn't check:" and the Not looked at line say what nothing checked.
+- `record.md`: written only when the task was accepted. Found says how many tests passed, how many were skipped, and what the blind checker said. In the script, call the blind checker "the automated reviewer". Lines like "Second Eye didn't check:" and the Not looked at line say what nothing checked.
 - `intent.md`: the numbered outcomes the build aimed at. `asked:` means the person asked for it. `inferred:` means the build added it.
 - `plan.md`: the steps, tests and risks. Its toml block maps each outcome to the tests that cover it (`covers`).
 
@@ -29,7 +36,7 @@ Match each criterion to the build's outcomes and the tests that cover them. A cr
 
 **Not ready:** the folder has no `record.md`, or the record says `Type: Decision needed`, or fewer tests passed than ran, or the blind checker failed it. Then nothing counts as verified. Start the Bottom line with "The build is not verified yet", set Type to Decision needed, make Next recommend holding the by-hand checks until the build is verified, and still write the script.
 
-**Inferred outcomes:** each one the story never stated goes to Confirm, with the source "inferred by the build". Leave out inferred outcomes about the build's own tests or process.
+**Inferred outcomes:** each one the story never stated goes to Confirm, with the source "the build decided this". Leave out inferred outcomes about the build's own tests or process.
 
 **Other records** (a CI log, a pull request description, pasted notes): read them the same way. Count something as verified only when the record shows an automated check covered it and passed. If you can't tell, count it as not checked and say so under Not looked at.
 

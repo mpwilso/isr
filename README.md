@@ -25,11 +25,11 @@ You get one script, always in the same shape. It starts with four lines:
 Then these sections:
 
 - **Already verified:** what a passing automated check in the record covers, and what checked it.
-- **Check by hand:** what nothing checked, or checked only in part, ranked High, Medium or Low by risk. Each check has Risk, Needs, Steps (at most five), Expect and Covers.
-- **Confirm:** questions for the business, each ending with where it came from.
+- **Check by hand:** what nothing checked, or checked only in part, ranked High, Medium or Low by risk. Each check has Risk, Needs, Steps (at most five), Expect and Covers, which names each criterion by number and in a few plain words.
+- **Confirm:** questions for the business, each ending with where it came from in plain words, like "open in the story" or "the build decided this".
 - **Not covered:** only when needed, for a criterion that fits nowhere above, with the reason.
 
-Every criterion in the story appears exactly once: under Already verified, Check by hand or Not covered. No list shows more than five items; the rest are named in one line, `Not shown (N): title; title`. When the story has a `First question:` line, that question is the first Confirm item.
+Every criterion in the story appears exactly once: under Already verified, Check by hand or Not covered. No list shows more than five items; the rest are named in one line, `Not shown (N): title; title`, and the heading says how many are shown, like `Confirm (8, 5 shown)`. When the story has a `First question:` line, that question is the first Confirm item.
 
 If the story is too thin to build from, ISR writes a short not ready report instead of a script.
 
@@ -79,7 +79,7 @@ The skill is told not to do these, and the checker cannot catch them:
 
 ## An example
 
-This is the script from the one real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. The record for this run is not included here. With it, today's checker flags the "43 of 43", because the record says 1 test was skipped. Without it, the script passes when checked on its own; checked against the story with no record, it fails the no record rules, since it lists items as verified. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
+This is the script from the one real run. It was written by an earlier version, before ISR accepted `## Requirements` and stopped stating durations. Today's checker rejects it even on its own: its Covers line gives only a number, its Confirm sources use the story's section names, it says "the blind checker", and its Confirm heading does not say how many are shown. The record for this run is not included here. With it, the checker also flags the "43 of 43", because the record says 1 test was skipped. Its first Confirm question rested on a reading the build's plan contradicts: the plan says the gate's ledger entry records the merge commit as tested, not the accepted commit.
 
 The story's acceptance criteria, shortened, and numbered as the script uses them:
 

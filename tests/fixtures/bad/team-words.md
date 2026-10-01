@@ -1,6 +1,6 @@
 Type: Decision needed
 Bottom line: 1 verified, 1 to check by hand, 2 to confirm, 1 not covered; what agents see for a paused subscriber is not defined yet.
-Not looked at: the build itself, since ISR read only the story and the build record.
+Not looked at: the build itself, since ISR read only the story and the build record, and what the blind checker did not see.
 Next: Decide what agents should see for a paused subscriber, then give check 1 to a tester.
 
 # Acceptance script: Let subscribers pause reminder emails
@@ -17,7 +17,7 @@ Next: Decide what agents should see for a paused subscriber, then give check 1 t
   1. Let the subscriber's next box ship in staging.
   2. Open the subscriber's inbox.
 - Expect: the shipping email arrives.
-- Covers: criterion 2 (shipping emails still arrive) and criterion 3 (agents can tell reminders are paused).
+- Covers: criterion 2 (shipping emails still arrive).
 
 ## Confirm (2)
 - What should an agent see in Stockroom when a subscriber has paused reminders, and where? (the story asks this first; criterion 3 leaves this open; asked in the story)

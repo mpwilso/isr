@@ -18,7 +18,7 @@ None. The build has no record of passing its tests yet.
   2. Ask the engineer to make the box's original ship date pass in staging; the story does not say how.
   3. Ask the engineer for the subscriber's charges on that date.
 - Expect: no charge for the skipped box on its original ship date.
-- Covers: criterion 3.
+- Covers: criterion 3 (no charge for a skipped box).
 
 ### 2. A skip moves the box to the next delivery date
 - Risk: High. Why: a skip that doesn't take leaves a subscriber with a box they didn't want.
@@ -28,7 +28,7 @@ None. The build has no record of passing its tests yet.
   2. Open the subscriber in Stockroom as an agent.
   3. Find the box they skipped.
 - Expect: the box has moved to the next regular delivery date.
-- Covers: criterion 1.
+- Covers: criterion 1 (a skip moves the box to the next delivery date).
 
 ### 3. No skip once the cutoff has passed
 - Risk: Medium. Why: a late skip could stop a box that is already on its way, and what the page shows instead is still open.
@@ -37,7 +37,7 @@ None. The build has no record of passing its tests yet.
   1. Sign in as the subscriber.
   2. Try to skip their next box from their account.
 - Expect: they can't skip it. What the page shows instead is not settled yet (Confirm 5).
-- Covers: criterion 2.
+- Covers: criterion 2 (no skip once the cutoff has passed).
 
 ### 4. The skip note in Stockroom
 - Risk: Medium. Why: agents answer subscribers from this history, and the story assumes Stockroom needs no change to show it.
@@ -46,12 +46,12 @@ None. The build has no record of passing its tests yet.
   1. Open the subscriber in Stockroom as an agent.
   2. Open their history.
 - Expect: a note that the customer skipped the box. Its exact wording, and whether it shows the date and time, are still open (Confirm 4).
-- Covers: criterion 4.
+- Covers: criterion 4 (a skip note in Stockroom).
 
-## Confirm (12)
-- Does skipping count as a payments change under the December freeze, since it affects charging? (First question; Questions before building)
-- After a skip, the build shows "Your next box is skipped" and the new delivery date, but the story left how the page shows the date to confirm. Is that what the page should say? (inferred by the build; criterion 1)
-- The build takes the next regular delivery date from the web app, as its plan records, though the web app and Stockroom sometimes disagree. Is the web app the right source? (Questions before building; inferred by the build)
-- What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4)
-- What should the page show once the cutoff has passed? (criterion 2)
+## Confirm (12, 5 shown)
+- Does skipping count as a payments change under the December freeze, since it affects charging? (the story asks this first; asked in the story)
+- After a skip, the build shows "Your next box is skipped" and the new delivery date, but the story left how the page shows the date to confirm. Is that what the page should say? (the build decided this; criterion 1 leaves this open)
+- The build takes the next regular delivery date from the web app, as its plan records, though the web app and Stockroom sometimes disagree. Is the web app the right source? (asked in the story; the build decided this)
+- What exact wording should the Stockroom note use, with Dana's "Skipped by customer" as a suggestion, and should it show the date and time? (criterion 4 leaves this open)
+- What should the page show once the cutoff has passed? (criterion 2 leaves this open)
 Not shown (7): whether a billing fix is part of this story; where skipping sits, which the build put on the account page; skipping a box whose payment already failed; skipping the box after one already skipped; the cutoff passing while the page is open; undoing a skip before the cutoff; changes to the cutoff while skipping is live

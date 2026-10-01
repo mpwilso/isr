@@ -26,25 +26,36 @@ Rank by what goes wrong for customers or money if the behavior is wrong, then by
   - When the check needs an engineer, a real build, a test project or a date that has to pass, say so in plain words, and say that the engineer should size it before anyone commits to it. Never give a duration; ISR can't know how long a check takes.
 - **Steps:** at most five, numbered, one short sentence each. A step that depends on time passing names who makes it pass and how, using only what the story or record says; if they say nothing, the step asks the engineer to make that date pass in the test environment and says the story does not say how.
 - **Expect:** what the tester should see, as the story states it. When the story defines the result but leaves one detail to confirm, keep the check, say that detail is not settled yet, and point to the Confirm item.
-- **Covers:** the criterion numbers.
+- **Covers:** each criterion's number, then what it asks in a few plain words, in parentheses: "Covers: criterion 4 (the clone fixes origin and git trust)." For two: "criterion 1 (...) and criterion 2 (...)". The number lets the checker place every criterion exactly once; the words tell the reader what it is.
 
 Use the story's own words for pages, systems and people. No file names, ticket ids, function names or code formatting. Use the test environment the story or record names, such as staging; if neither names one, write "a test environment".
 
 ## Confirm
 
-Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions before building, and outcomes the build inferred that the story never stated. Each item is a question for the business, ending with its source in parentheses.
+Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions before building, and outcomes the build inferred that the story never stated. Each item is a question for the business, ending with its source in parentheses, in plain words a reader outside the team understands. Use only these phrases, joined by "; " when there are several:
+
+- "the story asks this first": the story's First question line.
+- "criterion N leaves this open": a "To confirm" detail in criterion N.
+- "open in the story": the story's Unknown section.
+- "asked in the story": the story's Questions before building section.
+- "the story assumes this": the story's Assumed section.
+- "the build decided this": an outcome the build inferred, or a choice its intent, plan or record records.
+- "left open in the build's plan": a risk the build's plan leaves undecided.
+- "raised in the build record": a risk the build record leaves undecided.
+
+The reader never sees the story's section names, such as "Questions before building" or "Assumed".
 
 - The same thing found in two places is one line that names both sources.
 - An unknown that a check by hand will answer goes in that check's Why, not in Confirm.
-- When the intent, plan or record already answers something the story lists as Unknown or asks under Questions before building, don't ask it cold. Say what the build chose and where it is recorded, ask whether that is right, and add "inferred by the build" to the source.
-- A risk the plan or record says is undecided is a Confirm item, even when the story never mentions it, with the source "the build's plan" or "the build record".
-- When the story has a First question line, the first Confirm item is that question, with "First question" in its source, like "(First question; Questions before building)". It uses one of the five slots. If the build already answered it, the item still comes first, in the build's choice form above.
+- When the intent, plan or record already answers something the story lists as Unknown or asks under Questions before building, don't ask it cold. Say what the build chose and where it is recorded, ask whether that is right, and add "the build decided this" to the source.
+- A risk the plan or record says is undecided is a Confirm item, even when the story never mentions it, with the source "left open in the build's plan" or "raised in the build record".
+- When the story has a First question line, the first Confirm item is that question, with "the story asks this first" in its source, like "(the story asks this first; asked in the story)". It uses one of the five slots. If the build already answered it, the item still comes first, in the build's choice form above.
 - Then order the rest: questions that change what a check by hand should expect, then questions that only matter if a check fails and risks the build left undecided, then everything else.
 
 ## Lists and counts
 
 - Show at most five items in any list. Name the rest in one line under it: `Not shown (N): title; title`. In Already verified, Check by hand and Not covered, each hidden title names its criterion, like "skipping from the home page (criterion 6)".
-- A heading's count includes hidden items. An empty list says "None." with a count of (0). Leave out Not covered when nothing lands there.
+- A heading's count includes hidden items. When some are hidden, the heading also says how many it shows, like "## Confirm (8, 5 shown)", and the Not shown line stays. This applies to every list. An empty list says "None." with a count of (0). Leave out Not covered when nothing lands there.
 - The Bottom line gives the counts: "N verified, N to check by hand, N to confirm", plus ", N not covered" when that section is there.
 
 ## The four top lines
@@ -56,4 +67,4 @@ Draw from "To confirm" details in the criteria, Unknown, Assumed, Questions befo
 
 ## Words
 
-Plain words a product owner would use. No em dashes, en dashes or double hyphens used as dashes. No verdict fields: no pass, fail, status, result, checkbox or sign-off.
+Plain words a product owner would use, and none of the team's own: call the record's blind checker "the automated reviewer". No em dashes, en dashes or double hyphens used as dashes. No verdict fields: no pass, fail, status, result, checkbox or sign-off.

@@ -12,6 +12,9 @@ export const shape = JSON.parse(readFileSync(join(here, '..', 'spec', 'script-sh
 const re = (pattern, flags = '') => new RegExp(pattern, flags);
 const isVerdict = (line) => re(shape.banned.verdict, 'i').test(line);
 const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, k) => String(vars[k]));
+// A Confirm source phrase as a whole-text pattern: "criterion N leaves this open" takes any number for N.
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const sourcePattern = (phrase) => re(`^${escape(phrase).replace(/\bN\b/g, '\\d+')}$`);
 
 export function readStory(text) {
   const sections = new Map();
@@ -60,11 +63,15 @@ export function check(text, { story = null, record = null } = {}) {
   const add = (line, rule, key, vars = {}) =>
     problems.push({ line, rule, message: fill(shape.messages[key] ?? key, vars) });
 
-  // Banned anywhere: dashes, double hyphens used as dashes, verdict fields.
+  // Banned anywhere: dashes, double hyphens used as dashes, verdict fields, the team's own words.
   const dashes = shape.banned.dashes.map(([code, name]) => [String.fromCodePoint(code), name]);
   lines.forEach((line, i) => {
     for (const [char, name] of dashes) if (line.includes(char)) add(i + 1, 'dash', 'dash', { name });
     if (re(shape.banned.doubleHyphen).test(line)) add(i + 1, 'dash', 'doubleHyphen');
+    for (const w of shape.banned.teamWords) {
+      const found = line.match(re(w.pattern, w.flags));
+      if (found) add(i + 1, 'team-words', 'teamWords', { found: found[0], instead: w.instead });
+    }
     if (i > 3 && isVerdict(line)) add(i + 1, 'verdict', 'verdict');
   });
 
@@ -103,7 +110,7 @@ function parseSections(lines, defs, add) {
     const line = lines[i];
     const n = i + 1;
     if (/^#/.test(line) && lines[i - 1] !== '') add(n, 'layout', 'layout');
-    const h = line.match(/^## (.+?)(?: \((\d+)\))?$/);
+    const h = line.match(re(shape.heading));
     if (h) {
       const def = defs.find((d) => d.heading === h[1]);
       if (!def) { add(n, 'sections', 'unknownSection', { heading: h[1], order }); current = null; continue; }
@@ -112,7 +119,9 @@ function parseSections(lines, defs, add) {
       if (index < lastIndex) add(n, 'sections', 'outOfOrder', { heading: h[1], order });
       lastIndex = Math.max(lastIndex, index);
       if (h[2] === undefined) add(n, 'counts', 'headingCount', { heading: h[1] });
-      current = sections[def.key] = { def, line: n, said: h[2] === undefined ? null : Number(h[2]), items: [], checks: [], none: false, notShown: null };
+      const said = h[2] === undefined ? null : Number(h[2]);
+      const saidShown = h[3] === undefined ? null : Number(h[3]);
+      current = sections[def.key] = { def, line: n, said, saidShown, items: [], checks: [], none: false, notShown: null };
       check = null;
       continue;
     }
@@ -151,6 +160,9 @@ function checkCounts(s, add) {
   }
   if (shown > max) add(s.line, 'max-items', 'tooMany', { heading, count: shown, max });
   if (s.notShown && shown < max) add(s.notShown.line, 'max-items', 'hiddenTooSoon', { heading, count: shown, max });
+  // When the cap hides items, the heading says how many it shows: "## Confirm (8, 5 shown)".
+  if (s.said !== null && s.notShown && s.saidShown !== shown) add(s.line, 'shown-count', 'headingShown', { heading, hidden, said: s.said, shown });
+  if (s.said !== null && !s.notShown && s.saidShown !== null) add(s.line, 'shown-count', 'headingNoneHidden', { heading, said: s.said });
   if (s.def.item) {
     for (const item of s.items) if (!re(s.def.item).test(item.line)) add(item.n, 'item-shape', s.def.itemMessage);
   }
@@ -203,7 +215,19 @@ function checkScript(lines, sections, { story, record }, add) {
     }
     const covers = check.body.find((b) => /^- Covers:/.test(b.line));
     if (covers) for (const n of refs(covers.line)) covered.push([n, covers.n]);
+    // Found in the blind read of the e9a55a script: readers saw "criterion 3" and could not tell what it asked.
+    if (covers && refs(covers.line).length && !re(c.coversNamed).test(covers.line)) add(covers.n, 'covers-name', 'coversName');
   });
+
+  // Each Confirm source is a plain phrase from the shape file, so a reader never sees the story's section names.
+  const phrases = shape.script.sources.map((s) => s.phrase);
+  for (const item of sections.confirm?.items ?? []) {
+    const source = item.line.match(re(shape.script.source.pattern))?.[1];
+    if (!source) continue; // item-shape reports a missing source
+    if (!source.split(shape.script.source.separator).every((part) => phrases.some((p) => sourcePattern(p).test(part)))) {
+      add(item.n, 'confirm-source', 'confirmSource', { phrases: phrases.map((p) => `"${p}"`).join(', ') });
+    }
+  }
 
   for (const key of ['verified', 'notCovered']) {
     for (const item of sections[key]?.items ?? []) {
@@ -266,11 +290,15 @@ function checkScript(lines, sections, { story, record }, add) {
   }
   const notLookedAt = (lines[2] ?? '').toLowerCase();
   for (const section of story.missing) {
-    if (!notLookedAt.includes(section.toLowerCase())) add(3, 'missing-sections', 'missingStorySection', { section });
+    const words = shape.story.sectionWords[section];
+    if (!notLookedAt.includes(words)) add(3, 'missing-sections', 'missingStorySection', { section, words });
   }
   if (story.firstQuestion) {
     const first = sections.confirm?.items[0];
-    if (!first || !re(shape.script.firstQuestionSource).test(first.line)) add(first?.n ?? sections.confirm?.line ?? 6, 'first-question', 'firstQuestion');
+    const source = first?.line.match(re(shape.script.source.pattern))?.[1] ?? '';
+    if (!source.split(shape.script.source.separator).includes(shape.script.firstQuestionSource)) {
+      add(first?.n ?? sections.confirm?.line ?? 6, 'first-question', 'firstQuestion');
+    }
   }
   const total = story.criteria.length;
   const seen = new Map();

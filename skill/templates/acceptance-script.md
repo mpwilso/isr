@@ -16,10 +16,10 @@ Next: [One action for the product owner.]
 - Steps:
   1. [One short sentence.]
 - Expect: [what the tester should see].
-- Covers: criterion [N].
+- Covers: criterion [N] ([what it asks, in a few plain words]).
 
 ## Confirm ([N])
-- [A question for the business?] ([where it came from: a criterion, a story section, or inferred by the build])
+- [A question for the business?] ([where it came from, in the plain phrases the writing rules list])
 
 ## Not covered ([N])
 - Criterion [N]: [the reason. Leave this section out when every criterion lands above.]
