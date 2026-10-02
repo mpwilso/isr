@@ -64,6 +64,21 @@ export function check(text, { story = null, record = null } = {}) {
   const add = (line, rule, key, vars = {}) =>
     problems.push({ line, rule, message: fill(shape.messages[key] ?? key, vars) });
 
+  // The four top lines, each with a blank line after it.
+  // Found in the README: without the blank lines, Markdown runs the four lines together into one paragraph.
+  const head = { text: [], line: [], title: 1 }; // title: the line the title should be on
+  shape.top.forEach((top, k) => {
+    const n = head.title;
+    head.text.push(lines[n - 1] ?? '');
+    head.line.push(n);
+    if (!re(top.pattern).test(lines[n - 1] ?? '')) add(n, 'top-lines', top.message);
+    if (lines[n] === '') head.title = n + 2;
+    else {
+      head.title = n + 1;
+      if (shape.blankAfterTop || k === shape.top.length - 1) add(n, 'top-spacing', 'topSpacing');
+    }
+  });
+
   // Banned anywhere: dashes, double hyphens used as dashes, verdict fields, the team's own words.
   const dashes = shape.banned.dashes.map(([code, name]) => [String.fromCodePoint(code), name]);
   lines.forEach((line, i) => {
@@ -73,41 +88,36 @@ export function check(text, { story = null, record = null } = {}) {
       const found = line.match(re(w.pattern, w.flags));
       if (found) add(i + 1, 'team-words', 'teamWords', { found: found[0], instead: w.instead });
     }
-    if (i > 3 && isVerdict(line)) add(i + 1, 'verdict', 'verdict');
+    if (i + 1 > head.line.at(-1) && isVerdict(line)) add(i + 1, 'verdict', 'verdict');
   });
 
-  shape.top.forEach((top, i) => {
-    if (!re(top.pattern).test(lines[i] ?? '')) add(i + 1, 'top-lines', top.message);
-  });
-  if (lines[4] !== '') add(5, 'layout', 'layout');
-
-  const title = lines[5] ?? '';
+  const title = lines[head.title - 1] ?? '';
   const kind = re(shape.script.title).test(title) ? 'script' : re(shape.notReady.title).test(title) ? 'notReady' : null;
   if (!kind) {
-    add(6, 'title', 'title');
+    add(head.title, 'title', 'title');
     return sorted(problems);
   }
   const defs = kind === 'script' ? shape.script.sections : [{ key: 'missing', heading: shape.notReady.section, required: true }];
-  const sections = parseSections(lines, defs, add);
+  const sections = parseSections(lines, head, defs, add);
 
   for (const [key, s] of Object.entries(sections)) checkCounts(s, add);
-  if (kind === 'script') checkScript(lines, sections, { story, record }, add);
+  if (kind === 'script') checkScript(head, sections, { story, record }, add);
   else {
-    if (!re(shape.notReady.next).test(lines[3] ?? '')) add(4, 'not-ready', 'notReadyNext');
-    if (story && !story.notReady) add(6, 'not-ready', 'storyReady');
+    if (!re(shape.notReady.next).test(head.text[3])) add(head.line[3], 'not-ready', 'notReadyNext');
+    if (story && !story.notReady) add(head.title, 'not-ready', 'storyReady');
   }
   return sorted(problems);
 }
 
 const sorted = (problems) => problems.sort((a, b) => a.line - b.line);
 
-function parseSections(lines, defs, add) {
+function parseSections(lines, head, defs, add) {
   const order = defs.map((d) => d.heading).join(', ');
   const sections = {};
   let current = null;
   let check = null;
   let lastIndex = -1;
-  for (let i = 6; i < lines.length; i++) {
+  for (let i = head.title; i < lines.length; i++) {
     const line = lines[i];
     const n = i + 1;
     if (/^#/.test(line) && lines[i - 1] !== '') add(n, 'layout', 'layout');
@@ -142,7 +152,7 @@ function parseSections(lines, defs, add) {
     add(n, 'stray', 'stray');
   }
   for (const def of defs) {
-    if (def.required && !sections[def.key]) add(6, 'sections', 'missingSection', { heading: def.heading });
+    if (def.required && !sections[def.key]) add(head.title, 'sections', 'missingSection', { heading: def.heading });
   }
   return sections;
 }
@@ -176,7 +186,7 @@ function refs(text) {
   return out;
 }
 
-function checkScript(lines, sections, { story, record }, add) {
+function checkScript(head, sections, { story, record }, add) {
   const c = shape.script.check;
   const risks = c.risks;
   let worst = 0;
@@ -264,44 +274,44 @@ function checkScript(lines, sections, { story, record }, add) {
 
   // The Bottom line's counts against the section headings.
   const said = (key) => (sections[key] ? (sections[key].none ? 0 : sections[key].said) : null);
-  const m = (lines[1] ?? '').match(re(shape.script.counts));
-  if (!m) add(2, 'counts', 'bottomCounts');
+  const m = head.text[1].match(re(shape.script.counts));
+  if (!m) add(head.line[1], 'counts', 'bottomCounts');
   else {
     const pairs = [['verified', 'verified', m[1]], ['byHand', 'to check by hand', m[2]], ['confirm', 'to confirm', m[3]], ['notCovered', 'not covered', m[4]]];
     for (const [key, what, value] of pairs) {
       const count = said(key) ?? 0;
-      if (Number(value ?? 0) !== count) add(2, 'counts', 'bottomMismatch', { said: value ?? 'nothing', what, count });
+      if (Number(value ?? 0) !== count) add(head.line[1], 'counts', 'bottomMismatch', { said: value ?? 'nothing', what, count });
     }
   }
 
-  const type = (lines[0] ?? '').replace(/^Type: /, '');
+  const type = head.text[0].replace(/^Type: /, '');
   if (sections.notCovered?.items.some((i) => i.line.includes(shape.script.movedToConfirm)) && type !== 'Decision needed') {
-    add(1, 'type', 'movedType');
+    add(head.line[0], 'type', 'movedType');
   }
 
   if (record?.notReady) {
-    if (type !== shape.record.type) add(1, 'build-not-ready', 'buildNotReadyType', { why: record.notReady });
-    if (!re(shape.record.bottomLine).test(lines[1] ?? '')) add(2, 'build-not-ready', 'buildNotReadyBottom', { why: record.notReady });
+    if (type !== shape.record.type) add(head.line[0], 'build-not-ready', 'buildNotReadyType', { why: record.notReady });
+    if (!re(shape.record.bottomLine).test(head.text[1])) add(head.line[1], 'build-not-ready', 'buildNotReadyBottom', { why: record.notReady });
   }
   if (!story) return;
   if (story.notReady) {
-    add(6, 'not-ready', 'storyNotReady');
+    add(head.title, 'not-ready', 'storyNotReady');
     return;
   }
   if (!record) {
     if (said('verified')) add(sections.verified.line, 'no-record', 'noRecordVerified');
-    if (!re(shape.noRecord, 'i').test(lines[2] ?? '')) add(3, 'no-record', 'noRecordSaid');
+    if (!re(shape.noRecord, 'i').test(head.text[2])) add(head.line[2], 'no-record', 'noRecordSaid');
   }
-  const notLookedAt = (lines[2] ?? '').toLowerCase();
+  const notLookedAt = head.text[2].toLowerCase();
   for (const section of story.missing) {
     const words = shape.story.sectionWords[section];
-    if (!notLookedAt.includes(words)) add(3, 'missing-sections', 'missingStorySection', { section, words });
+    if (!notLookedAt.includes(words)) add(head.line[2], 'missing-sections', 'missingStorySection', { section, words });
   }
   if (story.firstQuestion) {
     const first = sections.confirm?.items[0];
     const source = first?.line.match(re(shape.script.source.pattern))?.[1] ?? '';
     if (!source.split(shape.script.source.separator).includes(shape.script.firstQuestionSource)) {
-      add(first?.n ?? sections.confirm?.line ?? 6, 'first-question', 'firstQuestion');
+      add(first?.n ?? sections.confirm?.line ?? head.title, 'first-question', 'firstQuestion');
     }
   }
   // Found in regression 2 on the 40171b inputs: criterion 4's "To confirm" detail was never asked.
@@ -312,7 +322,7 @@ function checkScript(lines, sections, { story, record }, add) {
   ];
   const asked = new Set(sources.flatMap((s) => [...s.matchAll(re(shape.script.toConfirmSource, 'g'))].map((m) => Number(m[1]))));
   for (const n of story.toConfirm ?? []) {
-    if (!asked.has(n)) add(confirm?.line ?? 6, 'to-confirm', 'toConfirm', { n });
+    if (!asked.has(n)) add(confirm?.line ?? head.title, 'to-confirm', 'toConfirm', { n });
   }
   const total = story.criteria.length;
   const seen = new Map();
@@ -321,7 +331,7 @@ function checkScript(lines, sections, { story, record }, add) {
     else if (seen.has(n)) add(line, 'coverage-duplicate', 'coverageDuplicate', { n });
     else seen.set(n, line);
   }
-  const where = sections.verified?.line ?? 6;
+  const where = sections.verified?.line ?? head.title;
   for (let n = 1; n <= total; n++) if (!seen.has(n)) add(where, 'coverage-missing', 'coverageMissing', { n });
 }
 

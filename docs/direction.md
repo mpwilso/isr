@@ -1,6 +1,6 @@
 # ISR: direction
 
-ISR is reconnaissance before and after release. Before release, it turns what the story asked and what the build already proved into a short acceptance script, so the people accepting a change check only what a person needs to. After release, it traces failures back to the story and says whether the code, the requirement or an assumption was wrong.
+ISR prepares acceptance. From the story and what the build already proved, it writes a short acceptance script, so the people accepting a change check only what a person needs to. Tracing failures back to the story after release is a later idea and is not built.
 
 It is not a test management tool, a test runner or an incident tool. Teams keep theirs. ISR's script is plain Markdown that can be pasted into whatever they already use.
 

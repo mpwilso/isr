@@ -1,6 +1,9 @@
 Type: [Recommendation, or Decision needed]
+
 Bottom line: [N verified, N to check by hand, N to confirm; then the one thing that matters most.]
+
 Not looked at: [What ISR could not see: the build itself, and any missing record, story section or gap the record admits.]
+
 Next: [One action for the product owner.]
 
 # Acceptance script: [The story's title]

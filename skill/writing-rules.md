@@ -63,6 +63,8 @@ The reader never sees the story's section names, such as "Questions before build
 
 ## The four top lines
 
+Put a blank line after each, so Markdown shows them as four lines and not one paragraph.
+
 - **Type:** Recommendation, unless a check moved to Confirm or the build is not verified. Then Decision needed.
 - **Bottom line:** one sentence, with the counts and the one thing that matters most.
 - **Not looked at:** one sentence on what ISR could not see. Always the build itself, since ISR reads only text. Add a missing record, missing story sections, and gaps the record admits.

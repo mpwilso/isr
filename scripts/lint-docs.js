@@ -16,8 +16,8 @@ const DASHES = new Map([
 
 // Two hyphens between spaces, or between two letters. A flag has a letter right after, so it passes.
 const DOUBLE_HYPHEN = /(^|\s)--(?=\s|$)|\w--\w/;
-// "<id>" or "<path to file>". Comments and autolinks are fine.
-const PLACEHOLDER = /<(?!!--)(?!https?:|mailto:)[A-Za-z][^<>\n]*>/;
+// "<id>" or "<path to file>". Comments, autolinks and the README logo's HTML tags (p, picture, source, img, b) are fine.
+const PLACEHOLDER = /<(?!!--)(?!https?:|mailto:)(?!(?:p|picture|source|img|b)(?:\s[^<>\n]*)?>)[A-Za-z][^<>\n]*>/;
 // Where prose hides in code files: whole-line and trailing comments.
 const COMMENT = { js: /(?:^|\s)\/\/(.*)$|^\s*\*(.*)$/, sh: /(?:^|\s)#(.*)$/, yml: /(?:^|\s)#(.*)$/ };
 

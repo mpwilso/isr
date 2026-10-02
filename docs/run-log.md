@@ -2,13 +2,15 @@
 
 This log was written from the builder's own notes after the runs; the raw outputs are not kept in this repo.
 
+The advisor named in some entries is a separate Claude chat that reviewed each step, wrote predictions before runs, and judged the output alongside Matt.
+
 Each entry names the note file it came from.
 
 ## Real run 1, 2026-10-01
 
 - Run: ISR on one real change, the Parallax change that lets Accept and merge land a task whose base has moved.
 - Input: the story for that change, and the record of Parallax task 786e71. That record says 43 plan tests passed and 1 was skipped, Second Eye, the blind checker, passed it, 7 files changed, and the build cost an estimated $2.63 of a $5.00 cap.
-- Result: a script with 4 verified, 1 to check by hand and 6 to confirm, shown in the README. The builder judged it. An attempt at the hand check took about 70 minutes and $1.47 and did not get far enough to run it.
+- Result: a script with 4 verified, 1 to check by hand and 6 to confirm. The builder judged it. An attempt at the hand check took about 70 minutes and $1.47 and did not get far enough to run it.
 - README: this script was the README example until the README switched to the 40171b script in `examples/parallax-40171b/`.
 - Notes: `real-run-1/run/record/record.md`, `real-run-1/run/script.md`, `real-run-1/after.txt`.
 
@@ -78,9 +80,18 @@ Each entry names the note file it came from.
 - Why: to separate variation from the model from variation caused by rule changes. Earlier runs on these inputs put 3, 2 and 1 criteria under Already verified, but the rules changed between them.
 - Setup: master 026a514, the same story and record copied byte for byte into three folders, the README prompt word for word, and the same permission flags as the regressions.
 - Cost: $0.47, $0.47 and $0.56, $1.50 in total. Each run's checker passed in one round.
-- Agreed in all three: Type Recommendation; the first question and its source; the five Confirm questions shown; three checks by hand; criterion 1 and criterion 3 under Check by hand; criterion 5 under Already verified.
+- Agreed in all three: Type Recommendation; the first question and its source; the five Confirm questions shown; three checks by hand; criterion 1, criterion 3 and criterion 4 under Check by hand; criterion 5 under Already verified.
 - Differed: criterion 2 was verified in run 2 and checked by hand in runs 1 and 3, although the plan names a risk against that step in the WSL guide; risk levels (criterion 1 High once and Medium twice, criterion 4 from Medium to Low); how criteria were grouped into checks; the order of Confirm items; and which items fell under Not shown.
 - Verified counts: 1, 2 and 1. Most of the earlier spread of 3, 2 and 1 came from rule changes.
 - Wrong item: run 2 said the build's plan states something about the error wording that the plan does not say; the plan says the wording likely comes from the agent runtime. Counting the first regression, two of the last five runs on these inputs had a wrong item, both about where a claim came from.
 - Decision: no new rules from these inputs. Five runs on one story risk fitting rules to that story. The next evidence should come from a different story.
 - Notes: `variance-40171b/run-1`, `run-2` and `run-3`.
+
+## A fourth run with fixed rules, and the blank-line shape, on the 40171b inputs, 2026-10-01
+
+- Why: a fresh example after the shape changed to put a blank line after each of the four top lines, so scripts render correctly as Markdown. Before this, the four top lines ran together into one paragraph on GitHub and in most tools a team would paste into.
+- Setup: this branch's skill, the same story and record copied byte for byte, the same flags as the variance runs, the README prompt word for word.
+- Result: cost $0.53, checker passed in 1 round. 2 verified, 3 to check by hand, 7 to confirm (5 shown).
+- Rule bent: criterion 2 was counted as verified although the plan names a risk against that step in the WSL guide. The claim itself is true against the landed commit. With the rules fixed, 2 of 4 runs on these inputs bent the named-risk rule, both times on criterion 2. This is the weakest rule so far, and the checker cannot enforce it.
+- Not used as the README example, because it bent a rule; the example stays the run-3 script, which kept every rule, with the blank lines added.
+- Notes: `example-40171b-v2/run/`.

@@ -57,10 +57,19 @@ test('the checker still runs when the skill folder is a symlink', () => {
   }
 });
 
+// Each template starts with the four top lines, each with a blank line after it, then the title.
+const topLines = (lines) => {
+  assert.ok(shape.blankAfterTop);
+  shape.top.forEach((top, i) => {
+    assert.ok(lines[2 * i].startsWith(top.pattern.match(/^\^(.+?: )/)[1]), lines[2 * i]);
+    assert.equal(lines[2 * i + 1], '');
+  });
+  return lines[2 * shape.top.length];
+};
+
 test('the script template follows the shape file', () => {
   const lines = read('skill/templates/acceptance-script.md').split('\n');
-  shape.top.forEach((top, i) => assert.ok(lines[i].startsWith(top.pattern.match(/^\^(.+?: )/)[1]), lines[i]));
-  assert.ok(lines[5].startsWith(shape.script.title.slice(1, -3)));
+  assert.ok(topLines(lines).startsWith(shape.script.title.slice(1, -3)));
   const headings = lines.filter((l) => l.startsWith('## ')).map((l) => l.replace(/^## (.+) \(\[N\]\)$/, '$1'));
   assert.deepEqual(headings, shape.script.sections.map((s) => s.heading));
   const labels = lines.filter((l) => /^- \w+:/.test(l)).map((l) => l.match(/^- (\w+):/)[1]);
@@ -82,9 +91,9 @@ test('the reading guide, writing rules and template use the shape file\'s plain 
 
 test('the not ready template follows the shape file', () => {
   const lines = read('skill/templates/not-ready.md').split('\n');
-  assert.ok(lines[5].startsWith(shape.notReady.title.slice(1, -3)));
+  assert.ok(topLines(lines).startsWith(shape.notReady.title.slice(1, -3)));
   assert.ok(lines.includes(`## ${shape.notReady.section} ([N])`));
-  assert.match(lines[3], new RegExp(shape.notReady.next));
+  assert.match(lines[6], new RegExp(shape.notReady.next));
 });
 
 test('every example script has its story', () => {

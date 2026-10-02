@@ -1,6 +1,9 @@
 Type: Decision needed
+
 Bottom line: The build is not verified yet, so hold the by-hand checks until it is; 0 verified, 4 to check by hand, 12 to confirm.
+
 Not looked at: the build's test results and review, since its task folder has no record, which means it never reached its ready state; the build itself.
+
 Next: Hold these checks until the build is verified, then ask Sam to run check 1 and give checks 2 to 4 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account

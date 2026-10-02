@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { check, readRecord, readStory, shape } from '../skill/src/check.js';
 
@@ -24,9 +25,17 @@ for (const file of readdirSync(EX).filter((f) => f.endsWith('.script.md'))) {
   });
 }
 
-// The README example: a real run's script, kept byte for byte with its story and record.
-test('the README example, examples/parallax-40171b, passes the checker against its story and record', () => {
+// Joins the four top lines back together, as scripts were written before the blank line rule.
+const joined = (text) => text.replace(/^((?:.+\n\n){3})/, (top) => top.replace(/\n\n/g, '\n'));
+
+// The README example: a real run's script, kept byte for byte with its story and record,
+// except for the blank lines the current shape puts between the four top lines.
+test('the README example, examples/parallax-40171b, is the run-3 script with blank lines added, and passes the checker', () => {
   const dir = 'examples/parallax-40171b';
+  const text = read(`${dir}/script.md`);
+  // Without the blank lines, it is the run-3 script from the builder's notes, byte for byte.
+  const original = createHash('sha256').update(joined(text)).digest('hex');
+  assert.equal(original, 'cc9fcf82abed91fa44f62a98e568107d575aeea3adf8e3b413594b5bc167cc6b');
   const args = [CHECKER, `${dir}/script.md`, '--story', `${dir}/story.md`, '--record', `${dir}/record`];
   assert.match(execFileSync('node', args, { encoding: 'utf8' }), /^Checked with Node \d+\.\d+\.\d+\.\n$/);
 });
@@ -50,6 +59,15 @@ for (const [what, dash] of [['an em dash', String.fromCodePoint(0x2014)], ['an e
   });
 }
 
+test('each of the four top lines has a blank line after it, in a script and in the not ready report', () => {
+  // Found in the README: Markdown ran the four top lines together into one paragraph.
+  const problems = check(joined(good), { story, record });
+  assert.deepEqual(rules(problems), ['top-spacing']);
+  assert.deepEqual(problems.map((p) => p.line), [1, 2, 3]);
+  assert.equal(read(`${FIX}/bad/top-spacing.md`), joined(good));
+  assert.deepEqual(rules(check(joined(read(`${EX}/export-notes.script.md`)))), ['top-spacing']);
+});
+
 test('a script with Type: FYI is rejected on line 1', () => {
   const fyi = good.replace('Type: Decision needed', 'Type: FYI');
   assert.deepEqual(check(fyi, { story, record }).filter((p) => p.rule === 'top-lines').map((p) => p.line), [1]);
@@ -58,7 +76,7 @@ test('a script with Type: FYI is rejected on line 1', () => {
 test('with a story and no record, the no record rules apply', () => {
   const problems = check(good, { story });
   assert.deepEqual(rules(problems), ['no-record']);
-  assert.deepEqual(problems.map((p) => p.line), [3, 8]);
+  assert.deepEqual(problems.map((p) => p.line), [5, 11]);
 });
 
 test('a story section that is missing must be named under Not looked at', () => {
@@ -127,8 +145,11 @@ test('criteria hidden under Not shown still count toward coverage', () => {
   const checkBlock = (n) => `\n### ${n}. Case ${n}\n- Risk: Low. Why: invented.\n- Needs: an account.\n- Steps:\n  1. Do the thing.\n- Expect: it works.\n- Covers: criterion ${n} (case ${n} works).\n`;
   const script = [
     'Type: Recommendation',
+    '',
     'Bottom line: 0 verified, 6 to check by hand, 0 to confirm; invented.',
+    '',
     'Not looked at: no build record was given.',
+    '',
     'Next: Give the checks to a tester.',
     '',
     '# Acceptance script: Six',
@@ -187,7 +208,7 @@ test('the record\'s blind checker, Second Eye, is called the automated reviewer'
 test('the command line: exit 1 with file and line on a problem, 2 on bad usage', () => {
   const bad = spawnSync('node', [CHECKER, `${FIX}/bad/title.md`], { encoding: 'utf8' });
   assert.equal(bad.status, 1);
-  assert.match(bad.stdout, /^tests\/fixtures\/bad\/title\.md:6: .+ \[title\]$/m);
+  assert.match(bad.stdout, /^tests\/fixtures\/bad\/title\.md:9: .+ \[title\]$/m);
   assert.equal(spawnSync('node', [CHECKER], { encoding: 'utf8' }).status, 2);
   const missing = spawnSync('node', [CHECKER, 'no-such-file.md'], { encoding: 'utf8' });
   assert.equal(missing.status, 2);

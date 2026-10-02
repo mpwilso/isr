@@ -28,6 +28,20 @@ test('flags angle-bracket placeholders outside code', () => {
   assert.deepEqual(lines('a.md', 'See <https://example.com>. <!-- a comment -->'), []);
 });
 
+test('allows the HTML tags p, picture, source, img and b, with their attributes, and nothing else', () => {
+  const html = [
+    '<p align="center">',
+    '  <picture>',
+    '    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/lockup-dark.svg">',
+    '    <img src="docs/brand/lockup-light.svg" alt="ISR" height="72">',
+    '  </picture>',
+    '</p>',
+    '<p align="center"><b>Bold words.</b></p>',
+  ].join('\n');
+  assert.deepEqual(lines('a.md', html), []);
+  assert.deepEqual(lines('a.md', 'Save it as <name>.\nRun it on <path>.\n<p align="center"><name></p>\n<div align="center">'), [1, 2, 3, 4]);
+});
+
 test('the repo files themselves pass', async () => {
   const { execFileSync } = await import('node:child_process');
   const out = execFileSync('node', ['scripts/lint-docs.js'], { encoding: 'utf8' });

@@ -1,6 +1,9 @@
 Type: Recommendation
+
 Bottom line: 2 verified, 2 to check by hand, 12 to confirm; nothing has checked that a skipped box is not charged, so check 1 matters most.
+
 Not looked at: the build itself, since ISR read only the story and the build record and takes the record's word on what its tests cover.
+
 Next: Ask Sam to run check 1 in staging, then give check 2 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account

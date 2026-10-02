@@ -1,10 +1,11 @@
 {
   "top": [
     { "pattern": "^Type: (Decision needed|Recommendation)$", "message": "Line 1 must read \"Type: Decision needed\" or \"Type: Recommendation\"." },
-    { "pattern": "^Bottom line: \\S", "message": "Line 2 must start with \"Bottom line: \", one sentence." },
-    { "pattern": "^Not looked at: \\S", "message": "Line 3 must start with \"Not looked at: \", what ISR could not see." },
-    { "pattern": "^Next: \\S", "message": "Line 4 must start with \"Next: \", one action for the product owner." }
+    { "pattern": "^Bottom line: \\S", "message": "Line 3 must start with \"Bottom line: \", one sentence." },
+    { "pattern": "^Not looked at: \\S", "message": "Line 5 must start with \"Not looked at: \", what ISR could not see." },
+    { "pattern": "^Next: \\S", "message": "Line 7 must start with \"Next: \", one action for the product owner." }
   ],
+  "blankAfterTop": true,
   "maxItems": 5,
   "none": "^None\\.",
   "notShown": { "pattern": "^Not shown \\((\\d+)\\): (.+)$", "separator": "; " },
@@ -115,8 +116,9 @@
   "noRecord": "\\bno (?:build )?record\\b",
 
   "messages": {
-    "layout": "Leave line 5 blank, and put a blank line before every heading.",
-    "title": "Line 6 must be the title: \"# Acceptance script: \" and the story's title, or \"# Not ready for acceptance: \" and what the story is about.",
+    "topSpacing": "Leave a blank line after each of the four top lines, so Markdown shows them as four lines and not one paragraph.",
+    "layout": "Put a blank line before every heading.",
+    "title": "Line 9 must be the title: \"# Acceptance script: \" and the story's title, or \"# Not ready for acceptance: \" and what the story is about.",
     "stray": "This line doesn't belong here. Each section holds only its items, \"None.\" or one \"Not shown (N):\" line.",
     "unknownSection": "\"{heading}\" is not a section. The sections, in order: {order}.",
     "duplicateSection": "\"{heading}\" appears more than once.",

@@ -1,6 +1,9 @@
 Type: Recommendation
+
 Bottom line: 0 verified, 4 to check by hand, 12 to confirm; with no build record, every criterion needs a person to check it.
+
 Not looked at: no build record was given, so nothing counts as verified, and ISR did not look at the build itself.
+
 Next: Ask Sam to run check 1 in staging, then give checks 2 to 4 to a tester.
 
 # Acceptance script: Let subscribers skip their next box from their account
