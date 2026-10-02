@@ -9,7 +9,7 @@
 
 Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 13 runs. Every result is in the run log, including the misses.
 
-ISR is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have not yet been run in that order on one change. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
+ISR (Intelligence, Surveillance, and Reconnaissance) is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have not yet been run in that order on one change. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
 ## The problem it addresses
 
@@ -123,6 +123,10 @@ The skill is told not to do these, and the checker cannot catch them:
 - Not shown yet: use by a team, or a time saving. Those need real users.
 
 The rest, run by run, is in [docs/run-log.md](docs/run-log.md).
+
+## How it was built
+
+I designed ISR and directed its build; Claude Code wrote most of the code. The run log shows the process: [docs/run-log.md](docs/run-log.md).
 
 ## What's here
 
