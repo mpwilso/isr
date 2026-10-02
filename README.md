@@ -7,7 +7,7 @@
 
 <p align="center"><b>Writes the acceptance script for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.</b></p>
 
-Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 12 runs. Every result is in the run log, including the misses.
+Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 13 runs. Every result is in the run log, including the misses.
 
 ISR is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
@@ -21,7 +21,7 @@ When a change lands, whoever accepts it has to work out what the build already s
 - Checked the script's claims against the commit that actually landed.
 - Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
 - Measured how much runs vary with the rules held fixed: three runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
-- Counted wrong items: two of the last five runs on the same inputs credited a claim to the wrong source. One led to a new rule; the other was logged and left, so the rules don't get fitted to one story.
+- Counted where it broke its own rules: with the rules held fixed, two of four runs counted the same criterion as verified although the plan names a risk against it. That rule is now the weakest, and it is logged rather than patched, so the rules don't get fitted to one story.
 - Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 ## What you give it and what you get
@@ -61,13 +61,13 @@ The story's requirements, shortened, and numbered as the script uses them:
 4. `parallax show` and the web card show the same hint, and the card's options, question and retry behavior stay as they are.
 5. A test covers both cases: a namespace or bwrap error shows both pointers, and another sandbox start error shows only the `parallax doctor` line.
 
-Type: Recommendation
-
-Bottom line: 1 verified, 3 to check by hand, 8 to confirm; the most important thing is that the build spots a sandbox start failure only by key words in the error text, and the automated reviewer found that any error mentioning "namespace" also gets the hint.
-
-Not looked at: ISR did not see the build itself, the record says the automated reviewer did not run the tests or see how the web card reads the extra lines or how the card shape checks treat them, and nobody looked at what wording real sandbox start failures produce beyond the one example.
-
-Next: Answer the first Confirm question on how a sandbox start failure should be recognized, then ask an engineer to size the three checks by hand.
+> Type: Recommendation
+> 
+> Bottom line: 1 verified, 3 to check by hand, 8 to confirm; the most important thing is that the build spots a sandbox start failure only by key words in the error text, and the automated reviewer found that any error mentioning "namespace" also gets the hint.
+> 
+> Not looked at: ISR did not see the build itself, the record says the automated reviewer did not run the tests or see how the web card reads the extra lines or how the card shape checks treat them, and nobody looked at what wording real sandbox start failures produce beyond the one example.
+> 
+> Next: Answer the first Confirm question on how a sandbox start failure should be recognized, then ask an engineer to size the three checks by hand.
 
 The full script, rendered: [examples/parallax-40171b/script.md](examples/parallax-40171b/script.md)
 
