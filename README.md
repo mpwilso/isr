@@ -20,7 +20,7 @@ When a change lands, whoever accepts it has to work out what the build already s
 - Wrote predictions before runs and scored the script against them.
 - Checked the script's claims against the commit that actually landed.
 - Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
-- Measured how much runs vary with the rules held fixed: three runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
+- Measured how much runs vary with the rules held fixed: four runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
 - Counted where it broke its own rules: with the rules held fixed, two of four runs counted the same criterion as verified although the plan names a risk against it. That rule is now the weakest, and it is logged rather than patched, so the rules don't get fitted to one story.
 - Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 

@@ -92,6 +92,7 @@ Each entry names the note file it came from.
 - Why: a fresh example after the shape changed to put a blank line after each of the four top lines, so scripts render correctly as Markdown. Before this, the four top lines ran together into one paragraph on GitHub and in most tools a team would paste into.
 - Setup: this branch's skill, the same story and record copied byte for byte, the same flags as the variance runs, the README prompt word for word.
 - Result: cost $0.53, checker passed in 1 round. 2 verified, 3 to check by hand, 7 to confirm (5 shown).
+- Agreed with the three earlier fixed-rules runs on: Type Recommendation; the first question and its source; the five Confirm questions shown; criteria 1, 3 and 4 under Check by hand; criterion 5 under Already verified. It differed on criterion 2, as run 2 did.
 - Rule bent: criterion 2 was counted as verified although the plan names a risk against that step in the WSL guide. The claim itself is true against the landed commit. With the rules fixed, 2 of 4 runs on these inputs bent the named-risk rule, both times on criterion 2. This is the weakest rule so far, and the checker cannot enforce it.
 - Not used as the README example, because it bent a rule; the example stays the run-3 script, which kept every rule, with the blank lines added.
 - Notes: `example-40171b-v2/run/`.
