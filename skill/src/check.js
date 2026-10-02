@@ -111,7 +111,7 @@ export function check(text, { story = null, record = null } = {}) {
 
 const sorted = (problems) => problems.sort((a, b) => a.line - b.line);
 
-function parseSections(lines, head, defs, add) {
+export function parseSections(lines, head, defs, add) {
   const order = defs.map((d) => d.heading).join(', ');
   const sections = {};
   let current = null;
@@ -180,7 +180,7 @@ function checkCounts(s, add) {
 }
 
 // Criterion numbers an item names: "Criterion 3", "criteria 1 and 2".
-function refs(text) {
+export function refs(text) {
   const out = [];
   for (const m of text.matchAll(re(shape.criterionRef, 'gi'))) out.push(...m[1].split(/\D+/).filter(Boolean).map(Number));
   return out;
