@@ -108,3 +108,24 @@ Each entry names the note file it came from.
 - The runner returns the file the checker passed, not the writer's reply, so a reply reworded after the check can no longer slip through.
 - What this does not show: that the loop lowers the rate of broken rules, since in this one run the writer kept the rule on its own, as 2 of the 4 earlier runs did; a real run where the Stop hook sent a script back; the mapper on any other story. The send-back is shown only in tests, with a stand-in for the SDK.
 - Notes: `runner-smoke-1/` (`run.json`, `risks.json`, `script.md`, and `map-5.mjs`, the script for the mapper-only runs).
+
+## Four runner runs on the 40171b inputs, two with the risks hidden from the writer, 2026-10-05
+
+- Why: to see the Stop hook act on a real run. With the risk map in hand, the writer's own checker runs fail a bent script before it ever stops, so a normal run can't show the hook. `--hide-risks-from-writer` leaves the map to the Stop hook alone. It is an experiment, not how ISR is meant to run.
+- Setup: branch runner-loop at e3d6a2b, claude-opus-5-5, the same story and record as the variance runs, the writer capped at $0.65 (normal) or $0.90 (hidden). Two runs at a time, in parallel.
+- Total cost: $1.48 of a $3.00 limit.
+
+| Run | Risks hidden | Cost | Checker runs by the writer | Stop hook send-backs | Criterion 2 | Blocked by the map | Final file passed |
+|:---|:---|---:|---:|---:|:---|:---|:---|
+| normal-1 | no | $0.42 | 1 | 0 | Check by hand | 1, 2, 3, 4 of 5 | yes |
+| normal-2 | no | $0.35 | 1 | 0 | Check by hand | 1, 2, 3, 4 of 5 | yes |
+| hidden-1 | yes | $0.37 | 2 | 0 | Check by hand | 1, 2, 3, 4 of 5 | yes |
+| hidden-2 | yes | $0.34 | 1 | 0 | Check by hand | 1, 2, 3, 4 of 5 | yes |
+
+- What the normal arm shows: the loop runs end to end, and with the map in hand the writer placed every criterion where the map allows on its first stop. It can't show the Stop hook catching anything, since the writer's own checker would have caught a bent script first.
+- What the hidden arm shows: without the map, the writer still kept criterion 2 out of Already verified in both runs, so the Stop hook had nothing to send back. No real run has yet shown a send-back; that path is shown only in tests, with a stand-in for the SDK.
+- Agreed in all four: every criterion in the same section (1 to 4 by hand, 5 verified) and Type Recommendation. Counts differed only in checks by hand (3 or 4) and Confirm items (9 or 10).
+- Over-blocking: the mapper again linked criteria 1 to 4 in every run, so 10 of 10 mapper runs on these inputs now agree. Its links have still not been judged by a person.
+- Refused tool calls: each run had one or two, all Bash. The writer tried a combined command to read its inputs (`cd`, `ls`, `cat` together), or a `sed` edit of the script; each time it fell back to the allowed tools and finished.
+- What this does not show: a rate. Two runs per arm, on one story, can't say how often the writer bends the rule without the map; the earlier 2 of 4 came from runs under `claude -p`, with a different setup.
+- Notes: `runner-runs/normal-1`, `normal-2`, `hidden-1` and `hidden-2`, each with `run.json`, `risks.json` and `script.md`, and the reply and stderr next to each.
