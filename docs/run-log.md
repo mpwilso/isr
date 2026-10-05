@@ -129,3 +129,13 @@ Each entry names the note file it came from.
 - Refused tool calls: each run had one or two, all Bash. The writer tried a combined command to read its inputs (`cd`, `ls`, `cat` together), or a `sed` edit of the script; each time it fell back to the allowed tools and finished.
 - What this does not show: a rate. Two runs per arm, on one story, can't say how often the writer bends the rule without the map; the earlier 2 of 4 came from runs under `claude -p`, with a different setup.
 - Notes: `runner-runs/normal-1`, `normal-2`, `hidden-1` and `hidden-2`, each with `run.json`, `risks.json` and `script.md`, and the reply and stderr next to each.
+
+## Judging the mapper's links on 40171b, 2026-10-05
+
+- Why: the mapper linked criteria 1 to 4 to a risk in 10 of 10 runs, so only criterion 5 could be verified. The question was whether that blocking is earned or the mapper over-links.
+- What was judged: the 10 distinct risk-to-criterion links the mapper made across the 5 saved runner runs (the smoke run and the 4 runs in runner-runs). The question for each: if this risk came true, would that criterion plausibly fail or be unproven?
+- Who judged: an independent reviewer agent (same model family as ISR) that saw only the 5 criteria, the 5 risks and the links in shuffled order, without how often each was made; the advisor, who wrote marks before seeing the agent's; and Matt, who broke the one tie that decided a criterion.
+- Results: 7 links right by agreement or Matt's tie-break: free-text detection to criteria 1 and 3, the shape check to criteria 1 and 4, web card rendering to criterion 4, the bare "namespace" match to criterion 3, and editing the WSL guide step to criterion 2 (the agent said right, the advisor said wrong, Matt said right). 2 links right by the agent and unsure by the advisor: free-text detection to criterion 2, and the shape check to criterion 2. 1 link doubtful: the bare "namespace" match to criterion 2 (the agent said wrong, the advisor unsure), made in 4 of 5 runs. 1 link missing: web card rendering to criterion 1, which the agent found and the mapper never made.
+- Verdict for this story: the blocking is earned. Every blocked criterion is held out by at least one link judged right. Neither the doubtful link nor the missing one changed what could be verified.
+- What this does not show: the mapper on any other story; a judgment by anyone outside the builder and two models of the same family; whether broad plan risks over-block on stories where the build is less risky.
+- Notes: `runner-smoke-1/risks.json`, `runner-runs/*/risks.json`.

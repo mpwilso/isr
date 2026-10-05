@@ -127,7 +127,7 @@ The skill is told not to do these, and the checker cannot catch them:
 - Tested in Claude Code only.
 - Loupe bug reports have no criteria section, so ISR calls them not ready.
 - Not shown yet: use by a team, or a time saving. Those need real users.
-- The runner's risk map can over-block. On 40171b the mapper linked 4 of 5 criteria in all 6 runs, so only 1 could be verified. On stories whose plans name broad risks, Already verified may be left nearly empty, and whether each link is right has not been judged by a person yet.
+- The runner's mapper can keep most criteria out of Already verified when a plan names broad risks. On 40171b it blocked 4 of 5, and a review of each link found the blocking earned. It has not been judged on any other story.
 
 The rest, run by run, is in [docs/run-log.md](docs/run-log.md).
 
