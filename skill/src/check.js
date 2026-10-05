@@ -49,14 +49,16 @@ export function readRecord(path) {
   }
   const text = readFileSync(path, 'utf8');
   const skipped = Math.max(0, ...[...text.matchAll(re(shape.record.skipped, 'g'))].map((m) => Number(m[1])));
+  // Parallax writes "plan tests" or "the plan's tests" in every record so far: only the plan's tests ran, not the full suite.
+  const planTests = re(shape.record.planTests, 'i').test(text);
   for (const pattern of shape.record.notReady) {
     const m = text.match(re(pattern, 'm'));
-    if (m) return { notReady: `the record says "${m[0]}"`, skipped };
+    if (m) return { notReady: `the record says "${m[0]}"`, skipped, planTests };
   }
   for (const m of text.matchAll(re(shape.record.passedOf, 'g'))) {
-    if (Number(m[1]) < Number(m[2])) return { notReady: `the record says "${m[0]}"`, skipped };
+    if (Number(m[1]) < Number(m[2])) return { notReady: `the record says "${m[0]}"`, skipped, planTests };
   }
-  return { notReady: null, skipped };
+  return { notReady: null, skipped, planTests };
 }
 
 // The risk map the runner writes: each risk the build's plan or record names, and the criteria it bears on.
@@ -310,6 +312,10 @@ function checkScript(head, sections, { story, record, riskMap }, add) {
     add(head.line[0], 'type', 'movedType');
   }
 
+  // Named on e9a55a, missed on 40171b and e3108e: the record showed only the plan's tests, and Not looked at didn't say so.
+  if (record?.planTests && !record.notReady && !re(shape.record.planTestsSaid, 'i').test(head.text[2])) {
+    add(head.line[2], 'plan-tests', 'planTestsNotSaid');
+  }
   if (record?.notReady) {
     if (type !== shape.record.type) add(head.line[0], 'build-not-ready', 'buildNotReadyType', { why: record.notReady });
     if (!re(shape.record.bottomLine).test(head.text[1])) add(head.line[1], 'build-not-ready', 'buildNotReadyBottom', { why: record.notReady });

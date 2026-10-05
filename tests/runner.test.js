@@ -14,9 +14,11 @@ const inputs = { story: `${EX}/story.md`, record: `${EX}/record` };
 // Written by hand for these tests, not by the mapper: which criteria each 40171b risk bears on.
 const handMap = JSON.parse(read('tests/fixtures/named-risk/40171b.risks.json'));
 const mapperReply = { links: handMap.risks.map((r, i) => ({ risk: i + 1, criteria: r.criteria, why: 'by hand' })) };
+// Both real scripts predate the plan-tests rule; this adds what it asks, so only the risk map decides here.
+const sayPlanTests = (text) => text.replace(/^(Not looked at: .*)\.$/m, "$1; the record shows only the plan's tests, not the full suite.");
 // Fixed-rules run 4 verified criterion 2 although the plan names a risk against it; the README example did not.
-const bent = read('tests/fixtures/named-risk/run-4.script.md');
-const kept = read(`${EX}/script.md`);
+const bent = sayPlanTests(read('tests/fixtures/named-risk/run-4.script.md'));
+const kept = sayPlanTests(read(`${EX}/script.md`));
 
 // A stand-in for the SDK's query(): the mapper replies with `reply`; the writer saves each script in `writes` in turn
 // through the gate, and asks to stop after each one, as a real writer would.

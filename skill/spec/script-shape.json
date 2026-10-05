@@ -111,7 +111,9 @@
     "skipped": "\\b(\\d+) (?:were |was )?skipped\\b",
     "allPassed": "\\b(\\d+) of \\1\\b",
     "passedCount": "\\b\\d+ (?:\\w+ ){0,3}pass(?:ed|ing)\\b",
-    "skippedCount": "\\b{n} (?:\\w+ ){0,2}skipped\\b"
+    "skippedCount": "\\b{n} (?:\\w+ ){0,2}skipped\\b",
+    "planTests": "\\bplan(?:'s)? tests\\b",
+    "planTestsSaid": "\\bplan(?:'s)? (?:own )?tests\\b|\\b(?:full|whole) (?:test )?suite\\b"
   },
   "noRecord": "\\bno (?:build )?record\\b",
   "risks": { "from": { "plan": "the build's plan", "record": "the build record" } },
@@ -168,6 +170,7 @@
     "movedType": "A check moved to Confirm means a decision is needed, so Type must be \"Decision needed\".",
     "skippedAllPassed": "The record says {skipped}, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",
     "namedRisk": "Criterion {n} is under Already verified, but {where} names a risk against it: \"{risk}\". Put it under Check by hand. If the risk is a question for the business, ask it under Confirm and list the criterion under Not covered with \"moved to Confirm\".",
+    "planTestsNotSaid": "The record shows only the plan's tests ran, not the full suite. Say so under Not looked at, like \"the record shows only the plan's tests, not the full suite\".",
     "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped."
   }
 }

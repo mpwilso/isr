@@ -2,7 +2,7 @@ Type: Decision needed
 
 Bottom line: 1 verified, 1 to check by hand, 8 to confirm, 1 not covered; the build gave boxes created before 1 December the 96 hour cutoff, which the story left open, so that needs a decision first.
 
-Not looked at: the build itself, since ISR read only the story and the build record; the record admits its tests set the date with a stand-in clock, skipped the 2 tests that read staging's own clock, and never looked at Stockroom.
+Not looked at: the build itself, since ISR read only the story and the build record; the record admits its tests set the date with a stand-in clock, skipped the 2 tests that read staging's own clock, and never looked at Stockroom; it shows only the plan's tests, not the full suite.
 
 Next: Ask Theo and Sam whether a box created before 1 December keeps 72 hours, then have an engineer run check 1 in staging.
 

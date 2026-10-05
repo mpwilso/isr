@@ -30,14 +30,15 @@ const joined = (text) => text.replace(/^((?:.+\n\n){3})/, (top) => top.replace(/
 
 // The README example: a real run's script, kept byte for byte with its story and record,
 // except for the blank lines the current shape puts between the four top lines.
-test('the README example, examples/parallax-40171b, is the run-3 script with blank lines added, and passes the checker', () => {
+// It predates the plan-tests rule and misses exactly that, so it fails that rule and nothing else.
+test('the README example, examples/parallax-40171b, is the run-3 script with blank lines added, and fails only the plan-tests rule', () => {
   const dir = 'examples/parallax-40171b';
   const text = read(`${dir}/script.md`);
   // Without the blank lines, it is the run-3 script from the builder's notes, byte for byte.
   const original = createHash('sha256').update(joined(text)).digest('hex');
   assert.equal(original, 'cc9fcf82abed91fa44f62a98e568107d575aeea3adf8e3b413594b5bc167cc6b');
-  const args = [CHECKER, `${dir}/script.md`, '--story', `${dir}/story.md`, '--record', `${dir}/record`];
-  assert.match(execFileSync('node', args, { encoding: 'utf8' }), /^Checked with Node \d+\.\d+\.\d+\.\n$/);
+  const problems = check(text, { story: readStory(read(`${dir}/story.md`)), record: readRecord(`${dir}/record`) });
+  assert.deepEqual(problems.map((p) => [p.line, p.rule]), [[5, 'plan-tests']]);
 });
 
 test('the good fixture passes', () => {
@@ -97,6 +98,23 @@ test('a build that did not reach ready: Type and Bottom line must say so', () =>
     const recommended = good.replace('Type: Decision needed', 'Type: Recommendation').replace(/\n## Not covered[\s\S]*$/, '\n');
     assert.deepEqual(rules(check(recommended, { record: notReady })), ['build-not-ready', 'counts']);
   }
+});
+
+test('a record that shows only the plan\'s tests: Not looked at must say so', () => {
+  // Named on e9a55a, missed on 40171b and e3108e.
+  assert.equal(record.planTests, true);
+  assert.equal(readRecord(`${EX}/skip-a-box.record`).planTests, true);
+  const unsaid = read(`${FIX}/bad/plan-tests.md`);
+  assert.deepEqual(check(unsaid, { story, record }).map((p) => [p.line, p.rule]), [[5, 'plan-tests']]);
+  // The e9a55a wording, and other plain ways to say it, pass.
+  for (const words of ['not the full test suite', 'only the plan tests ran', 'not the whole suite']) {
+    assert.deepEqual(check(unsaid.replace('the build record.', `the build record, ${words}.`), { story, record }), [], words);
+  }
+  // A record that never mentions the plan's tests, and a build that never reached ready, are left alone.
+  assert.deepEqual(check(unsaid, { story, record: { notReady: null, skipped: 0, planTests: false } }), []);
+  const notReady = readRecord(`${FIX}/record-not-ready.md`);
+  assert.ok(notReady.notReady && notReady.planTests);
+  assert.ok(!rules(check(unsaid, { record: notReady })).includes('plan-tests'));
 });
 
 test('a record with skipped tests: Verified by gives both counts, never "N of N"', () => {
@@ -248,11 +266,13 @@ test('with a risk map, no criterion a risk names can be under Already verified',
   const inputs = { story: readStory(read(`${dir}/story.md`)), record: readRecord(`${dir}/record`) };
   const risks = readRisks(read(`${FIX}/named-risk/40171b.risks.json`));
   const bent = read(`${FIX}/named-risk/run-4.script.md`);
-  assert.deepEqual(check(bent, inputs), []);
-  const found = check(bent, { ...inputs, risks });
+  // Both real scripts predate the plan-tests rule and miss it; this test is about the risk map only.
+  const rest = (problems) => problems.filter((p) => p.rule !== 'plan-tests');
+  assert.deepEqual(rest(check(bent, inputs)), []);
+  const found = rest(check(bent, { ...inputs, risks }));
   assert.deepEqual(rules(found), ['named-risk']);
   assert.match(found[0].message, /^Criterion 2 is under Already verified, but the build's plan names a risk against it: "Detection works/);
-  assert.deepEqual(check(read(`${dir}/script.md`), { ...inputs, risks }), []);
+  assert.deepEqual(rest(check(read(`${dir}/script.md`), { ...inputs, risks })), []);
   // A shown item and a title under Not shown both count; a risk on another criterion changes nothing.
   const onOne = [{ from: 'record', risk: 'a loose match', criteria: [1] }];
   assert.deepEqual(rules(check(good, { story, record, risks: onOne })), ['named-risk']);

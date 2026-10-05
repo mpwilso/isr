@@ -139,3 +139,44 @@ Each entry names the note file it came from.
 - Verdict for this story: the blocking is earned. Every blocked criterion is held out by at least one link judged right. Neither the doubtful link nor the missing one changed what could be verified.
 - What this does not show: the mapper on any other story; a judgment by anyone outside the builder and two models of the same family; whether broad plan risks over-block on stories where the build is less risky.
 - Notes: `runner-smoke-1/risks.json`, `runner-runs/*/risks.json`.
+
+## The first story-first run, on a real Parallax change (e3108e), 2026-10-05
+
+- Why: Loupe, Parallax and ISR had never been run in order on one change. The change: the sandbox start hint on Parallax's error cards matched the bare word "namespace", so another tool's error could get it by mistake.
+- What ran, in order:
+  - Matt's request, in his own words.
+  - Loupe's story. It first wrote a bug report, which ISR can't read because it has no Requirements or Acceptance criteria section. Following ISR's own not-ready guidance, Matt answered its four questions and Loupe rewrote it as a user story with 5 numbered requirements.
+  - Parallax's build, task e3108e, in a separate worktree on its own branch. Matt approved the plan and clicked Accept and merge, which landed it on that branch.
+  - The record (intent, plan and record), copied byte for byte.
+  - Blind predictions by a helper agent that saw only the story and the record, written before ISR ran.
+  - ISR's runner.
+  - Checks by reading against the landed commit (c273ee1), then three checks by hand by Matt.
+- Inputs: story 5998 bytes; record files 4324, 5221 and 1753 bytes.
+- Costs and times: Parallax $0.77 of a $5.00 cap. ISR $0.37, runner with skill 7b1df40 on claude-opus-5-5, 72 seconds. Its checker passed on the first run, and the Stop hook sent nothing back.
+- Result: Type Recommendation, 2 verified, 2 to check by hand (High and Medium), 6 to confirm (5 shown). The mapper blocked criteria 2, 3 and 5 of 5.
+- ISR got right:
+  - It blocked exactly the requirements the record doesn't prove.
+  - It picked the right high risk: three of the four user namespace wordings came from the model's memory and were never checked against real output.
+  - It raised the two decisions the build made on its own as Confirm questions: a "sandbox runtime" or "srt:" marker is now required for any hint, and a bare bwrap error with no marker gets none.
+- ISR missed or overclaimed:
+  - It counted requirement 1 as verified although that requirement includes "unchanged card", and the tests only check that the hint lines are gone. ISR verifies whole criteria, and here the evidence covered part of one.
+  - It did not flag that only the plan's one test file ran (37 of 37), the same miss as on 40171b.
+  - It did not mention that logging must not change.
+  - It did not flag a contradiction in the plan's step 2: one bullet says a marker or a wording is enough, the next says a marker is required.
+- What the checks found:
+  - Matt ran bwrap and srt inside a bwrap that forbids new user namespaces. Both printed "bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)", with no "srt:" or "sandbox runtime" marker.
+  - So the change gives that real output no hint, where the old code, read at 22ef600, gave both lines. This is a regression that the build's 37 passing tests, the automated reviewer and ISR's reading of the record all missed.
+  - In the seeded demo UI, the error card still showed both lines in order, and a budget card showed neither. A demo error card written on Sept 30, before the change, also showed both lines with the new code.
+  - Reading the code also suggests that a real sandbox start failure stops at preflight with a "stuck" card, which never gets the hint, so the feature may never have reached a real user.
+  - ISR's first check by hand, which says to turn off user namespaces and open the task's error card, would most likely have ended at that preflight card.
+  - The kubectl half of ISR's second check was not attempted: no older card for another tool's namespace error exists.
+  - The change was not merged to master.
+- Predictions: 7 hits, 11 misses, 0 wrong of 18. Most misses were the helper expecting more checks by hand than ISR kept: 8 against 2.
+- Advisor error, from Matt: the advisor advised accepting the build's "marker required" rule, citing the wrapped error text, which came from tests, not real output.
+- Process slips, as written in the run's decisions file:
+  - "Process slip: the checker fixes were applied with a short python string replacement, not Claude Code's file tools, which Loupe's files mode asks for. The content is what the file tools would have written. Logged, not redone."
+  - "Correction: entries 18 to 21 first carried times from 18:40 to 18:46, and times.md and handcheck.md said Step F part 1 ran 18:35 to 18:47. Those were estimates written ahead of time. File times show all of it was written by 18:37:45. Fixed in all three files."
+- Change after this run: a checker rule. When the record says only the plan's tests ran, Not looked at must say so. With it, this run's script and the README example both fail on that line, and the e9a55a script, which said it, passes.
+- What this shows: the pipeline as a whole found a real regression. ISR alone did not, but its top risk pointed the check at it.
+- What this does not show: a time saving, or a judge other than Matt and the agents.
+- Notes: `real-run-3/`.

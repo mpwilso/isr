@@ -2,7 +2,7 @@ Type: Decision needed
 
 Bottom line: 1 verified, 1 to check by hand, 2 to confirm; what agents see for a paused subscriber is not defined yet.
 
-Not looked at: the build itself, since ISR read only the story and the build record.
+Not looked at: the build itself, since ISR read only the story and the build record, which shows only the plan's tests, not the full suite.
 
 Next: Decide what agents should see for a paused subscriber, then give check 1 to a tester.
 

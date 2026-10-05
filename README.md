@@ -7,9 +7,9 @@
 
 <p align="center"><b>Writes the acceptance script for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.</b></p>
 
-Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 14 runs. Every result is in the run log, including the misses.
+Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 4 real changes across 19 runs, one of them with the story written before the build. Every result is in the run log, including the misses.
 
-ISR (Intelligence, Surveillance, and Reconnaissance) is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have not yet been run in that order on one change. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
+ISR (Intelligence, Surveillance, and Reconnaissance) is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have been run in that order on one change so far. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
 ## The problem it addresses
 
@@ -22,6 +22,7 @@ When a change lands, whoever accepts it has to work out what the build already s
 - Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
 - Measured how much runs vary with the rules held fixed: four runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
 - Counted where it broke its own rules: with the rules held fixed, two of four runs counted the same criterion as verified although the plan names a risk against it. The checker could not enforce that rule, so I built a loop that can: a separate model links each of the build's risks to the criteria it bears on, and a Stop hook won't let the writer finish while a linked criterion sits under Already verified. The rule-breaking script from those runs fails it; the loop's first real run kept the rule without being sent back. One run, so it shows the loop works, not that it fixes the rate.
+- Ran Loupe, Parallax and ISR in order on one real change, then checked by hand. The hand check found a regression that the build's 37 passing tests, its automated reviewer and ISR all missed; ISR's top risk pointed the check at it.
 - Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 ## What you give it and what you get
