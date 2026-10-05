@@ -1,5 +1,7 @@
 // Runs ISR headless, through the loop in loop.js, and keeps what the run log needs.
 //   node runner/run.js --story FILE [--record FILE_OR_TASK_FOLDER] [--out FOLDER] [--model MODEL] [--budget USD]
+//     [--hide-risks-from-writer]
+// --hide-risks-from-writer is an experiment to measure the Stop hook; see docs/headless-runs.md.
 // Prints the checked script, or the script under "Failed the checker:" with the problems left. Exits 0 when the
 // checker passed, 1 when it did not, and 2 on bad usage or a run that could not finish.
 // Writes FOLDER/script.md, FOLDER/risks.json when there is a risk map, and FOLDER/run.json.
@@ -33,13 +35,14 @@ function skillCommit() {
 }
 
 export async function main(args, { query, print = (text) => process.stdout.write(text), note = console.error } = {}) {
-  const opts = {};
-  for (let i = 0; i < args.length; i += 2) {
-    if (!['--story', '--record', '--out', '--model', '--budget'].includes(args[i]) || !args[i + 1]) opts.bad = true;
-    else opts[args[i].slice(2)] = args[i + 1];
+  const rest = args.filter((a) => a !== '--hide-risks-from-writer');
+  const opts = { hideRisks: rest.length < args.length };
+  for (let i = 0; i < rest.length; i += 2) {
+    if (!['--story', '--record', '--out', '--model', '--budget'].includes(rest[i]) || !rest[i + 1]) opts.bad = true;
+    else opts[rest[i].slice(2)] = rest[i + 1];
   }
   if (opts.bad || !opts.story) {
-    note('Usage: node runner/run.js --story FILE [--record FILE_OR_TASK_FOLDER] [--out FOLDER] [--model MODEL] [--budget USD]');
+    note('Usage: node runner/run.js --story FILE [--record FILE_OR_TASK_FOLDER] [--out FOLDER] [--model MODEL] [--budget USD] [--hide-risks-from-writer]');
     return 2;
   }
   const out = opts.out ?? `isr-run-${new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '')}`;
@@ -48,12 +51,12 @@ export async function main(args, { query, print = (text) => process.stdout.write
 
   let run;
   try {
-    run = await runIsr({ story: opts.story, record: opts.record ?? null, query, model: opts.model, budgetUsd: opts.budget ? Number(opts.budget) : undefined });
+    run = await runIsr({ story: opts.story, record: opts.record ?? null, query, model: opts.model, budgetUsd: opts.budget ? Number(opts.budget) : undefined, hideRisks: opts.hideRisks });
   } catch (err) {
     note(`Not run: ${err.message}`);
     return 2;
   }
-  const { script, problems, riskMap, state } = run;
+  const { script, problems, riskMap, blocked, criteriaCount, state } = run;
   mkdirSync(out, { recursive: true });
   if (script !== null) writeFileSync(join(out, 'script.md'), script);
   if (riskMap) writeFileSync(join(out, 'risks.json'), `${JSON.stringify(riskMap, null, 2)}\n`);
@@ -61,6 +64,8 @@ export async function main(args, { query, print = (text) => process.stdout.write
   writeFileSync(join(out, 'run.json'), `${JSON.stringify({
     started, ended: new Date().toISOString(), skill: skillCommit(), node: process.versions.node,
     inputs: [opts.story, ...(opts.record ? files(opts.record) : [])].map(fingerprint),
+    hideRisksFromWriter: opts.hideRisks,
+    blocked: { criteria: blocked, of: criteriaCount },
     mapper: state.mapper, writer: state.writer,
     costUsd: cost.length ? Number(cost.reduce((a, b) => a + b, 0).toFixed(4)) : null,
     checkerRuns: state.checkerRuns, denied: state.denied, stops: state.stops, reworks: state.reworks, maxRework: MAX_REWORK,

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gate, MAX_REWORK, runIsr, SCRIPT } from '../runner/loop.js';
@@ -116,11 +116,25 @@ test(`the Stop hook gives up after ${MAX_REWORK} sends, and the problems left co
   assert.deepEqual(run.problems.map((p) => p.rule), ['named-risk']);
 });
 
+test('with the risks hidden from the writer, only the Stop hook uses the map, and it sends the bent script back', async () => {
+  // An experiment to measure the Stop hook, not how ISR is meant to run.
+  const { query, calls } = fakeQuery({ writes: [bent, kept] });
+  const run = await runIsr({ ...inputs, query, hideRisks: true });
+  const writer = calls.find((c) => c.options.hooks);
+  assert.doesNotMatch(writer.prompt, /risks/);
+  assert.equal(existsSync(join(run.state.work, 'risks.json')), false);
+  assert.equal(run.state.reworks, 1);
+  assert.match(calls.find((c) => c.sentBack).sentBack, /\[named-risk\]/);
+  assert.deepEqual(run.problems, []);
+  assert.deepEqual(run.blocked, [1, 2, 3, 4]);
+});
+
 test('with no record there is no mapper and no risk map', async () => {
   const story = 'examples/pellwick/skip-a-box.story.md';
   const { query, calls } = fakeQuery({ writes: [read('examples/pellwick/skip-a-box.no-record.script.md')] });
   const run = await runIsr({ story, query });
   assert.deepEqual(run.problems, []);
+  assert.deepEqual(run.blocked, []);
   assert.equal(calls.length, 1);
   assert.doesNotMatch(calls[0].prompt, /risks/);
   assert.equal(run.riskMap, null);
@@ -142,6 +156,8 @@ test('run.js saves the script, the risk map and a run record, and exits 0 when t
     assert.match(run.inputs[0].sha256, /^[0-9a-f]{64}$/);
     assert.equal(run.writer.model, 'fake-model');
     assert.deepEqual(run.denied, []);
+    assert.deepEqual(run.blocked, { criteria: [1, 2, 3, 4], of: 5 });
+    assert.equal(run.hideRisksFromWriter, false);
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -151,8 +167,9 @@ test('run.js labels a script that failed the checker, and exits 1', async () => 
   const out = mkdtempSync(join(tmpdir(), 'isr-out-'));
   try {
     const printed = [];
-    const code = await main(['--story', inputs.story, '--record', inputs.record, '--out', out], { ...fakeQuery({ writes: [bent] }), print: (t) => printed.push(t), note: () => {} });
+    const code = await main(['--story', inputs.story, '--hide-risks-from-writer', '--record', inputs.record, '--out', out], { ...fakeQuery({ writes: [bent] }), print: (t) => printed.push(t), note: () => {} });
     assert.equal(code, 1);
+    assert.equal(JSON.parse(read(join(out, 'run.json'))).hideRisksFromWriter, true);
     assert.match(printed.join(''), /^Failed the checker:\n.+\[named-risk\]\n\nType: /);
     assert.equal(JSON.parse(read(join(out, 'run.json'))).checker.passed, false);
   } finally {

@@ -18,6 +18,10 @@ With a risk map, the checker fails a script that puts a criterion a risk names u
 
 What comes out is the file the checker passed, not the writer's reply, so a reply reworded after the check can't slip through. The folder given with `--out` holds `script.md`, `risks.json` and `run.json`. `run.json` records what the run log needs: the size and sha256 of each input, the skill commit, the model, the cost, the checker runs, every refused tool call, and what each Stop said. The exit code is 0 when the checker passed, 1 when it did not, and 2 when the run could not finish. `--budget` caps the writer's spend in dollars (default 2).
 
+`--hide-risks-from-writer` is an experiment, off by default. With it, the writer is not told about the risk map and runs the checker without `--risks`; only the Stop hook uses the map. It exists to measure the Stop hook, since a writer that has the map rarely gets that far with a bent script, and it is not how ISR is meant to run.
+
+`run.json` also records which criteria the risk map blocks from Already verified, and how many criteria the story has, so over-blocking shows in every run.
+
 The tests drive the loop with a stand-in for the SDK, so no test calls a model.
 
 ## With claude -p

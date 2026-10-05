@@ -99,7 +99,9 @@ async function drain(stream, state, key) {
   return result;
 }
 
-export async function runIsr({ story: storyPath, record: recordPath = null, query, model, budgetUsd = 2 }) {
+// hideRisks is an experiment, off by default: the writer is not told about the risk map, so only the Stop hook
+// uses it. It exists to measure the Stop hook, and is not how ISR is meant to run.
+export async function runIsr({ story: storyPath, record: recordPath = null, query, model, budgetUsd = 2, hideRisks = false }) {
   const story = readStory(readFileSync(storyPath, 'utf8'));
   const record = recordPath ? readRecord(recordPath) : null;
   const work = prepare({ story: storyPath, record: recordPath });
@@ -116,14 +118,14 @@ export async function runIsr({ story: storyPath, record: recordPath = null, quer
     }), state, 'mapper');
     if (reply.subtype !== 'success') throw new Error(`the mapper stopped: ${reply.subtype}`);
     riskMap = toRiskMap(risks, reply.structured_output, story.criteria.length);
-    writeFileSync(join(work, 'risks.json'), `${JSON.stringify(riskMap, null, 2)}\n`);
+    if (!hideRisks) writeFileSync(join(work, 'risks.json'), `${JSON.stringify(riskMap, null, 2)}\n`);
   }
 
   // 2. The writer: the skill, gated tools, and the Stop hook that holds it to the checker.
   const inputs = { story, record, riskMap };
   const rule = gate(work);
   await drain(query({
-    prompt: writerPrompt({ record: recordPath, risks: riskMap }),
+    prompt: writerPrompt({ record: recordPath, risks: hideRisks ? null : riskMap }),
     options: {
       cwd: work, model, env,
       settingSources: ['project'], skills: ['isr'],
@@ -136,7 +138,9 @@ export async function runIsr({ story: storyPath, record: recordPath = null, quer
 
   const problems = checkScript(work, inputs);
   const script = existsSync(join(work, SCRIPT)) ? readFileSync(join(work, SCRIPT), 'utf8') : null;
-  return { script, problems, riskMap, state };
+  // Over-blocking shows here: every criterion a risk names is kept out of Already verified.
+  const blocked = [...new Set((riskMap?.risks ?? []).flatMap((r) => r.criteria))].sort((a, b) => a - b);
+  return { script, problems, riskMap, blocked, criteriaCount: story.criteria.length, state };
 }
 
 export { listProblems };
