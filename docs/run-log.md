@@ -96,3 +96,13 @@ Each entry names the note file it came from.
 - Rule bent: criterion 2 was counted as verified although the plan names a risk against that step in the WSL guide. The claim itself is true against the landed commit. With the rules fixed, 2 of 4 runs on these inputs bent the named-risk rule, both times on criterion 2. This is the weakest rule so far, and the checker cannot enforce it.
 - Not used as the README example, because it bent a rule; the example stays the run-3 script, which kept every rule, with the blank lines added.
 - Notes: `example-40171b-v2/run/`.
+
+## The runner: a loop that holds the writer to the checker, on the 40171b inputs, 2026-10-05
+
+- Why: the named-risk rule was the weakest, broken in 2 of 4 fixed-rules runs, and the checker could not enforce it, since linking a risk to a criterion takes judgment.
+- Change: `runner/` runs the skill with the Claude Agent SDK. Code reads the build's risks; a separate model call with no tools links each risk to criteria, seeing only the criteria and the risks; the checker's new `--risks` rule fails a script that verifies a linked criterion; a Stop hook runs the checker when the writer tries to finish and sends it back, up to 3 times. Setup is in `docs/headless-runs.md`.
+- Reproduction: the fixed-rules run-4 script passes the checker at master, and fails with a risk map, on criterion 2, both with a map written by hand and with the map the mapper wrote in the smoke run. The README example, which kept the rule, passes with either map.
+- Smoke run: skill and runner uncommitted on branch runner-loop at 1d61263, claude-opus-5-5, the same story and record as the variance runs. Cost $0.44: $0.06 for the mapper, $0.38 for the writer. 15 writer turns. The checker passed when the writer first stopped, so the Stop hook sent nothing back. 1 verified, 3 to check by hand, 8 to confirm; criterion 2 under Check by hand, criterion 5 verified, the same placement as the README example.
+- Mapper only, 5 more runs: $0.12 in total. The links for single risks varied, but all 6 mapper runs, counting the smoke run, linked criteria 1 to 4 and left criterion 5 unlinked. Criterion 2 was linked every time, by the plan's risk about changing the WSL guide step.
+- What this does not show: that the loop lowers the rate of broken rules, since in this one run the writer kept the rule on its own, as 2 of the 4 earlier runs did; a real run where the Stop hook sent a script back; the mapper on any other story. The send-back is shown only in tests, with a stand-in for the SDK.
+- Notes: `runner-smoke-1/` (`run.json`, `risks.json`, `script.md`, and `map-5.mjs`, the script for the mapper-only runs).

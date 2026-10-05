@@ -1,7 +1,8 @@
 // Checks an acceptance script against the shape in ../spec/script-shape.json.
-//   node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER]
+//   node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER] [--risks FILE]
 // With --story it also checks that every acceptance criterion appears exactly once.
 // With --story and no --record, it holds the script to the rules for "no record was given".
+// With --risks, a risk map ({"risks": [{"from", "risk", "criteria"}]}), no criterion a risk names can be verified.
 // Prints one line per problem and exits 1, or prints "Checked with Node VERSION." and exits 0.
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -58,7 +59,16 @@ export function readRecord(path) {
   return { notReady: null, skipped };
 }
 
-export function check(text, { story = null, record = null } = {}) {
+// The risk map the runner writes: each risk the build's plan or record names, and the criteria it bears on.
+export function readRisks(text) {
+  const risks = JSON.parse(text).risks;
+  const valid = Array.isArray(risks) && risks.every((r) => typeof r.risk === 'string' && shape.risks.from[r.from]
+    && Array.isArray(r.criteria) && r.criteria.every(Number.isInteger));
+  if (!valid) throw new Error('the risk map must read {"risks": [{"from": "plan" or "record", "risk": "...", "criteria": [1]}]}');
+  return risks;
+}
+
+export function check(text, { story = null, record = null, risks = null } = {}) {
   const lines = text.replace(/\n+$/, '').split('\n');
   const problems = [];
   const add = (line, rule, key, vars = {}) =>
@@ -101,7 +111,7 @@ export function check(text, { story = null, record = null } = {}) {
   const sections = parseSections(lines, head, defs, add);
 
   for (const [key, s] of Object.entries(sections)) checkCounts(s, add);
-  if (kind === 'script') checkScript(head, sections, { story, record }, add);
+  if (kind === 'script') checkScript(head, sections, { story, record, riskMap: risks }, add);
   else {
     if (!re(shape.notReady.next).test(head.text[3])) add(head.line[3], 'not-ready', 'notReadyNext');
     if (story && !story.notReady) add(head.title, 'not-ready', 'storyReady');
@@ -109,6 +119,7 @@ export function check(text, { story = null, record = null } = {}) {
   return sorted(problems);
 }
 
+const short = (text) => (text.length > 120 ? `${text.slice(0, 117).trimEnd()}...` : text);
 const sorted = (problems) => problems.sort((a, b) => a.line - b.line);
 
 export function parseSections(lines, head, defs, add) {
@@ -186,7 +197,7 @@ export function refs(text) {
   return out;
 }
 
-function checkScript(head, sections, { story, record }, add) {
+function checkScript(head, sections, { story, record, riskMap }, add) {
   const c = shape.script.check;
   const risks = c.risks;
   let worst = 0;
@@ -256,6 +267,16 @@ function checkScript(head, sections, { story, record }, add) {
       const found = refs(name);
       if (!found.length) add(shown.line, 'item-shape', 'noCriterion');
       for (const n of found) covered.push([n, shown.line]);
+    }
+  }
+
+  // Found in the fixed-rules runs on the 40171b inputs: 2 of 4 verified criterion 2 although the plan names a risk against it.
+  const verified = sections.verified;
+  const hidden = (verified?.notShown?.names ?? []).map((line) => ({ n: verified.notShown.line, line }));
+  for (const item of [...(verified?.items ?? []), ...hidden]) {
+    for (const n of refs(item.line)) {
+      const risk = (riskMap ?? []).find((r) => r.criteria.includes(n));
+      if (risk) add(item.n, 'named-risk', 'namedRisk', { n, where: shape.risks.from[risk.from], risk: short(risk.risk) });
     }
   }
 
@@ -339,11 +360,11 @@ export function main(args) {
   const opts = {};
   const files = [];
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--story' || args[i] === '--record') opts[args[i].slice(2)] = args[++i];
+    if (['--story', '--record', '--risks'].includes(args[i])) opts[args[i].slice(2)] = args[++i];
     else files.push(args[i]);
   }
   if (files.length !== 1 || Object.values(opts).some((v) => !v)) {
-    console.error('Usage: node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER]');
+    console.error('Usage: node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER] [--risks FILE]');
     return 2;
   }
   let problems;
@@ -351,6 +372,7 @@ export function main(args) {
     problems = check(readFileSync(files[0], 'utf8'), {
       story: opts.story ? readStory(readFileSync(opts.story, 'utf8')) : null,
       record: opts.record ? readRecord(opts.record) : null,
+      risks: opts.risks ? readRisks(readFileSync(opts.risks, 'utf8')) : null,
     });
   } catch (err) {
     console.error(`Not checked: ${err.message}`);

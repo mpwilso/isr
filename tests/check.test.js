@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { check, readRecord, readStory, shape } from '../skill/src/check.js';
+import { check, readRecord, readRisks, readStory, shape } from '../skill/src/check.js';
 
 const CHECKER = 'skill/src/check.js';
 const read = (path) => readFileSync(path, 'utf8');
@@ -239,4 +239,34 @@ test('every "To confirm" in a requirement reaches Confirm, shown or named in Not
     .replace('(open in the story)', `(open in the story)\n${others}\nNot shown (1): ${title}`);
   assert.deepEqual(check(hidden('what an agent sees, and where (criterion 3 leaves this open)'), { story, record }), []);
   assert.deepEqual(rules(check(hidden('what an agent sees, and where (criterion 3)'), { story, record })), ['to-confirm']);
+});
+
+test('with a risk map, no criterion a risk names can be under Already verified', () => {
+  // Found in the fixed-rules runs on the 40171b inputs: 2 of 4 verified criterion 2 although the plan names a risk
+  // against it. Run 4's script passes without a risk map and fails with one; the README example passes both ways.
+  const dir = 'examples/parallax-40171b';
+  const inputs = { story: readStory(read(`${dir}/story.md`)), record: readRecord(`${dir}/record`) };
+  const risks = readRisks(read(`${FIX}/named-risk/40171b.risks.json`));
+  const bent = read(`${FIX}/named-risk/run-4.script.md`);
+  assert.deepEqual(check(bent, inputs), []);
+  const found = check(bent, { ...inputs, risks });
+  assert.deepEqual(rules(found), ['named-risk']);
+  assert.match(found[0].message, /^Criterion 2 is under Already verified, but the build's plan names a risk against it: "Detection works/);
+  assert.deepEqual(check(read(`${dir}/script.md`), { ...inputs, risks }), []);
+  // A shown item and a title under Not shown both count; a risk on another criterion changes nothing.
+  const onOne = [{ from: 'record', risk: 'a loose match', criteria: [1] }];
+  assert.deepEqual(rules(check(good, { story, record, risks: onOne })), ['named-risk']);
+  assert.deepEqual(check(good, { story, record, risks: [{ ...onOne[0], criteria: [2] }] }), []);
+  const item = good.match(/^- A subscriber who pauses reminders.+$/m)[0];
+  const hidden = good.replace(item, 'Not shown (1): pausing reminders (criterion 1)');
+  assert.ok(rules(check(hidden, { story, record, risks: onOne })).includes('named-risk'));
+  assert.ok(!rules(check(hidden, { story, record })).includes('named-risk'));
+});
+
+test('a risk map in the wrong shape is refused, and the checker exits 2', () => {
+  assert.throws(() => readRisks('{"risks": [{"from": "chat", "risk": "x", "criteria": [1]}]}'), /risk map must read/);
+  assert.throws(() => readRisks('{"risks": [{"from": "plan", "risk": "x", "criteria": ["1"]}]}'), /risk map must read/);
+  const r = spawnSync('node', [CHECKER, `${FIX}/good.script.md`, '--risks', `${FIX}/good.script.md`], { encoding: 'utf8' });
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /^Not checked: /);
 });

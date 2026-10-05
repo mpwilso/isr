@@ -4,6 +4,9 @@ node_modules/
 # Test output
 test-output.txt
 
+# Runner output
+isr-run-*/
+
 # OS
 .DS_Store
 Thumbs.db

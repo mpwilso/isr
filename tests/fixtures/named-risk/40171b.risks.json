@@ -1,0 +1,9 @@
+{
+  "risks": [
+    { "from": "plan", "risk": "Detection works on free text, so a sandbox start failure worded differently gets no hint. Matching too loosely could hint on unrelated errors.", "criteria": [1, 2, 3] },
+    { "from": "plan", "risk": "lint.shaped may reject or reword the extra lines. If so, I'll adjust the line shape rather than the lint rules.", "criteria": [1, 4] },
+    { "from": "plan", "risk": "The web card may render the added lines oddly. app.js was not read.", "criteria": [4] },
+    { "from": "plan", "risk": "Changing item 4 in docs/wsl.md could break a test or link that points at it.", "criteria": [2] },
+    { "from": "record", "risk": "The trigger words include a bare \"namespace\", which also matches errors that have nothing to do with the sandbox.", "criteria": [3] }
+  ]
+}

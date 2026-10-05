@@ -7,7 +7,7 @@
 
 <p align="center"><b>Writes the acceptance script for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.</b></p>
 
-Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 13 runs. Every result is in the run log, including the misses.
+Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 3 real changes across 14 runs. Every result is in the run log, including the misses.
 
 ISR (Intelligence, Surveillance, and Reconnaissance) is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have not yet been run in that order on one change. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
@@ -21,7 +21,7 @@ When a change lands, whoever accepts it has to work out what the build already s
 - Checked the script's claims against the commit that actually landed.
 - Had four reader agents, each playing a different role, read one script without the story, and fixed the three things all four tripped on.
 - Measured how much runs vary with the rules held fixed: four runs on the same inputs agreed on the Type, the first question, the questions shown and four of five criteria.
-- Counted where it broke its own rules: with the rules held fixed, two of four runs counted the same criterion as verified although the plan names a risk against it. That rule is now the weakest, and it is logged rather than patched, so the rules don't get fitted to one story.
+- Counted where it broke its own rules: with the rules held fixed, two of four runs counted the same criterion as verified although the plan names a risk against it. The checker could not enforce that rule, so I built a loop that can: a separate model links each of the build's risks to the criteria it bears on, and a Stop hook won't let the writer finish while a linked criterion sits under Already verified. The rule-breaking script from those runs fails it; the loop's first real run kept the rule without being sent back. One run, so it shows the loop works, not that it fixes the rate.
 - Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 ## What you give it and what you get
@@ -101,6 +101,12 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
 
    Leave out `--record` when there is no record. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0. On bad usage, or a file it cannot read, it exits 2.
 
+4. To run it headless, with the loop that holds the writer to the checker, see [docs/headless-runs.md](docs/headless-runs.md):
+
+   ```
+   node runner/run.js --story story.md --record record --out run-1
+   ```
+
 ## What it must not do
 
 The checker rejects a script that has:
@@ -131,6 +137,7 @@ I designed ISR and directed its build; Claude Code wrote most of the code. The r
 ## What's here
 
 - `skill/`: the skill, self-contained. `skill/spec/script-shape.json` holds the script's shape as data, and `skill/src/check.js` enforces it.
+- `runner/`: runs the skill headless with the Claude Agent SDK, in a loop that code controls. It needs `npm ci` in that folder; the skill doesn't.
 - `examples/parallax-40171b/`: the README example's story, record and script, copied byte for byte from a real run, except the blank lines added between the script's four top lines; a test runs the checker on them.
 - `examples/pellwick/`: invented stories, build records, and the scripts ISR should write for them. Pellwick is an invented company.
 - `docs/brand/`: the logo. The scope's three blips are the script's three kinds of item: a solid dot for verified, a ring for check by hand, a dashed ring for confirm.
@@ -144,7 +151,7 @@ scripts/test.sh
 
 It checks the Node version, lints every file git knows about for dashes, double hyphens and angle-bracket placeholders (the HTML tags p, picture, source, img and b are allowed), then runs every test in `tests/`. No test calls a model or the network. CI runs it on Node 22.18.0 and 24.21.0. Commit only when it passes, and run it with pipefail when you pipe its output.
 
-To compare scripts from several runs on the same inputs, run `node scripts/compare-runs.js run-1.md run-2.md run-3.md`. It shows each run's Type and counts, and the section each run put each criterion in, matched by criterion number. Confirm questions change wording between runs, so it compares only how many there are. For runs with `claude -p`, [docs/headless-runs.md](docs/headless-runs.md) has the permission flags.
+To compare scripts from several runs on the same inputs, run `node scripts/compare-runs.js run-1.md run-2.md run-3.md`. It shows each run's Type and counts, and the section each run put each criterion in, matched by criterion number. Confirm questions change wording between runs, so it compares only how many there are. For headless runs, [docs/headless-runs.md](docs/headless-runs.md) covers the runner and the `claude -p` flags.
 
 Work happens on a branch: push it, wait for CI to pass, fast-forward master, push, then delete the branch locally and on GitHub. CLAUDE.md has the rest of the rules for agents working here.
 
