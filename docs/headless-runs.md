@@ -24,6 +24,14 @@ What comes out is the file the checker passed, not the writer's reply, so a repl
 
 The tests drive the loop with a stand-in for the SDK, so no test calls a model.
 
+## Several runs
+
+```
+scripts/variance.sh --story story.md --record record --runs 3
+```
+
+It runs the runner that many times on the same inputs, each into `run-N` in one folder (by default `isr-variance-` and the time, which git ignores), then lines the scripts up with `scripts/compare-runs.js`. It passes `--model`, `--budget` and `--hide-risks-from-writer` on to every run. Each run costs money, so it refuses more than 5 runs without `--more`.
+
 ## With claude -p
 
 Before the runner, runs used `claude -p`. A headless run can't answer a permission prompt, so a denied step ends the run. The first one did: it was denied the skill files and `mktemp`, and returned a script marked "Not checked" (run log, "Plain words for readers"). These flags give ISR what its steps use and nothing more.

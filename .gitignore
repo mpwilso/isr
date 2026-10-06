@@ -4,8 +4,10 @@ node_modules/
 # Test output
 test-output.txt
 
-# Runner output
+# Runner output, as the docs name it and as scripts/variance.sh does
 isr-run-*/
+run-*/
+isr-variance-*/
 
 # OS
 .DS_Store
