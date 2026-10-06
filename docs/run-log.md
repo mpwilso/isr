@@ -177,7 +177,7 @@ Each entry names the note file it came from.
   - "Process slip: the checker fixes were applied with a short python string replacement, not Claude Code's file tools, which Loupe's files mode asks for. The content is what the file tools would have written. Logged, not redone."
   - "Correction: entries 18 to 21 first carried times from 18:40 to 18:46, and times.md and handcheck.md said Step F part 1 ran 18:35 to 18:47. Those were estimates written ahead of time. File times show all of it was written by 18:37:45. Fixed in all three files."
 - Change after this run: a checker rule. When the record says only the plan's tests ran, Not looked at must say so. With it, this run's script and the README example both fail on that line, and the e9a55a script, which said it, passes.
-- Follow-up in Parallax, branch real-sandbox-hint, not merged:
+- Follow-up in Parallax, branch real-sandbox-hint, merged to Parallax's master as f0a80e8 (master at 4f318e8):
   - The code path matched these notes, with one step they left out: before preflight, Reticle runs its tests through srt and records srt's last line.
   - The fix keeps what bwrap or srt printed when the sandbox doesn't start, and quotes it on the stuck card with one next step.
   - CI's real-failure test exists: a real preflight inside a bwrap that forbids new user namespaces. CI passed, 617 tests, 0 skipped.
