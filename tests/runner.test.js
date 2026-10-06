@@ -191,6 +191,23 @@ test('run.js labels a script that failed the checker, and exits 1', async () => 
   }
 });
 
+test('run.js refuses a budget that is not a positive number, before any model call', async () => {
+  // NaN went to the SDK as --max-budget-usd NaN.
+  const out = mkdtempSync(join(tmpdir(), 'isr-out-'));
+  try {
+    for (const budget of ['abc', '0', '-1', 'Infinity']) {
+      const { query, calls } = fakeQuery({ writes: [kept] });
+      const notes = [];
+      const code = await main(['--story', inputs.story, '--record', inputs.record, '--out', out, '--budget', budget], { query, print: () => {}, note: (t) => notes.push(t) });
+      assert.equal(code, 2, budget);
+      assert.equal(calls.length, 0, budget);
+      assert.match(notes.join('\n'), /^Usage: /, budget);
+    }
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
 test('run.js shows its usage and exits 2 without loading the SDK', () => {
   const r = spawnSync('node', ['runner/run.js'], { encoding: 'utf8' });
   assert.equal(r.status, 2);

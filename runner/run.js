@@ -41,7 +41,8 @@ export async function main(args, { query, print = (text) => process.stdout.write
     if (!['--story', '--record', '--out', '--model', '--budget'].includes(rest[i]) || !rest[i + 1]) opts.bad = true;
     else opts[rest[i].slice(2)] = rest[i + 1];
   }
-  if (opts.bad || !opts.story) {
+  const budget = opts.budget === undefined ? undefined : Number(opts.budget);
+  if (opts.bad || !opts.story || (budget !== undefined && !(Number.isFinite(budget) && budget > 0))) {
     note('Usage: node runner/run.js --story FILE [--record FILE_OR_TASK_FOLDER] [--out FOLDER] [--model MODEL] [--budget USD] [--hide-risks-from-writer]');
     return 2;
   }
@@ -51,7 +52,7 @@ export async function main(args, { query, print = (text) => process.stdout.write
 
   let run;
   try {
-    run = await runIsr({ story: opts.story, record: opts.record ?? null, query, model: opts.model, budgetUsd: opts.budget ? Number(opts.budget) : undefined, hideRisks: opts.hideRisks });
+    run = await runIsr({ story: opts.story, record: opts.record ?? null, query, model: opts.model, budgetUsd: budget, hideRisks: opts.hideRisks });
   } catch (err) {
     note(`Not run: ${err.message}`);
     return 2;
