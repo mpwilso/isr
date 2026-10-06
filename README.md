@@ -144,6 +144,7 @@ I designed ISR and directed its build; Claude Code wrote most of the code. The r
 - `examples/pellwick/`: invented stories, build records, and the scripts ISR should write for them. Pellwick is an invented company.
 - `docs/brand/`: the logo. The scope's three blips are the script's three kinds of item: a solid dot for verified, a ring for check by hand, a dashed ring for confirm.
 - `scripts/test.sh`: every test.
+- `.claude/skills/ship/`: a `/ship` command for working on this repo. It is not part of ISR, and installing ISR copies only `skill/`.
 
 ## Development
 
