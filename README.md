@@ -154,7 +154,7 @@ scripts/test.sh
 
 It checks the Node version, lints every file git knows about for dashes, double hyphens and angle-bracket placeholders (the HTML tags p, picture, source, img and b are allowed), then runs every test in `tests/`. No test calls a model or the network. CI runs it on Node 22.18.0 and 24.21.0. Commit only when it passes, and run it with pipefail when you pipe its output.
 
-To compare scripts from several runs on the same inputs, run `node scripts/compare-runs.js run-1.md run-2.md run-3.md`. It shows each run's Type and counts, and the section each run put each criterion in, matched by criterion number. Confirm questions change wording between runs, so it compares only how many there are. For headless runs, [docs/headless-runs.md](docs/headless-runs.md) covers the runner and the `claude -p` flags.
+To compare scripts from several runs on the same inputs, run `node scripts/compare-runs.js run-1.md run-2.md run-3.md`. It shows each run's Type and counts, and the section each run put each criterion in, matched by criterion number. Confirm questions change wording between runs, so it compares only how many there are. For headless runs, [docs/headless-runs.md](docs/headless-runs.md) covers the runner, `scripts/variance.sh`, which runs it several times and compares the scripts, and the `claude -p` flags.
 
 Work happens on a branch: push it, wait for CI to pass, fast-forward master, push, then delete the branch locally and on GitHub. CLAUDE.md has the rest of the rules for agents working here.
 

@@ -52,4 +52,4 @@ claude -p "Here is a story (story.md) and the build record (the record folder). 
 - If the skill folder is a link, add `--add-dir` with the folder it points to, or the skill files are denied.
 - `--output-format json`: the reply comes with the run's cost, for the run log.
 
-These are the flags the runs before 2026-10-05 used, written out here; the exact command lines of those runs were not kept. To compare several runs, see `scripts/compare-runs.js` in the README.
+These are the flags the runs before 2026-10-05 used, written out here; the exact command lines of those runs were not kept. To compare several runs, see Several runs above.
