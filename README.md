@@ -52,7 +52,7 @@ If the story is too thin to build from, ISR writes a short not ready report inst
 
 ## An example
 
-This is the script from a run on a real Parallax change, task 40171b, which adds a hint to error cards when the sandbox can't start. It was written by the rules at commit 026a514. The only change since is a blank line after each of the four top lines, which the current shape requires. Its story and record are in [examples/parallax-40171b/](examples/parallax-40171b/), and the original record is also public in the Parallax repo at [docs/tasks/40171b/](https://github.com/mpwilso/parallax/tree/master/docs/tasks/40171b). Only one criterion counts as verified, because ISR won't count a criterion when the record names a risk against it.
+This is the script from a run on a real Parallax change, task 40171b, which adds a hint to error cards when the sandbox can't start. It was written by the rules at commit 026a514. The only change since is a blank line after each of the four top lines, which the current shape requires. Its story and record are in [examples/parallax-40171b/](examples/parallax-40171b/), and the original record is also public in the Parallax repo at [docs/tasks/40171b/](https://github.com/mpwilso/parallax/tree/master/docs/tasks/40171b). Only one criterion counts as verified, because ISR won't count a criterion when the record names a risk against it. Today's checker flags it for not saying that only the plan's tests ran, the miss that led to that rule.
 
 The story's requirements, shortened, and numbered as the script uses them:
 
