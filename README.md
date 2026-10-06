@@ -124,11 +124,11 @@ The skill is told not to do these, and the checker cannot catch them:
 
 ## Known limits
 
-- No check by hand has been run to the end yet.
+- Checks by hand have been run on one change, e3108e. They found a regression, but not every check could be finished: one would have stopped at an earlier screen, and half of another had nothing real to test against.
 - Tested in Claude Code only.
 - Loupe bug reports have no criteria section, so ISR calls them not ready.
-- Not shown yet: use by a team, or a time saving. Those need real users.
 - The runner's mapper can keep most criteria out of Already verified when a plan names broad risks. On 40171b it blocked 4 of 5, and a review of each link found the blocking earned. It has not been judged on any other story.
+- Not shown yet: use by a team, or a time saving. Those need real users.
 
 The rest, run by run, is in [docs/run-log.md](docs/run-log.md).
 
