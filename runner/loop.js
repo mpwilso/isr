@@ -40,7 +40,10 @@ export function gate(work) {
     return abs === work || abs.startsWith(work + sep);
   };
   const escaped = work.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const checker = new RegExp(`^node (?:${escaped}/)?${CHECKER.replace(/\./g, '\\.')}(?: [\\w./ -]+)?$`);
+  // Each word bare, or wholly in single or double quotes, and made only of characters the shell does nothing with.
+  const quotable = (w) => `(?:${w}|"${w}"|'${w}')`;
+  const path = `(?:${escaped}/)?${CHECKER.replace(/\./g, '\\.')}`;
+  const checker = new RegExp(`^node ${quotable(path)}(?: +(?:[\\w./-]+|"[\\w./ -]*"|'[\\w./ -]*'))*$`);
   return (name, input) => {
     if (name === 'Skill') return allow;
     if (['Read', 'Glob', 'Grep'].includes(name)) return inside(input.file_path ?? input.path) ? allow : deny('Read only inside this folder.');

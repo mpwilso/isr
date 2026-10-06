@@ -94,6 +94,18 @@ test('the gate allows reads in the folder, writing the script, and the checker, 
   assert.ok(!ok('WebFetch', { url: 'https://example.com' }));
 });
 
+test('the gate allows the checker with quoted paths, and no shell syntax inside or around the quotes', () => {
+  const work = '/tmp/isr-run-x';
+  const ok = (command) => gate(work)('Bash', { command }).decision === 'allow';
+  const checker = '.claude/skills/isr/src/check.js';
+  assert.ok(ok(`node "${work}/${checker}" "${SCRIPT}" --story 'story.md' --risks "risks.json"`));
+  assert.ok(ok(`node '${checker}' ${SCRIPT} --story "a folder/story.md"`));
+  for (const bad of ['"$(rm -rf ~)"', '"`id`"', "'a';id", '"a"&id', '"a" | id', '"a" > b', '"*.md"', '"a\nb"', '"a\\"', '"a', "'a\"", '"a""b"']) {
+    assert.ok(!ok(`node ${checker} ${SCRIPT} --story ${bad}`), bad);
+  }
+  assert.ok(!ok(`node "${checker} ${SCRIPT}"`), 'the checker and its arguments in one quoted word');
+});
+
 test('the Stop hook sends back a script that verifies a criterion with a named risk, and the fixed one comes out', async () => {
   const { query, calls } = fakeQuery({ writes: [bent, kept] });
   const run = await runIsr({ ...inputs, query });
