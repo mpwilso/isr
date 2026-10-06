@@ -94,6 +94,18 @@ test('the gate allows reads in the folder, writing the script, and the checker, 
   assert.ok(!ok('WebFetch', { url: 'https://example.com' }));
 });
 
+test('the gate holds a Glob pattern inside the folder too, not only its path', () => {
+  const work = '/tmp/isr-run-x';
+  const ok = (input) => gate(work)('Glob', input).decision === 'allow';
+  assert.ok(ok({ pattern: 'record/**/*.md' }));
+  assert.ok(ok({ pattern: `${work}/record/*.md` }));
+  assert.ok(ok({ pattern: '*.md', path: `${work}/record` }));
+  assert.ok(!ok({ pattern: '/home/someone/.ssh/*' }));
+  assert.ok(!ok({ pattern: '../*' }));
+  assert.ok(!ok({ pattern: '**/../../*' }));
+  assert.ok(!ok({ pattern: '*', path: '/etc' }));
+});
+
 test('the gate allows the checker with quoted paths, and no shell syntax inside or around the quotes', () => {
   const work = '/tmp/isr-run-x';
   const ok = (command) => gate(work)('Bash', { command }).decision === 'allow';

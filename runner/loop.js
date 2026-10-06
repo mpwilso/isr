@@ -44,9 +44,13 @@ export function gate(work) {
   const quotable = (w) => `(?:${w}|"${w}"|'${w}')`;
   const path = `(?:${escaped}/)?${CHECKER.replace(/\./g, '\\.')}`;
   const checker = new RegExp(`^node ${quotable(path)}(?: +(?:[\\w./-]+|"[\\w./ -]*"|'[\\w./ -]*'))*$`);
+  // A Glob pattern can be absolute or climb with "..", so its fixed start has to be inside as well as its path.
+  const globInside = ({ pattern = '', path }) => inside(path) && !/(^|\/)\.\.(\/|$)/.test(pattern)
+    && inside(resolve(work, path ?? '.', pattern.split(/[*?[{]/)[0] || '.'));
   return (name, input) => {
     if (name === 'Skill') return allow;
-    if (['Read', 'Glob', 'Grep'].includes(name)) return inside(input.file_path ?? input.path) ? allow : deny('Read only inside this folder.');
+    if (name === 'Glob') return globInside(input) ? allow : deny('Read only inside this folder.');
+    if (['Read', 'Grep'].includes(name)) return inside(input.file_path ?? input.path) ? allow : deny('Read only inside this folder.');
     if (['Write', 'Edit'].includes(name)) {
       return resolve(work, input.file_path ?? '') === join(work, SCRIPT) ? allow : deny(`Write only ${SCRIPT}, in this folder.`);
     }
