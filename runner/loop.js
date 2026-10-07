@@ -2,7 +2,7 @@
 // skill, and a Stop hook runs the checker with that risk map and sends the writer back until the script passes,
 // up to MAX_REWORK times. What comes out is the file the checker passed, never the writer's reply.
 // `query` is passed in, so tests drive the loop with a fake writer and never call a model.
-import { cpSync, existsSync, mkdtempSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,11 +15,16 @@ const SKILL = join(dirname(fileURLToPath(import.meta.url)), '..', 'skill');
 const CHECKER = '.claude/skills/isr/src/check.js';
 const NO_MEMORY = { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' };
 
-// A fresh folder holding copies of the inputs and the skill, so the writer reads and writes nothing else.
+// A fresh folder holding copies of the inputs and the skill, so the writer reads and writes nothing else. A link in
+// the record is refused: copied as a link, the gate would pass a read of it by its path and the read would leave.
 export function prepare({ story, record }) {
   const work = realpathSync(mkdtempSync(join(tmpdir(), 'isr-run-')));
   cpSync(story, join(work, 'story.md'));
-  if (record) cpSync(record, join(work, statSync(record).isDirectory() ? 'record' : 'record.md'), { recursive: true });
+  const noLinks = (src) => {
+    if (src !== record && lstatSync(src).isSymbolicLink()) throw new Error(`the record holds a link: ${src}`);
+    return true;
+  };
+  if (record) cpSync(record, join(work, statSync(record).isDirectory() ? 'record' : 'record.md'), { recursive: true, filter: noLinks });
   cpSync(SKILL, join(work, '.claude', 'skills', 'isr'), { recursive: true });
   return work;
 }
@@ -55,7 +60,7 @@ export function gate(work) {
       return resolve(work, input.file_path ?? '') === join(work, SCRIPT) ? allow : deny(`Write only ${SCRIPT}, in this folder.`);
     }
     if (name === 'Bash') {
-      if (checker.test(input.command.trim())) return allow;
+      if (typeof input.command === 'string' && checker.test(input.command.trim())) return allow;
       return deny(`The one command allowed here is the checker: node ${CHECKER} ${SCRIPT} --story story.md and its other flags. This folder is already your temporary folder.`);
     }
     return deny(`${name} is not used here.`);
@@ -113,6 +118,15 @@ export async function runIsr({ story: storyPath, record: recordPath = null, quer
   const record = recordPath ? readRecord(recordPath) : null;
   const work = prepare({ story: storyPath, record: recordPath });
   const state = { work, mapper: {}, writer: {}, stops: [], reworks: 0, checkerRuns: 0, denied: [] };
+  try {
+    return await run({ story, record, recordPath, work, state, query, model, budgetUsd, hideRisks });
+  } catch (err) {
+    err.state = state; // what was spent before it stopped, for the run record
+    throw err;
+  }
+}
+
+async function run({ story, record, recordPath, work, state, query, model, budgetUsd, hideRisks }) {
   const env = { ...process.env, ...NO_MEMORY };
 
   // 1. The mapper: no tools, the criteria and the risks only, a structured reply.

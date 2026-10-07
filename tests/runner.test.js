@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { gate, MAX_REWORK, runIsr, SCRIPT } from '../runner/loop.js';
+import { gate, MAX_REWORK, prepare, runIsr, SCRIPT } from '../runner/loop.js';
 import { extractRisks, mapPrompt, toRiskMap } from '../runner/risks.js';
 import { main } from '../runner/run.js';
 
@@ -224,4 +224,38 @@ test('run.js shows its usage and exits 2 without loading the SDK', () => {
   const r = spawnSync('node', ['runner/run.js'], { encoding: 'utf8' });
   assert.equal(r.status, 2);
   assert.match(r.stderr, /^Usage: node runner\/run\.js --story FILE/);
+});
+
+test('the gate denies a Bash call with no command instead of throwing', () => {
+  const rule = gate('/tmp/isr-run-x');
+  for (const input of [{}, { command: null }, { command: 42 }]) assert.equal(rule('Bash', input).decision, 'deny');
+});
+
+test('a record folder that holds a link is refused, since a read could follow it out of the folder', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'isr-linked-'));
+  try {
+    const record = join(dir, 'record');
+    mkdirSync(record);
+    writeFileSync(join(record, 'plan.md'), '# Plan\n');
+    symlinkSync('/etc/hostname', join(record, 'leak.md'));
+    assert.throws(() => prepare({ story: inputs.story, record }), /link/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('run.js records a run that stopped after spending money, with its cost, and exits 2', async () => {
+  const out = mkdtempSync(join(tmpdir(), 'isr-out-'));
+  try {
+    const notes = [];
+    const code = await main(['--story', inputs.story, '--record', inputs.record, '--out', out], { ...fakeQuery({ reply: { links: [] }, writes: [kept] }), print: () => {}, note: (t) => notes.push(t) });
+    assert.equal(code, 2);
+    const run = JSON.parse(read(join(out, 'run.json')));
+    assert.match(run.error, /\S/);
+    assert.equal(run.costUsd, 0.01);
+    assert.equal(run.mapper.model, 'fake-model');
+    assert.ok(!existsSync(join(out, 'script.md')));
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
 });

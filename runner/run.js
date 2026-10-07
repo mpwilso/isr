@@ -4,7 +4,8 @@
 // --hide-risks-from-writer is an experiment to measure the Stop hook; see docs/headless-runs.md.
 // Prints the checked script, or the script under "Failed the checker:" with the problems left. Exits 0 when the
 // checker passed, 1 when it did not, and 2 on bad usage or a run that could not finish.
-// Writes FOLDER/script.md, FOLDER/risks.json when there is a risk map, and FOLDER/run.json.
+// Writes FOLDER/script.md, FOLDER/risks.json when there is a risk map, and FOLDER/run.json. A run that stops after a
+// model call still writes run.json, with the error and what it cost.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -50,28 +51,40 @@ export async function main(args, { query, print = (text) => process.stdout.write
   const started = new Date().toISOString();
   query ??= (await import('@anthropic-ai/claude-agent-sdk')).query;
 
+  const costOf = (state) => [state.mapper.costUsd, state.writer.costUsd].filter((c) => typeof c === 'number');
+  const record = (fields) => {
+    mkdirSync(out, { recursive: true });
+    writeFileSync(join(out, 'run.json'), `${JSON.stringify({
+      started, ended: new Date().toISOString(), skill: skillCommit(), node: process.versions.node,
+      inputs: [opts.story, ...(opts.record ? files(opts.record) : [])].map(fingerprint),
+      hideRisksFromWriter: opts.hideRisks, ...fields,
+    }, null, 2)}\n`);
+  };
+
   let run;
   try {
     run = await runIsr({ story: opts.story, record: opts.record ?? null, query, model: opts.model, budgetUsd: budget, hideRisks: opts.hideRisks });
   } catch (err) {
     note(`Not run: ${err.message}`);
+    if (err.state) { // it stopped after a model call: keep what it cost
+      const cost = costOf(err.state);
+      record({ error: err.message, mapper: err.state.mapper, writer: err.state.writer, costUsd: cost.length ? Number(cost.reduce((a, b) => a + b, 0).toFixed(4)) : null, denied: err.state.denied });
+      note(`isr: stopped, $${cost.reduce((a, b) => a + b, 0).toFixed(2)} spent, recorded in ${out}`);
+    }
     return 2;
   }
   const { script, problems, riskMap, blocked, criteriaCount, state } = run;
   mkdirSync(out, { recursive: true });
   if (script !== null) writeFileSync(join(out, 'script.md'), script);
   if (riskMap) writeFileSync(join(out, 'risks.json'), `${JSON.stringify(riskMap, null, 2)}\n`);
-  const cost = [state.mapper.costUsd, state.writer.costUsd].filter((c) => typeof c === 'number');
-  writeFileSync(join(out, 'run.json'), `${JSON.stringify({
-    started, ended: new Date().toISOString(), skill: skillCommit(), node: process.versions.node,
-    inputs: [opts.story, ...(opts.record ? files(opts.record) : [])].map(fingerprint),
-    hideRisksFromWriter: opts.hideRisks,
+  const cost = costOf(state);
+  record({
     blocked: { criteria: blocked, of: criteriaCount },
     mapper: state.mapper, writer: state.writer,
     costUsd: cost.length ? Number(cost.reduce((a, b) => a + b, 0).toFixed(4)) : null,
     checkerRuns: state.checkerRuns, denied: state.denied, stops: state.stops, reworks: state.reworks, maxRework: MAX_REWORK,
     checker: { passed: problems.length === 0, problems: problems.map((p) => `${p.line}: ${p.message} [${p.rule}]`) },
-  }, null, 2)}\n`);
+  });
 
   if (!problems.length) print(script);
   else print(`Failed the checker:\n${listProblems(problems)}\n\n${script ?? ''}`);
