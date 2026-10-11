@@ -281,3 +281,17 @@ test('a risk the mapper answers twice keeps the criteria of both answers', () =>
   assert.deepEqual(first.criteria, [1, 3]);
   assert.equal(first.why, 'one; two');
 });
+
+test('a record folder that is itself a link is looked through, and a link inside it is still refused', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'isr-linked-'));
+  try {
+    const real = join(dir, 'real');
+    mkdirSync(real);
+    writeFileSync(join(real, 'plan.md'), '# Plan\n');
+    symlinkSync('/etc/hostname', join(real, 'leak.md'));
+    symlinkSync(real, join(dir, 'record'));
+    assert.throws(() => prepare({ story: inputs.story, record: join(dir, 'record') }), /the record holds a link/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
