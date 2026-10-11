@@ -9,6 +9,8 @@ cd runner && npm ci && cd ..
 node runner/run.js --story story.md --record record --out run-1
 ```
 
+`npm ci` takes about 290 MB on Linux x64, most of it the Claude Agent SDK's native binary for the platform (235 MB). The skill alone needs none of it.
+
 1. **Risks, by code.** It reads every risk the build names: the bullets under the plan's Risks, and the record's Known risks lines.
 2. **The mapper.** A separate model call, with no tools, sees only the story's criteria and those risks, and says which criteria each risk bears on. It never sees the record's results or a script. The links go in `risks.json`.
 3. **The writer.** The skill runs in a fresh folder holding copies of the story, the record and the skill. A PreToolUse hook rules on every tool call: reads inside the folder, writes only to the script, and the checker as the one command.
@@ -34,22 +36,4 @@ It runs the runner that many times on the same inputs, each into `run-N` in one 
 
 ## With claude -p
 
-Before the runner, runs used `claude -p`. A headless run can't answer a permission prompt, so a denied step ends the run. The first one did: it was denied the skill files and `mktemp`, and returned a script marked "Not checked" (run log, "Plain words for readers"). These flags give ISR what its steps use and nothing more.
-
-From the project folder that holds the story, the record and the skill at `.claude/skills/isr`:
-
-```
-claude -p "Here is a story (story.md) and the build record (the record folder). What should the product owner check by hand?" \
-  --permission-mode acceptEdits \
-  --add-dir /tmp \
-  --allowedTools "Bash(mktemp *),Bash(node *),Bash(ls *)" \
-  --output-format json > run.json
-```
-
-- `--add-dir /tmp`: the temporary folder `mktemp` makes, where ISR saves the script and the checker reads it.
-- `Bash(mktemp *)`, `Bash(node *)`, `Bash(ls *)`: making that folder, running the checker, and listing a task folder. `Bash(node *)` allows any Node command, so run it in a copy you can throw away.
-- `--permission-mode acceptEdits`: saving the script without a prompt.
-- If the skill folder is a link, add `--add-dir` with the folder it points to, or the skill files are denied.
-- `--output-format json`: the reply comes with the run's cost, for the run log.
-
-These are the flags the runs before 2026-10-05 used, written out here; the exact command lines of those runs were not kept. To compare several runs, see Several runs above.
+Before the runner, runs used `claude -p`. The flags they used are kept in the run log, under [Headless runs before the runner](run-log.md#headless-runs-before-the-runner).

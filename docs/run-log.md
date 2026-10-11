@@ -97,6 +97,30 @@ Each entry names the note file it came from.
 - Not used as the README example, because it bent a rule; the example stays the run-3 script, which kept every rule, with the blank lines added.
 - Notes: `example-40171b-v2/run/`.
 
+## Headless runs before the runner
+
+Moved here from [headless-runs.md](headless-runs.md) once the runner replaced it.
+
+Before the runner, runs used `claude -p`. A headless run can't answer a permission prompt, so a denied step ends the run. The first one did: it was denied the skill files and `mktemp`, and returned a script marked "Not checked" (see Plain words for readers above). These flags give ISR what its steps use and nothing more.
+
+From the project folder that holds the story, the record and the skill at `.claude/skills/isr`:
+
+```
+claude -p "Here is a story (story.md) and the build record (the record folder). What should the product owner check by hand?" \
+  --permission-mode acceptEdits \
+  --add-dir /tmp \
+  --allowedTools "Bash(mktemp *),Bash(node *),Bash(ls *)" \
+  --output-format json > run.json
+```
+
+- `--add-dir /tmp`: the temporary folder `mktemp` makes, where ISR saves the script and the checker reads it.
+- `Bash(mktemp *)`, `Bash(node *)`, `Bash(ls *)`: making that folder, running the checker, and listing a task folder. `Bash(node *)` allows any Node command, so run it in a copy you can throw away.
+- `--permission-mode acceptEdits`: saving the script without a prompt.
+- If the skill folder is a link, add `--add-dir` with the folder it points to, or the skill files are denied.
+- `--output-format json`: the reply comes with the run's cost, for the run log.
+
+These are the flags the runs before 2026-10-05 used, written out here; the exact command lines of those runs were not kept. To compare several runs, see [Several runs](headless-runs.md#several-runs).
+
 ## The runner: a loop that holds the writer to the checker, on the 40171b inputs, 2026-10-05
 
 - Why: the named-risk rule was the weakest, broken in 2 of 4 fixed-rules runs, and the checker could not enforce it, since linking a risk to a criterion takes judgment.
