@@ -8,3 +8,9 @@ updates:
     # caught and pulled.
     cooldown:
       default-days: 7
+  - package-ecosystem: npm
+    directory: /runner
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
