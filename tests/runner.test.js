@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gate, MAX_REWORK, prepare, runIsr, SCRIPT } from '../runner/loop.js';
@@ -25,7 +25,9 @@ const kept = sayPlanTests(read(`${EX}/script.md`));
 function fakeQuery({ reply = mapperReply, writes }) {
   const calls = [];
   const query = ({ prompt, options }) => (async function* () {
-    calls.push({ prompt, options });
+    // What the run's folder holds when the call starts, since the folder is removed when the run ends.
+    const risksFile = join(options.cwd, 'risks.json');
+    calls.push({ prompt, options, risksJson: existsSync(risksFile) ? read(risksFile) : null });
     yield { type: 'system', subtype: 'init', model: 'fake-model' };
     if (options.outputFormat) {
       yield { type: 'result', subtype: 'success', structured_output: reply, total_cost_usd: 0.01, num_turns: 1, session_id: 'm' };
@@ -131,7 +133,7 @@ test('the Stop hook sends back a script that verifies a criterion with a named r
   assert.match(writer.prompt, /--risks risks\.json/);
   assert.deepEqual(writer.options.skills, ['isr']);
   assert.ok(writer.options.maxBudgetUsd > 0);
-  assert.deepEqual(JSON.parse(read(join(run.state.work, 'risks.json'))).risks.map((r) => r.criteria), handMap.risks.map((r) => r.criteria));
+  assert.deepEqual(JSON.parse(writer.risksJson).risks.map((r) => r.criteria), handMap.risks.map((r) => r.criteria));
 });
 
 test(`the Stop hook gives up after ${MAX_REWORK} sends, and the problems left come out with the script`, async () => {
@@ -148,7 +150,7 @@ test('with the risks hidden from the writer, only the Stop hook uses the map, an
   const run = await runIsr({ ...inputs, query, hideRisks: true });
   const writer = calls.find((c) => c.options.hooks);
   assert.doesNotMatch(writer.prompt, /risks/);
-  assert.equal(existsSync(join(run.state.work, 'risks.json')), false);
+  assert.equal(writer.risksJson, null);
   assert.equal(run.state.reworks, 1);
   assert.match(calls.find((c) => c.sentBack).sentBack, /\[named-risk\]/);
   assert.deepEqual(run.problems, []);
@@ -292,6 +294,30 @@ test('a record folder that is itself a link is looked through, and a link inside
     symlinkSync(real, join(dir, 'record'));
     assert.throws(() => prepare({ story: inputs.story, record: join(dir, 'record') }), /the record holds a link/);
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the run\'s folder is removed when the run ends, finished, stopped or refused', async () => {
+  // Every run left its folder, with copies of the inputs, in the temp folder; run.js copies out what it keeps.
+  const done = await runIsr({ ...inputs, query: fakeQuery({ writes: [kept] }).query });
+  assert.ok(!existsSync(done.state.work), 'finished');
+  const stopped = await runIsr({ ...inputs, query: fakeQuery({ reply: { links: [] }, writes: [kept] }).query }).catch((err) => err);
+  assert.match(stopped.message, /did not answer/);
+  assert.ok(!existsSync(stopped.state.work), 'stopped');
+  const dir = mkdtempSync(join(tmpdir(), 'isr-linked-'));
+  const tmp = process.env.TMPDIR;
+  try {
+    const record = join(dir, 'record');
+    mkdirSync(record);
+    symlinkSync('/etc/hostname', join(record, 'leak.md'));
+    mkdirSync(join(dir, 'tmp'));
+    process.env.TMPDIR = join(dir, 'tmp');
+    assert.throws(() => prepare({ story: inputs.story, record }), /link/);
+    assert.deepEqual(readdirSync(join(dir, 'tmp')), [], 'refused');
+  } finally {
+    if (tmp === undefined) delete process.env.TMPDIR;
+    else process.env.TMPDIR = tmp;
     rmSync(dir, { recursive: true, force: true });
   }
 });

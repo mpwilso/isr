@@ -2,7 +2,7 @@
 // skill, and a Stop hook runs the checker with that risk map and sends the writer back until the script passes,
 // up to MAX_REWORK times. What comes out is the file the checker passed, never the writer's reply.
 // `query` is passed in, so tests drive the loop with a fake writer and never call a model.
-import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, realpathSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,15 +20,20 @@ const NO_MEMORY = { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' };
 // A record that is itself a link is copied from where it points, so what it holds is looked through too.
 export function prepare({ story, record }) {
   const work = realpathSync(mkdtempSync(join(tmpdir(), 'isr-run-')));
-  cpSync(story, join(work, 'story.md'));
-  const from = record && realpathSync(record);
-  const noLinks = (src) => {
-    if (lstatSync(src).isSymbolicLink()) throw new Error(`the record holds a link: ${src}`);
-    return true;
-  };
-  if (record) cpSync(from, join(work, statSync(from).isDirectory() ? 'record' : 'record.md'), { recursive: true, filter: noLinks });
-  cpSync(SKILL, join(work, '.claude', 'skills', 'isr'), { recursive: true });
-  return work;
+  try {
+    cpSync(story, join(work, 'story.md'));
+    const from = record && realpathSync(record);
+    const noLinks = (src) => {
+      if (lstatSync(src).isSymbolicLink()) throw new Error(`the record holds a link: ${src}`);
+      return true;
+    };
+    if (record) cpSync(from, join(work, statSync(from).isDirectory() ? 'record' : 'record.md'), { recursive: true, filter: noLinks });
+    cpSync(SKILL, join(work, '.claude', 'skills', 'isr'), { recursive: true });
+    return work;
+  } catch (err) {
+    rmSync(work, { recursive: true, force: true });
+    throw err;
+  }
 }
 
 export function writerPrompt({ record, risks }) {
@@ -131,6 +136,8 @@ export async function runIsr({ story: storyPath, record: recordPath = null, quer
   } catch (err) {
     err.state = state; // what was spent before it stopped, for the run record
     throw err;
+  } finally {
+    rmSync(work, { recursive: true, force: true }); // the script and the risk map are returned; run.js saves them
   }
 }
 
