@@ -4,7 +4,7 @@ This log was written from the builder's own notes after the runs; the raw output
 
 The advisor named in some entries is a separate Claude chat that reviewed each step, wrote predictions before runs, and judged the output alongside Matt.
 
-Each entry names the note file it came from.
+Each entry ends with the names of the private notes it came from; those files are not in this repo.
 
 ## Real run 1, 2026-10-01
 
@@ -12,32 +12,32 @@ Each entry names the note file it came from.
 - Input: the story for that change, and the record of Parallax task 786e71. That record says 43 plan tests passed and 1 was skipped, Second Eye, the blind checker, passed it, 7 files changed, and the build cost an estimated $2.63 of a $5.00 cap.
 - Result: a script with 4 verified, 1 to check by hand and 6 to confirm. The builder judged it. An attempt at the hand check took about 70 minutes and $1.47 and did not get far enough to run it.
 - README: this script was the README example until the README switched to the 40171b script in `examples/parallax-40171b/`.
-- Notes: `real-run-1/run/record/record.md`, `real-run-1/run/script.md`, `real-run-1/after.txt`.
+- Private notes, not in this repo: `real-run-1/run/record/record.md`, `real-run-1/run/script.md`, `real-run-1/after.txt`.
 
 ## Regression on the real-run inputs, 3 runs
 
 - Run: ISR after the first fixes, three times, with the same request and inputs as real run 1.
-- Result: four of six checks held in all three runs. The starting-state check held in 1 of 3. All three guessed minutes for the gate run in the hand check, against the about 70 minutes the real attempt took (`real-run-1/after.txt` line 13), so the effort was understated in 3 of 3. Cost: $0.54, $0.52 and $0.59.
+- Result: four of six checks held in all three runs. The starting-state check held in 1 of 3. All three guessed minutes for the gate run in the hand check, against the about 70 minutes the real attempt took (line 13 of `real-run-1/after.txt`, a private note), so the effort was understated in 3 of 3. Cost: $0.54, $0.52 and $0.59.
 - What this does not show: that the fixes hold on other inputs. These runs reused the inputs that exposed the problems, so they show only whether a fix held on those inputs.
-- Notes: `report-m2.md`.
+- Private notes, not in this repo: `report-m2.md`.
 
 ## Smoke runs on the invented example, 3 runs
 
 - Run: ISR after the first fixes, three times, on the invented Pellwick skip-a-box story and record.
 - Result: in 1 of 3 runs the reply was reworded after the checker had passed the saved script, and the reworded reply broke a step rule. Cost: $0.43, $0.46 and $0.44.
-- Notes: `report-m2.md`.
+- Private notes, not in this repo: `report-m2.md`.
 
 ## Runs after the duration rule, 2 runs
 
 - Run: ISR after it accepted `## Requirements` and stopped stating durations, once on the Pellwick skip-a-box inputs and once on the real-run inputs.
 - Result: neither gave a duration, and both replies passed the checker. The real-input run still asked for a starting state the product does not allow. Cost: $0.42 and $0.55.
-- Notes: `report-m2b.md`.
+- Private notes, not in this repo: `report-m2b.md`.
 
 ## Smoke run after the writing-rules change, 1 run
 
 - Run: ISR after the writing-rules change to the duration sentence, once on the Pellwick skip-a-box inputs, with the README example request.
 - Result: no duration given. The run's own checker failed once ("Not shown (7)" named 9 items) and then passed. The reply equalled the saved script and passed the checker as returned. Cost: $0.44.
-- Notes: `audit-smoke/smoke-1.jsonl`, `audit-smoke/smoke-1.reply.md`, `audit-smoke/smoke-1.saved-script.md`.
+- Private notes, not in this repo: `audit-smoke/smoke-1.jsonl`, `audit-smoke/smoke-1.reply.md`, `audit-smoke/smoke-1.saved-script.md`.
 
 ## Retrospective run on an older Parallax task (e9a55a), 2026-10-01
 
@@ -48,7 +48,7 @@ Each entry names the note file it came from.
 - Misses: the record's point about the order of the unset commands did not appear in the script; only its matching risk did, under Not shown. The em dash nit also went under Not shown rather than becoming a check.
 - Predictions hit: the fresh-distro check was marked High with an engineer sizing it and no durations, and the Node minimum question came first under Confirm. Predicted miss: ISR put 0 under Already verified, because the record shows only 22 tests, not the full suite.
 - What this does not show: any time saving, or that the script helps anyone but the person who built the change.
-- Notes: `retro-run-1/run/story.md`, `retro-run-1/run/record/`, `retro-run-1/run/script.md`.
+- Private notes, not in this repo: `retro-run-1/run/story.md`, `retro-run-1/run/record/`, `retro-run-1/run/script.md`.
 
 ## After-the-fact run on an older Parallax task (40171b), 2026-10-01
 
@@ -62,7 +62,7 @@ Each entry names the note file it came from.
 - Judgment: ISR made the bare "namespace" match its headline and a Medium check. The blind checker in the record called that risk small. Low or a Confirm item would have fit better. This is a difference of judgment, not an error.
 - Several verified items rest on the plan, since the record only says the plan's tests passed. Reading the commit confirmed them this time.
 - What this does not show: any time saving, use by anyone but the builder, or a real run with the story written first.
-- Notes: `retro-run-2/story.md`, `retro-run-2/predictions.md`, `retro-run-2/record/`, `retro-run-2/run/script.md`.
+- Private notes, not in this repo: `retro-run-2/story.md`, `retro-run-2/predictions.md`, `retro-run-2/record/`, `retro-run-2/run/script.md`.
 
 ## Plain words for readers, and two regressions on the 40171b inputs, 2026-10-01
 
@@ -73,7 +73,7 @@ Each entry names the note file it came from.
 - Regression 2, after the two-phrase cap and the named-risk rule, cost $0.66, checker passed in 1 round: 1 verified, 3 to check by hand, 6 to confirm (5 shown). Criterion 3 was back under Check by hand, sources named at most two places, and the reviewer was no longer named as a verifier. Gap: criterion 4's "To confirm" was not asked, which led to the new checker rule.
 - Variance: three runs on the same inputs put 3, 2 and 1 criteria under Already verified.
 - What this does not show: that a person finds the new wording clearer, or that the checker's new rules hold across other stories.
-- Notes: `blind-read-e9a55a/reads.md`, `retro-run-2-regress/`, `retro-run-2-regress-2/`.
+- Private notes, not in this repo: `blind-read-e9a55a/reads.md`, `retro-run-2-regress/`, `retro-run-2-regress-2/`.
 
 ## Three runs with the rules held fixed, on the 40171b inputs, 2026-10-01
 
@@ -85,7 +85,7 @@ Each entry names the note file it came from.
 - Verified counts: 1, 2 and 1. Most of the earlier spread of 3, 2 and 1 came from rule changes.
 - Wrong item: run 2 said the build's plan states something about the error wording that the plan does not say; the plan says the wording likely comes from the agent runtime. Counting the first regression, two of the last five runs on these inputs had a wrong item, both about where a claim came from.
 - Decision: no new rules from these inputs. Five runs on one story risk fitting rules to that story. The next evidence should come from a different story.
-- Notes: `variance-40171b/run-1`, `run-2` and `run-3`.
+- Private notes, not in this repo: `variance-40171b/run-1`, `run-2` and `run-3`.
 
 ## A fourth run with fixed rules, and the blank-line shape, on the 40171b inputs, 2026-10-01
 
@@ -95,7 +95,7 @@ Each entry names the note file it came from.
 - Agreed with the three earlier fixed-rules runs on: Type Recommendation; the first question and its source; the five Confirm questions shown; criteria 1, 3 and 4 under Check by hand; criterion 5 under Already verified. It differed on criterion 2, as run 2 did.
 - Rule bent: criterion 2 was counted as verified although the plan names a risk against that step in the WSL guide. The claim itself is true against the landed commit. With the rules fixed, 2 of 4 runs on these inputs bent the named-risk rule, both times on criterion 2. This is the weakest rule so far, and the checker cannot enforce it.
 - Not used as the README example, because it bent a rule; the example stays the run-3 script, which kept every rule, with the blank lines added.
-- Notes: `example-40171b-v2/run/`.
+- Private notes, not in this repo: `example-40171b-v2/run/`.
 
 ## Headless runs before the runner
 
@@ -131,7 +131,7 @@ These are the flags the runs before 2026-10-05 used, written out here; the exact
 - Over-blocking: on 40171b the mapper linked 4 of 5 criteria in all 6 runs, so only 1 could be verified. On stories whose plans name broad risks, Already verified may be left nearly empty. Whether each link is right has not been judged by a person yet.
 - The runner returns the file the checker passed, not the writer's reply, so a reply reworded after the check can no longer slip through.
 - What this does not show: that the loop lowers the rate of broken rules, since in this one run the writer kept the rule on its own, as 2 of the 4 earlier runs did; a real run where the Stop hook sent a script back; the mapper on any other story. The send-back is shown only in tests, with a stand-in for the SDK.
-- Notes: `runner-smoke-1/` (`run.json`, `risks.json`, `script.md`, and `map-5.mjs`, the script for the mapper-only runs).
+- Private notes, not in this repo: `runner-smoke-1/` (`run.json`, `risks.json`, `script.md`, and `map-5.mjs`, the script for the mapper-only runs).
 
 ## Four runner runs on the 40171b inputs, two with the risks hidden from the writer, 2026-10-05
 
@@ -152,17 +152,17 @@ These are the flags the runs before 2026-10-05 used, written out here; the exact
 - Over-blocking: the mapper again linked criteria 1 to 4 in every run, so 10 of 10 mapper runs on these inputs now agree. Its links have still not been judged by a person.
 - Refused tool calls: each run had one or two, all Bash. The writer tried a combined command to read its inputs (`cd`, `ls`, `cat` together), or a `sed` edit of the script; each time it fell back to the allowed tools and finished.
 - What this does not show: a rate. Two runs per arm, on one story, can't say how often the writer bends the rule without the map; the earlier 2 of 4 came from runs under `claude -p`, with a different setup.
-- Notes: `runner-runs/normal-1`, `normal-2`, `hidden-1` and `hidden-2`, each with `run.json`, `risks.json` and `script.md`, and the reply and stderr next to each.
+- Private notes, not in this repo: `runner-runs/normal-1`, `normal-2`, `hidden-1` and `hidden-2`, each with `run.json`, `risks.json` and `script.md`, and the reply and stderr next to each.
 
 ## Judging the mapper's links on 40171b, 2026-10-05
 
 - Why: the mapper linked criteria 1 to 4 to a risk in 10 of 10 runs, so only criterion 5 could be verified. The question was whether that blocking is earned or the mapper over-links.
-- What was judged: the 10 distinct risk-to-criterion links the mapper made across the 5 saved runner runs (the smoke run and the 4 runs in runner-runs). The question for each: if this risk came true, would that criterion plausibly fail or be unproven?
+- What was judged: the 10 distinct risk-to-criterion links the mapper made across the 5 saved runner runs (the smoke run and the 4 runs in the entry above). The question for each: if this risk came true, would that criterion plausibly fail or be unproven?
 - Who judged: an independent reviewer agent (same model family as ISR) that saw only the 5 criteria, the 5 risks and the links in shuffled order, without how often each was made; the advisor, who wrote marks before seeing the agent's; and Matt, who broke the one tie that decided a criterion.
 - Results: 7 links right by agreement or Matt's tie-break: free-text detection to criteria 1 and 3, the shape check to criteria 1 and 4, web card rendering to criterion 4, the bare "namespace" match to criterion 3, and editing the WSL guide step to criterion 2 (the agent said right, the advisor said wrong, Matt said right). 2 links right by the agent and unsure by the advisor: free-text detection to criterion 2, and the shape check to criterion 2. 1 link doubtful: the bare "namespace" match to criterion 2 (the agent said wrong, the advisor unsure), made in 4 of 5 runs. 1 link missing: web card rendering to criterion 1, which the agent found and the mapper never made.
 - Verdict for this story: the blocking is earned. Every blocked criterion is held out by at least one link judged right. Neither the doubtful link nor the missing one changed what could be verified.
 - What this does not show: the mapper on any other story; a judgment by anyone outside the builder and two models of the same family; whether broad plan risks over-block on stories where the build is less risky.
-- Notes: `runner-smoke-1/risks.json`, `runner-runs/*/risks.json`.
+- Private notes, not in this repo: `runner-smoke-1/risks.json`, `runner-runs/*/risks.json`.
 
 ## The first story-first run, on a real Parallax change (e3108e), 2026-10-05
 
@@ -205,7 +205,7 @@ These are the flags the runs before 2026-10-05 used, written out here; the exact
   - The code path matched these notes, with one step they left out: before preflight, Reticle runs its tests through srt and records srt's last line.
   - The fix keeps what bwrap or srt printed when the sandbox doesn't start, and quotes it on the stuck card with one next step.
   - CI's real-failure test exists: a real preflight inside a bwrap that forbids new user namespaces. CI passed, 617 tests, 0 skipped.
-  - A real task run that way on this machine got this card, quoted from `real-run-3/fix-real-card.txt`:
+  - A real task run that way on this machine got this card, quoted from `real-run-3/fix-real-card.txt`, a private note:
 
     > Bottom line: Needs you: the sandbox didn't start, so the build didn't launch.
     > - the sandbox didn't start, so the build didn't launch (bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)) (ledger 1b372506)
@@ -213,4 +213,4 @@ These are the flags the runs before 2026-10-05 used, written out here; the exact
 
 - What this shows: the pipeline as a whole found a real regression. ISR alone did not, but its top risk pointed the check at it.
 - What this does not show: a time saving, or a judge other than Matt and the agents.
-- Notes: `real-run-3/`.
+- Private notes, not in this repo: `real-run-3/`.
