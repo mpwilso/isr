@@ -48,7 +48,13 @@ export function gate(work) {
   // Each word bare, or wholly in single or double quotes, and made only of characters the shell does nothing with.
   const quotable = (w) => `(?:${w}|"${w}"|'${w}')`;
   const path = `(?:${escaped}/)?${CHECKER.replace(/\./g, '\\.')}`;
-  const checker = new RegExp(`^node ${quotable(path)}(?: +(?:[\\w./-]+|"[\\w./ -]*"|'[\\w./ -]*'))*$`);
+  const word = `[\\w./-]+|"[\\w./ -]*"|'[\\w./ -]*'`;
+  const checker = new RegExp(`^node ${quotable(path)}((?: +(?:${word}))*)$`);
+  // The checker reads every path it is given, and can echo parts back, so each one has to be inside too.
+  const checkerInside = (command) => {
+    const args = command.match(checker)?.[1];
+    return args !== undefined && [...args.matchAll(new RegExp(word, 'g'))].every(([w]) => inside(w.replace(/^(["'])(.*)\1$/, '$2')));
+  };
   // A Glob pattern can be absolute or climb with "..", so its fixed start has to be inside as well as its path.
   const globInside = ({ pattern = '', path }) => inside(path) && !/(^|\/)\.\.(\/|$)/.test(pattern)
     && inside(resolve(work, path ?? '.', pattern.split(/[*?[{]/)[0] || '.'));
@@ -60,7 +66,7 @@ export function gate(work) {
       return resolve(work, input.file_path ?? '') === join(work, SCRIPT) ? allow : deny(`Write only ${SCRIPT}, in this folder.`);
     }
     if (name === 'Bash') {
-      if (typeof input.command === 'string' && checker.test(input.command.trim())) return allow;
+      if (typeof input.command === 'string' && checkerInside(input.command.trim())) return allow;
       return deny(`The one command allowed here is the checker: node ${CHECKER} ${SCRIPT} --story story.md and its other flags. This folder is already your temporary folder.`);
     }
     return deny(`${name} is not used here.`);

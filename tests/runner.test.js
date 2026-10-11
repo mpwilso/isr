@@ -259,3 +259,16 @@ test('run.js records a run that stopped after spending money, with its cost, and
     rmSync(out, { recursive: true, force: true });
   }
 });
+
+test('the gate allows the checker to read only inside the folder', () => {
+  // Any path passed: the checker read what --story or the script path named, and could echo parts of it back.
+  const work = '/tmp/isr-run-x';
+  const ok = (command) => gate(work)('Bash', { command }).decision === 'allow';
+  const checker = '.claude/skills/isr/src/check.js';
+  assert.ok(ok(`node ${checker} ${SCRIPT} --story story.md --record record --risks "risks.json"`));
+  assert.ok(ok(`node ${checker} ${work}/${SCRIPT} --story ${work}/story.md`));
+  for (const bad of ['/etc/passwd', '"/etc/passwd"', '../../x', "'../x'", 'record/../../x', `${work}/../x`]) {
+    assert.ok(!ok(`node ${checker} ${SCRIPT} --story ${bad}`), bad);
+    assert.ok(!ok(`node ${checker} ${bad} --story story.md`), bad);
+  }
+});
