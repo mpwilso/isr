@@ -74,7 +74,9 @@ export function toRiskMap(risks, reply, criteriaCount) {
     if (!Number.isInteger(link.risk) || link.risk < 1 || link.risk > risks.length) throw new Error(`the mapper named risk ${link.risk}; there are ${risks.length}`);
     const bad = link.criteria.find((n) => !Number.isInteger(n) || n < 1 || n > criteriaCount);
     if (bad !== undefined) throw new Error(`the mapper named criterion ${bad}; the story has ${criteriaCount}`);
-    links.set(link.risk, link);
+    // A risk answered more than once keeps every criterion named, so a repeat can't make the script less careful.
+    const had = links.get(link.risk);
+    links.set(link.risk, had ? { criteria: [...had.criteria, ...link.criteria], why: `${had.why}; ${link.why}` } : link);
   }
   const missing = risks.findIndex((_, i) => !links.has(i + 1));
   if (missing !== -1) throw new Error(`the mapper did not answer risk ${missing + 1}`);

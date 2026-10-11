@@ -272,3 +272,12 @@ test('the gate allows the checker to read only inside the folder', () => {
     assert.ok(!ok(`node ${checker} ${bad} --story story.md`), bad);
   }
 });
+
+test('a risk the mapper answers twice keeps the criteria of both answers', () => {
+  // The last answer replaced the earlier ones, so a repeated link could drop a criterion and make the script less careful.
+  const risks = extractRisks(inputs.record);
+  const reply = { links: [{ risk: 1, criteria: [1], why: 'one' }, ...mapperReply.links.slice(1), { risk: 1, criteria: [3], why: 'two' }] };
+  const first = toRiskMap(risks, reply, 5).risks[0];
+  assert.deepEqual(first.criteria, [1, 3]);
+  assert.equal(first.why, 'one; two');
+});
