@@ -1,0 +1,18 @@
+{
+  "name": "isr",
+  "owner": {
+    "name": "Matt Wilson",
+    "url": "https://github.com/mpwilso"
+  },
+  "description": "ISR writes the acceptance script for an AI-built change.",
+  "plugins": [
+    {
+      "name": "isr",
+      "description": "Writes a short acceptance script from a user story and the build's record: what automated checks verified, what to check by hand, and what the business must confirm.",
+      "source": "./skill",
+      "license": "MIT",
+      "homepage": "https://github.com/mpwilso/isr",
+      "repository": "https://github.com/mpwilso/isr"
+    }
+  ]
+}

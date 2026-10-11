@@ -76,7 +76,14 @@ The full script, rendered: [examples/parallax-40171b/script.md](examples/paralla
 
 You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothing else, and no network.
 
-1. Clone this repo and copy the skill folder into your project:
+1. Install the skill as a plugin, in Claude Code:
+
+   ```
+   /plugin marketplace add mpwilso/isr
+   /plugin install isr@isr
+   ```
+
+   Or clone this repo and copy the skill folder into your project:
 
    ```
    git clone https://github.com/mpwilso/isr.git
@@ -84,7 +91,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    cp -r isr/skill YOUR_PROJECT/.claude/skills/isr
    ```
 
-   Installing by copy has been checked only as far as Claude Code listing the skill.
+   Each way has been checked only as far as Claude Code listing the skill, the plugin from a local copy of this repo.
 
 2. Put the story and the task folder in the project, open Claude Code there, and ask in plain words. For example:
 

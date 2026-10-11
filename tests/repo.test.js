@@ -28,3 +28,16 @@ test('run from scripts/test.sh, every test process has the memory cap', { skip: 
   const capMb = Number(process.env.ISR_MEMORY_MB);
   assert.ok(limitMb < capMb * 1.5, `heap limit ${Math.round(limitMb)} MB, cap ${capMb} MB`);
 });
+
+test('the plugin marketplace lists the skill folder, and the skill there is named isr and runs as ESM', () => {
+  // `claude plugin validate .` checks more, but CI has no Claude Code; this checks what an install depends on.
+  const market = JSON.parse(read('.claude-plugin/marketplace.json'));
+  assert.equal(market.name, 'isr');
+  assert.ok(market.owner?.name, 'owner.name');
+  assert.equal(market.plugins.length, 1);
+  const [plugin] = market.plugins;
+  assert.equal(plugin.name, 'isr');
+  assert.equal(plugin.source, './skill');
+  assert.equal(read('skill/SKILL.md').match(/^---\nname: (.+)\n/)[1], plugin.name);
+  assert.equal(JSON.parse(read('skill/package.json')).type, 'module');
+});
