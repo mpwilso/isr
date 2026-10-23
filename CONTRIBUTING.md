@@ -23,4 +23,4 @@ It checks the Node version, lints every file git knows about for dashes, double 
 
 To compare scripts from several runs on the same inputs, run `node scripts/compare-runs.js run-1.md run-2.md run-3.md`. It shows each run's Type and counts, and the section each run put each criterion in, matched by criterion number. Confirm questions change wording between runs, so it compares only how many there are. For headless runs, [docs/headless-runs.md](docs/headless-runs.md) covers the runner and `scripts/variance.sh`, which runs it several times and compares the scripts. The `claude -p` flags that runs used before the runner are in [docs/run-log.md](docs/run-log.md#headless-runs-before-the-runner).
 
-Work happens on a branch: push it, wait for CI to pass, fast-forward master, push, then delete the branch locally and on GitHub. CLAUDE.md has the rest of the rules for agents working here.
+Work happens on a branch: push it, wait for CI to pass, and the maintainer merges it into master. CLAUDE.md has the rest of the rules for agents working here.

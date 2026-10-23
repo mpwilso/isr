@@ -20,7 +20,7 @@ ISR is a skill that prepares the people who accept a software change. Read docs/
 
 ## Branches
 
-Work on a branch. Push it, wait for CI green, then fast-forward merge into master, push, and delete the branch locally and on GitHub (remote branches one at a time).
+Work on a branch. Push it, wait for CI green, and report the result with the run link. The owner merges with ~/merge-branch.sh and deletes the branch; don't merge, push or fast-forward master yourself. One git command per Bash call, with an absolute path.
 
 Don't change the docs lint allowlist in scripts/lint-docs.js or a test's cap, like the README line limit in tests/repo.test.js, unless asked. If one blocks a commit, report the problem and the options. This does not cover skill/spec/script-shape.json, which changes on purpose.
 
