@@ -20,6 +20,16 @@ test('SKILL.md has a name and a description that says when to use it and what it
   }
 });
 
+test('the plugin manifest beside SKILL.md carries its name and description, and the repo version', () => {
+  // `claude plugin validate skill` wants .claude-plugin/plugin.json at the plugin root; it must say the same as SKILL.md.
+  const plugin = JSON.parse(read('skill/.claude-plugin/plugin.json'));
+  const front = skill.match(/^---\nname: (.+)\ndescription: (.+)\n---\n/);
+  assert.equal(plugin.name, front[1]);
+  assert.equal(plugin.description, front[2]);
+  assert.equal(plugin.version, JSON.parse(read('package.json')).version);
+  assert.ok(plugin.author?.name, 'author.name');
+});
+
 test('SKILL.md stays under 500 lines and every file it points to exists', () => {
   assert.ok(skill.split('\n').length < 500);
   const paths = [...skill.matchAll(/`SKILL\/([^`\s]+)`/g)].map((m) => m[1]);

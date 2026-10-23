@@ -1,0 +1,9 @@
+{
+  "name": "isr",
+  "version": "0.2.1",
+  "description": "Writes a short acceptance script for a software change from a user story and the build's record, saying what automated checks already verified, what a person still has to check by hand, and what the business needs to confirm. Use when a product owner or business tester asks \"what should I test by hand\", \"help me accept this change\", \"UAT steps for this story\", or shares a story and says the build is done. Reads Loupe stories and Parallax task folders, or pasted text. It does not run tests, touch any environment or pass acceptance; a person makes that call.",
+  "author": {
+    "name": "Matt Wilson",
+    "url": "https://github.com/mpwilso"
+  }
+}

@@ -80,7 +80,7 @@ You need Claude Code and Node 22.18.0 or later. The checker uses Node and nothin
    cp -r isr/skill YOUR_PROJECT/.claude/skills/isr
    ```
 
-   Each way has been checked only as far as Claude Code listing the skill, the plugin from a local copy of this repo.
+   Each way has been checked as far as Claude Code listing the skill, the plugin from a local copy of this repo. `claude plugin validate` passes on the marketplace file and on the skill folder. The install from GitHub has not been tried.
 
 2. Put the story and the task folder in the project, open Claude Code there, and ask in plain words. For example:
 

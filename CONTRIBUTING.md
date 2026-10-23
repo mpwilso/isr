@@ -10,7 +10,7 @@ ISR is a personal project. To report a security problem, see [SECURITY.md](SECUR
 - `examples/pellwick/`: invented stories, build records, and the scripts ISR should write for them. Pellwick is an invented company.
 - `docs/brand/`: the logo. The scope's three blips are the script's three kinds of item: a solid dot for verified, a ring for check by hand, a dashed ring for confirm.
 - `scripts/test.sh`: every test.
-- `.claude-plugin/marketplace.json`: lists the skill as a Claude Code plugin whose source is `skill/`.
+- `.claude-plugin/marketplace.json`: lists the skill as a Claude Code plugin whose source is `skill/`. `skill/.claude-plugin/plugin.json` names that plugin, with the same name and description as `skill/SKILL.md`; `claude plugin validate --strict` passes on both files.
 - `.claude/skills/ship/`: a `/ship` command for working on this repo. It is not part of ISR, and installing ISR copies only `skill/`.
 
 ## Development
