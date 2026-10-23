@@ -17,6 +17,8 @@ The first four lines of a script from a real run, on Parallax task 40171b, which
 > 
 > Next: Answer the first Confirm question on how a sandbox start failure should be recognized, then ask an engineer to size the three checks by hand.
 
+The script was written under earlier rules; today's checker would ask for one more line under Not looked at, as the footnote says.[^example]
+
 Not looked at names what no one has checked yet, so the reader knows where the script's evidence stops.
 
 The full script, rendered: [examples/parallax-40171b/script.md](examples/parallax-40171b/script.md)
