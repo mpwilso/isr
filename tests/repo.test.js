@@ -5,16 +5,36 @@ import { getHeapStatistics } from 'node:v8';
 
 const read = (path) => readFileSync(path, 'utf8');
 
-test('CI runs the same Node versions that scripts/test.sh names', () => {
+const ci = read('.github/workflows/ci.yml');
+
+test('every CI job runs the same Node versions that scripts/test.sh names', () => {
   const pinned = read('scripts/test.sh').match(/^NODE_VERSIONS="([^"]+)"/m)[1].split(' ');
-  const matrix = read('.github/workflows/ci.yml').match(/^\s+node: \[([^\]]+)\]/m)[1];
-  assert.deepEqual(matrix.split(',').map((v) => v.trim().replace(/'/g, '')), pinned);
+  const matrices = [...ci.matchAll(/^\s+node: \[([^\]]+)\]/gm)].map((m) => m[1]);
+  assert.equal(matrices.length, 2, 'the test job and the runner job');
+  for (const matrix of matrices) assert.deepEqual(matrix.split(',').map((v) => v.trim().replace(/'/g, '')), pinned);
 });
 
 test('every action in CI is pinned to a full commit SHA', () => {
-  const uses = [...read('.github/workflows/ci.yml').matchAll(/uses: (\S+)/g)].map((m) => m[1]);
+  const uses = [...ci.matchAll(/uses: (\S+)/g)].map((m) => m[1]);
   assert.ok(uses.length > 0);
   for (const u of uses) assert.match(u, /@[0-9a-f]{40}$/, u);
+});
+
+test('CI reads only, every checkout drops its token, and every job skips a pull request from this repo', () => {
+  assert.match(ci, /^permissions:\n  contents: read\n/m);
+  const jobs = [...ci.split('\njobs:\n')[1].matchAll(/^  (\w+):\n/gm)].map((m) => m[1]);
+  assert.deepEqual(jobs, ['test', 'runner']);
+  const forkRule = "if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository";
+  assert.equal(ci.split(forkRule).length - 1, jobs.length);
+  const checkouts = ci.match(/uses: actions\/checkout@/g).length;
+  assert.equal(ci.match(/persist-credentials: false/g).length, checkouts);
+});
+
+test('CI installs the runner\'s dependency from its lock file and imports the SDK, weekly as well as on each push', () => {
+  assert.match(ci, /^on:\n  push:\n[\s\S]*?^  pull_request:\n[\s\S]*?^  schedule:\n(?:\s+#.*\n)*\s+- cron: '\d+ \d+ \* \* \d'\n/m);
+  const [sdk] = Object.keys(JSON.parse(read('runner/package.json')).dependencies);
+  assert.match(ci, /^\s+- run: npm ci\n\s+working-directory: runner\n/m);
+  assert.match(ci, new RegExp(`^\\s+- run: node --input-type=module -e "const m = await import\\('${sdk}'\\); if \\(typeof m\\.query !== 'function'\\) process\\.exit\\(1\\)"\\n\\s+working-directory: runner\\n`, 'm'));
 });
 
 test('the README stays under 200 lines', () => {
