@@ -7,11 +7,14 @@ const read = (path) => readFileSync(path, 'utf8');
 
 const ci = read('.github/workflows/ci.yml');
 
-test('every CI job runs the same Node versions that scripts/test.sh names', () => {
+test('the test job runs the Node versions scripts/test.sh names, and the runner job one of them', () => {
   const pinned = read('scripts/test.sh').match(/^NODE_VERSIONS="([^"]+)"/m)[1].split(' ');
-  const matrices = [...ci.matchAll(/^\s+node: \[([^\]]+)\]/gm)].map((m) => m[1]);
+  const matrices = [...ci.matchAll(/^\s+node: \[([^\]]+)\]/gm)].map((m) => m[1].split(',').map((v) => v.trim().replace(/'/g, '')));
   assert.equal(matrices.length, 2, 'the test job and the runner job');
-  for (const matrix of matrices) assert.deepEqual(matrix.split(',').map((v) => v.trim().replace(/'/g, '')), pinned);
+  const [testMatrix, runnerMatrix] = matrices;
+  assert.deepEqual(testMatrix, pinned);
+  assert.equal(runnerMatrix.length, 1, 'the runner job runs one version: the SDK is a large download');
+  assert.ok(pinned.includes(runnerMatrix[0]), runnerMatrix[0]);
 });
 
 test('every action in CI is pinned to a full commit SHA', () => {
