@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gate, MAX_REWORK, prepare, runIsr, SCRIPT } from '../runner/loop.js';
@@ -242,6 +242,20 @@ test('a record folder that holds a link is refused, since a read could follow it
     symlinkSync('/etc/hostname', join(record, 'leak.md'));
     assert.throws(() => prepare({ story: inputs.story, record }), /link/);
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a story given as a link is copied from where it points, so no link is left in the folder', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'isr-story-link-'));
+  let work;
+  try {
+    symlinkSync(realpathSync(inputs.story), join(dir, 'story.md'));
+    work = prepare({ story: join(dir, 'story.md') });
+    assert.equal(lstatSync(join(work, 'story.md')).isSymbolicLink(), false);
+    assert.equal(readFileSync(join(work, 'story.md'), 'utf8'), readFileSync(inputs.story, 'utf8'));
+  } finally {
+    if (work) rmSync(work, { recursive: true, force: true });
     rmSync(dir, { recursive: true, force: true });
   }
 });

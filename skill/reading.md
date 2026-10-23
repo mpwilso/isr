@@ -16,7 +16,8 @@ If one of these sections is missing, say so under Not looked at in plain words, 
 - Unknown: "the story has no unknowns"
 - Assumed: "the story has no assumptions"
 - Questions before building: "the story has no open questions"
- Other lines, such as Confidence, Estimate and Before release, are context only.
+
+Other lines, such as Confidence, Estimate and Before release, are context only.
 
 **Too thin to build from:** any line of the story reads exactly "Call: Not ready yet" or "# Not ready yet", or the story has no acceptance criteria. Write the not ready report from `templates/not-ready.md`: the four top lines, what is missing (at most five items) and a Next line that points back to the story tool. No script.
 

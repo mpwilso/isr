@@ -17,13 +17,15 @@ The first four lines of a script from a real run, on Parallax task 40171b, which
 > 
 > Next: Answer the first Confirm question on how a sandbox start failure should be recognized, then ask an engineer to size the three checks by hand.
 
+Not looked at names what no one has checked yet, so the reader knows where the script's evidence stops.
+
 The full script, rendered: [examples/parallax-40171b/script.md](examples/parallax-40171b/script.md)
 
 Where acceptance test generators write tests from a story, ISR starts from what the build already proved: it keeps hand checks to what no automated check verified, holds every script to one shape that a code checker enforces, and publishes its misses in the run log.
 
-Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 4 real changes across 19 runs, one of them with the story written before the build. Every result is in the run log, including the misses.
+Status: A portfolio project, built to show how I design, test and judge an AI tool. Tried on 4 real changes across 19 runs, one of them with the story written before the build. Every run is summarized in the run log, including the misses.
 
-ISR (Intelligence, Surveillance, and Reconnaissance) is the third of three tools. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have been run in that order on one change so far. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
+ISR (Intelligence, Surveillance, and Reconnaissance) is one of six tools, and one of three that run in order. [Loupe](https://github.com/mpwilso/loupe) writes the story, [Parallax](https://github.com/mpwilso/parallax) builds it under a gated agent loop and keeps the record, and ISR tells the person accepting it what is left. Each runs on its own, and they have been run in that order on one change so far. The other three stand alone: [Polarizer](https://github.com/mpwilso/polarizer) holds an agent's risky MCP tool calls until a person approves them, [Mordecai](https://github.com/mpwilso/mordecai) judges whether a skill helps, and [Project Max-Q](https://github.com/mpwilso/Project-Max-Q) ranks job postings and checks resume claims. ISR is a skill that runs in Claude Code. It reads a user story and a Parallax build record, and writes one acceptance script for a person to work through. It never passes or fails acceptance. The person does.
 
 ## The problem it addresses
 

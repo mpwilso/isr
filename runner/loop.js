@@ -17,11 +17,11 @@ const NO_MEMORY = { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' };
 
 // A fresh folder holding copies of the inputs and the skill, so the writer reads and writes nothing else. A link in
 // the record is refused: copied as a link, the gate would pass a read of it by its path and the read would leave.
-// A record that is itself a link is copied from where it points, so what it holds is looked through too.
+// A story or record that is itself a link is copied from where it points, so what it holds is looked through too.
 export function prepare({ story, record }) {
   const work = realpathSync(mkdtempSync(join(tmpdir(), 'isr-run-')));
   try {
-    cpSync(story, join(work, 'story.md'));
+    cpSync(realpathSync(story), join(work, 'story.md'));
     const from = record && realpathSync(record);
     const noLinks = (src) => {
       if (lstatSync(src).isSymbolicLink()) throw new Error(`the record holds a link: ${src}`);

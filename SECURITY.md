@@ -1,6 +1,6 @@
 # Security
 
-If you find a security problem in ISR, please report it privately, not in a public issue. On GitHub, open the repository's **Security** tab and choose **Report a vulnerability**. Only the maintainer can see the report.
+If you find a security problem in ISR, please report it privately, not in a public issue. On GitHub, open the repository's **Security** tab and choose **Report a vulnerability**. The report goes to the maintainer.
 
 Please say what you found, how to reproduce it, and what it affects. You'll get a reply, and a fix if one is needed.
 
