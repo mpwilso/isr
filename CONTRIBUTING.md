@@ -6,7 +6,7 @@ ISR is a personal project. To report a security problem, see [SECURITY.md](SECUR
 
 - `skill/`: the skill, self-contained. `skill/spec/script-shape.json` holds the script's shape as data, and `skill/src/check.js` enforces it.
 - `runner/`: runs the skill headless with the Claude Agent SDK, in a loop that code controls. It needs `npm ci` in that folder; the skill doesn't.
-- `examples/parallax-40171b/`: the README example's story, record and script, copied byte for byte from a real run, except the blank lines added between the script's four top lines; a test runs the checker on them.
+- `examples/parallax-40171b/`: the README example's story, record and script, copied byte for byte from a real run, except the blank lines added between the script's four top lines, with a README that lists the story's requirements; a test runs the checker on them.
 - `examples/pellwick/`: invented stories, build records, and the scripts ISR should write for them. Pellwick is an invented company.
 - `docs/brand/`: the logo. The scope's three blips are the script's three kinds of item: a solid dot for verified, a ring for check by hand, a dashed ring for confirm.
 - `scripts/test.sh`: every test.
