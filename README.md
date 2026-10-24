@@ -9,7 +9,7 @@
 
 <p align="center"><b>Writes the acceptance script for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.</b></p>
 
-ISR reads a user story and a Parallax build record and writes the acceptance script: what the build proved, what a person still has to check, and what the business has to decide.
+ISR is a Claude Code skill. Give it a user story and a Parallax build record and it writes the script a person works through at acceptance. It never passes or fails anything; the person does.
 
 Status: a portfolio project, built to show how I design, test and judge an AI tool. Tried on 4 real changes across 19 runs, one of them with the story written before the build; every run is in [the run log](docs/run-log.md), including the misses.
 
@@ -27,7 +27,7 @@ The full script, rendered: [examples/parallax-40171b/script.md](examples/paralla
 
 ## What it does
 
-ISR (Intelligence, Surveillance, and Reconnaissance) is a skill that runs in Claude Code. You give it a story in the shape Loupe writes, and a Parallax task folder with `intent.md`, `plan.md` and `record.md`. Without a record, ISR still writes a script, and nothing counts as verified. It never passes or fails acceptance. The person does.
+ISR (Intelligence, Surveillance, and Reconnaissance) takes a story in the shape Loupe writes, and a Parallax task folder with `intent.md`, `plan.md` and `record.md`. Without a record, ISR still writes a script, and nothing counts as verified.
 
 Where acceptance test generators write tests from a story, ISR starts from what the build already proved: it keeps hand checks to what no automated check verified, holds every script to one shape that a code checker enforces, and publishes its misses in the run log.
 

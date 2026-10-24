@@ -83,7 +83,7 @@ test('the README opens with the lockup, the CI badge, the tagline, what ISR is, 
     '<img src="docs/brand/lockup-light.svg" alt="ISR: a radar scope with three blips" height="72">',
     '[![CI](https://github.com/mpwilso/isr/actions/workflows/ci.yml/badge.svg)](https://github.com/mpwilso/isr/actions/workflows/ci.yml)',
     '<p align="center"><b>Writes the acceptance script for an AI-built change',
-    'ISR reads a user story and a Parallax build record and writes the acceptance script: what the build proved, what a person still has to check, and what the business has to decide.',
+    'ISR is a Claude Code skill. Give it a user story and a Parallax build record and it writes the script a person works through at acceptance. It never passes or fails anything; the person does.',
     'Status: a portfolio project, built to show how I design, test and judge an AI tool. ',
     '> Type: Recommendation',
   ];
