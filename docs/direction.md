@@ -50,6 +50,8 @@ Type, Bottom line, Not looked at, Next; then what was verified, what to check by
 
 ## Milestones
 
+M1 is built. M2 to M5 are not; the README's Limits say what has been shown so far and what has not.
+
 M1 The acceptance script, from a story and a build record, with the report shape and a checker.
 M2 Recording results with evidence, and classifying failures.
 M3 Feeding lessons back to the story tool and the build tool.

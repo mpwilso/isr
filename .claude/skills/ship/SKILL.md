@@ -12,7 +12,4 @@ The flow is the first paragraph of CLAUDE.md's Branches section, and it wins if 
 2. Run `scripts/test.sh` with pipefail. Stop unless it ends with ALL PASSED.
 3. If there is anything to commit, run `git branch --show-current` again, then commit on the branch.
 4. Push the branch, then `gh run watch` its CI run with `--exit-status`. Stop unless it passes.
-5. Switch to master, then `git merge --ff-only` the branch. Stop if it can't fast forward.
-6. Push master, then watch its CI run the same way.
-7. Delete the branch locally, then on GitHub, one remote branch per command.
-8. Report as CLAUDE.md's Reports section says, with the commit ids and the CI links.
+5. Report as CLAUDE.md's Reports section says, with the commit ids and the CI link. The owner merges with ~/merge-branch.sh and deletes the branch; never switch to master, merge, or push master.
