@@ -33,6 +33,12 @@ test('CI reads only, every checkout drops its token, and every job skips a pull 
   assert.equal(ci.match(/persist-credentials: false/g).length, checkouts);
 });
 
+test('on master each commit gets its own concurrency group, so a newer push cannot cancel a run waiting to start', () => {
+  // GitHub keeps one waiting run per group and cancels the older one even with cancel-in-progress off.
+  // Keyed by ref alone, master's run at e17764d was cancelled that way when the next merge queued.
+  assert.match(ci, /^concurrency:\n(?:\s+#.*\n)*  group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.ref == 'refs\/heads\/master' && github\.sha \|\| github\.ref \}\}\n  cancel-in-progress: \$\{\{ github\.ref != 'refs\/heads\/master' \}\}\n/m);
+});
+
 test('CI installs the runner\'s dependency from its lock file and imports the SDK, weekly as well as on each push', () => {
   assert.match(ci, /^on:\n  push:\n[\s\S]*?^  pull_request:\n[\s\S]*?^  schedule:\n(?:\s+#.*\n)*\s+- cron: '\d+ \d+ \* \* \d'\n/m);
   const [sdk] = Object.keys(JSON.parse(read('runner/package.json')).dependencies);

@@ -12,7 +12,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # A newer push to a branch cancels the run still going on it. On master each commit gets its own group:
+  # GitHub keeps one waiting run per group and cancels the older one even with cancel-in-progress off.
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/master' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
