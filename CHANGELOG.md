@@ -6,6 +6,8 @@ Each release is on GitHub with its full notes: [releases](https://github.com/mpw
 
 - README cut to about half. The top now reads lockup, CI badge, tagline, what ISR is, status, then the example. The six-tool paragraph moved to The other tools, the example's requirements to [examples/parallax-40171b/README.md](examples/parallax-40171b/README.md), and the full list of limits to [docs/limits.md](docs/limits.md). A new test, `tests/readme.test.js`, holds the README to its rules: under 155 shown lines, no dashes, links that resolve, no bare placeholders, no overclaiming words.
 - The `/ship` skill stops at the pushed branch and its CI run; the owner merges. docs/direction.md says which milestones are built.
+- README in plainer words, after a review by a reader who is not technical: the tagline says sign-off checklist, the name ISR is spelled out at the top, Parallax's record is explained, and headless, namespace and Stop hook are defined where they appear. Task and commit ids moved out of the prose into the linked docs. The run where a person's check by hand found what the change broke, which the tests, the automated reviewer and ISR all missed, now sits under the status line. The run count is 20 on 4 real changes, as the run log lists them; the old 19 left out a run that was denied its files.
+- CI: each master commit gets its own concurrency group. Keyed by branch, a newer merge cancelled the run still waiting on the one before it.
 
 ## [v0.2.1](https://github.com/mpwilso/isr/releases/tag/v0.2.1), 2026-10-11
 
