@@ -1,0 +1,83 @@
+{
+  "about": "The lesson from one check a tester said did not match what the script expects. ISR proposes a class with its reasons and labels it a proposal; a person picks the class. The class says where the lesson goes, and the file holds one entry in that place's format for the person to carry over by hand. ISR never writes into the story tool or the build tool.",
+  "title": "^# Lesson: (.+)$",
+  "fields": [
+    { "label": "Results", "pattern": "^(\\S.*), check (\\d+)\\.$", "path": true, "message": "Write \"- Results: \", the results file from this file's folder, then \", check N.\"" },
+    { "label": "Covers", "covers": true, "message": "Write \"- Covers: \" and the check's Covers line, as the results have it." },
+    { "label": "Tester saw", "pattern": "^\\S", "message": "Write \"- Tester saw: \" and the check's Saw line from the results, word for word." },
+    { "label": "Class proposed by ISR", "pattern": "^({classes})\\. This is a proposal, not a finding\\.$", "message": "Write \"- Class proposed by ISR: \", one class ({classes}), then \". This is a proposal, not a finding.\"" },
+    { "label": "Class picked by a person", "pattern": "^(?:not picked yet|({classes}), by [^,]+ on (\\d{4}-\\d{2}-\\d{2}))\\.$", "date": true, "message": "Write \"- Class picked by a person: not picked yet.\" until a person picks, then the class, who and when, like \"wrong assumption, by Priya Raman on 2026-10-10.\"" },
+    { "label": "Lesson goes to", "pattern": "^(.+)\\.$", "message": "Write \"- Lesson goes to: \" and the place the class sends it, ending with a period." }
+  ],
+  "notPicked": "not picked yet.",
+  "proposed": "\\bpropos",
+  "sections": [
+    { "key": "why", "heading": "Why ISR proposes this", "kind": "items", "max": 5,
+      "item": "^- .+ \\(([^()]+)\\)$",
+      "itemMessage": "Each reason is one line from the inputs, ending with where it came from in parentheses, like \"(the tester reported this)\"." },
+    { "key": "carry", "heading": "Carry over by hand", "kind": "block", "count": false }
+  ],
+  "sources": [
+    { "phrase": "the tester reported this", "from": "the check's entry in the results" },
+    { "phrase": "the story says this", "from": "the story's criteria or known facts" },
+    { "phrase": "the story assumes this", "from": "the story's Assumed section" },
+    { "phrase": "the story leaves this open", "from": "the story's Unknown section, open questions or a \"To confirm\" detail" },
+    { "phrase": "the script says this", "from": "the acceptance script" },
+    { "phrase": "the build record says this", "from": "the build's record" },
+    { "phrase": "the build decided this", "from": "an outcome the build inferred, or a choice its intent or plan records" }
+  ],
+  "classes": [
+    { "name": "build mistake", "means": "the story said clearly what should happen, and the build did something else", "goesTo": "evalCase" },
+    { "name": "requirements gap", "means": "the story left out, or left open, what the check showed it needed", "goesTo": "teamContext" },
+    { "name": "wrong assumption", "means": "the story, or the build, took something as true that the check showed is not", "goesTo": "teamContext" }
+  ],
+  "destinations": {
+    "teamContext": {
+      "words": "the story tool's team context (Loupe's learned.md)",
+      "from": "Loupe's spec/context-file.json, learned, at Loupe master 13a6c0b",
+      "entry": "^- (\\S.*)$",
+      "sentenceEnd": "[.!?]$",
+      "secondSentence": "[.!?]\\s+[A-Z]",
+      "field": "^\\s+(\\w+):\\s*(.*)$",
+      "fields": {
+        "kind": "^(fact|rule)$",
+        "source": "^[^,]+, [^,]+ on [^,]+, (\\d{4}-\\d{2}-\\d{2})$",
+        "applies": "^\\S.* to \\S.*$",
+        "replaces": "^\"(.+)\"$"
+      },
+      "required": ["kind", "source"]
+    },
+    "evalCase": {
+      "words": "the build tool's eval cases (Parallax's evals/cases.toml)",
+      "from": "Parallax's evals/cases.toml and the Case fields in parallax/evals.py, at Parallax master 102a9b5",
+      "header": "[[case]]",
+      "key": "^(\\w+) = ",
+      "unknown": "^# (\\w+): not known yet\\b",
+      "required": ["id", "repo", "base", "fix", "tests", "goal"],
+      "optional": ["test_command", "setup", "pr", "issue"]
+    }
+  },
+  "messages": {
+    "results": "The results have no check {n}.",
+    "notDidNotMatch": "The tester said \"{outcome}\" for check {n}. A lesson is for a check the tester said did not match what the script expects.",
+    "resultsTitle": "Check {n} is \"{title}\" in the results. Use that title, word for word.",
+    "resultsCovers": "This differs from check {n}'s Covers line in the results: \"{covers}\". Copy it word for word.",
+    "resultsSaw": "This differs from what the tester saw, as the results have it: \"{saw}\". Copy it word for word; ISR never rewrites what a tester reported.",
+    "goesTo": "The {which} class is \"{name}\", so the lesson goes to {words}. Write that, word for word.",
+    "typePicked": "A person picked the class, so Type is \"Recommendation\": the entry is ready to carry over.",
+    "typeNotPicked": "No one has picked the class yet, so Type is \"Decision needed\".",
+    "bottomProposed": "No one has picked the class yet, so the Bottom line says the class is what ISR proposes.",
+    "source": "Say where this reason came from, using one of these: {phrases}.",
+    "block": "Carry over by hand holds one code block, between two \"```\" lines, and nothing else.",
+    "entryFirst": "The block is one entry for {file}: a line starting \"- \", then its fields, indented, like \"  kind: fact\".",
+    "entrySentence": "Write the entry as one plain sentence, ending with a period.",
+    "entryField": "\"{field}:\" is not an entry field. The fields are {fields}.",
+    "entryFieldValue": "\"{field}: {value}\" is not in the shape {file} takes. See the writing rules.",
+    "entryMissing": "The entry needs \"{field}:\".",
+    "entryRepeated": "\"{field}:\" appears more than once. Keep one.",
+    "caseHeader": "The block starts with \"[[case]]\", one case for {file}.",
+    "caseKey": "\"{key}\" is not a case field. The fields are {fields}.",
+    "caseMissing": "The case needs \"{key} = \", or \"# {key}: not known yet\" and why, when no one knows it yet.",
+    "caseRepeated": "\"{key}\" appears more than once. Keep one."
+  }
+}

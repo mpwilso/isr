@@ -35,6 +35,8 @@ Where acceptance test generators write tests from a story, ISR starts from what 
 
 You get one script, always in the same shape: four top lines (Type, Bottom line, Not looked at, Next), then Already verified, Check by hand ranked by risk, Confirm for the business, and Not covered when needed. Every criterion in the story appears exactly once, and no list shows more than five items. A story too thin to build from gets a short not ready report instead.
 
+After the script, ISR keeps three short files beside it, each in a shape the checker enforces. A review says who reviewed the script, when, what they changed and whether they approved it for use. Results record, for each check by hand, what the person did and saw, with evidence, traced to the story's criteria. ISR writes down what the person reports and never decides whether a check passed. For a check that did not match, a lesson proposes a build mistake, a requirements gap or a wrong assumption, labeled as a proposal, and drafts an entry for Parallax's eval cases or Loupe's team context. The person picks the class and carries the entry over by hand. Examples, all invented: [examples/pellwick](examples/pellwick/).
+
 The shape, as data: [skill/spec/script-shape.json](skill/spec/script-shape.json). The template and the rules for each section: [skill/templates/acceptance-script.md](skill/templates/acceptance-script.md) and [skill/writing-rules.md](skill/writing-rules.md). How ISR reads the story and the record: [skill/reading.md](skill/reading.md).
 
 ## What it must not do
@@ -100,6 +102,7 @@ Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 
 - Checks by hand have been run on one change, the one with the story written before the build. They found what the change broke, but not every check could be finished: one would have stopped at an earlier screen, and half of another had nothing real to test against.
 - Tested in Claude Code, nowhere else.
+- The review, results and lesson files have been tried on invented examples, not yet with a real person or a live model run.
 - Not shown yet: use by a team, or a time saving. Those need real users.
 
 The full list: [docs/limits.md](docs/limits.md).

@@ -171,6 +171,18 @@
     "skippedAllPassed": "The record says {skipped}, so \"{text}\" overstates it. Say how many passed and how many were skipped, like \"9 passed and 2 skipped\".",
     "namedRisk": "Criterion {n} is under Already verified, but {where} names a risk against it: \"{risk}\". Put it under Check by hand. If the risk is a question for the business, ask it under Confirm and list the criterion under Not covered with \"moved to Confirm\".",
     "planTestsNotSaid": "The record shows only the plan's tests ran, not the full suite. Say so under Not looked at, like \"the record shows only the plan's tests, not the full suite\".",
-    "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped."
+    "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped.",
+
+    "followTitle": "Put the title on line {n}, after the four top lines.",
+    "followStray": "This line doesn't belong here. The template shows what goes where.",
+    "followFieldOrder": "\"{label}\" is out of order. The fields, in order: {order}.",
+    "followFieldRepeated": "\"{label}\" appears more than once. Keep one.",
+    "followStatement": "Keep this line after the fields, word for word: \"{statement}\"",
+    "followDate": "\"{value}\" is not a real date like 2026-10-08.",
+    "followLink": "\"{path}\" is not a file, from this file's folder.",
+    "followLinkKind": "\"{path}\" is not {what}.",
+    "followLinkTitle": "The title must match {what}'s, word for word: \"{title}\".",
+    "followCount": "{heading} says ({said}), but it lists {shown}.",
+    "followTooMany": "{heading} lists {count}; the limit is {max}."
   }
 }

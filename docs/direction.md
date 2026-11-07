@@ -10,7 +10,7 @@ Product owners and the business people who accept changes. Engineering leads rea
 
 ## Version 1: acceptance readiness
 
-ISR is a skill that runs in Claude Code. It writes a script and nothing more; it does not drive a browser or touch any environment.
+ISR is a skill that runs in Claude Code. It writes a script, and the review, results and lesson files that follow it, and nothing more; it does not drive a browser or touch any environment.
 
 1. Reads the story, as a Markdown file or pasted text. It looks for the acceptance criteria, what is known, unknown and assumed, what is not included, the open questions, and any detail the story marks as needing confirmation. If a story lacks one of these, the script says so. If the story is too thin to build from, ISR says that and writes no script.
 2. Reads the build's record (what changed, what automated checks verified, and what nothing checked) from a task folder, or from pasted text. With no record, everything counts as not checked, and the script says so.
@@ -19,9 +19,11 @@ ISR is a skill that runs in Claude Code. It writes a script and nothing more; it
    - Check by hand: only what no automated check covered, ranked by risk, each with what the tester needs in place, a few short steps and the expected result.
    - Confirm: guessed details, unknowns and assumptions from the story, and anything the build inferred that the story never stated.
 4. Every acceptance criterion in the story appears exactly once: verified, by hand, or named as not covered. When a list runs past five items, the script shows the top five and names the rest.
-5. A person reviews the script before anyone uses it. Not built yet.
-6. Records each result with evidence, traced to the story. Not built yet.
-7. Classifies a failed check as a build mistake, a requirements gap or a wrong assumption, and says where the lesson should go: a new eval case for the build tool, or the story tool's team context. Not built yet.
+5. A person reviews the script before anyone uses it. Built: a review file beside the script says who reviewed it, when, what they changed and whether they approved it for use. It is about the script, never the change, and the script's shape is unchanged.
+6. Records each result with evidence, traced to the story. Built: a results file holds, for each check by hand, who ran it and when, what they did, what they saw, evidence links or file paths, and what the tester says, in one of four fixed phrases. Every criterion in the story is accounted for. ISR writes down what the person reports and never decides pass or fail.
+7. Classifies a failed check as a build mistake, a requirements gap or a wrong assumption, and says where the lesson should go: a new eval case for the build tool, or the story tool's team context. Built: a lesson file for each check the tester said did not match. ISR proposes the class with its reasons and labels it a proposal; a person picks. It holds one entry in the format of Parallax's eval cases or Loupe's learned file, which the person carries over by hand.
+
+Steps 5 to 7 have their shapes in `skill/spec/` and the same checker, and have been tried on invented examples, not yet with a real person.
 
 It prepares acceptance. It never passes it; a person always makes that call.
 
@@ -50,7 +52,7 @@ Type, Bottom line, Not looked at, Next; then what was verified, what to check by
 
 ## Milestones
 
-M1 is built. M2 to M5 are not; the README's Limits say what has been shown so far and what has not.
+M1 and M2 are built; M2 has not yet been tried with a real person. M3 to M5 are not built: a lesson is carried over by hand. The README's Limits say what has been shown so far and what has not.
 
 M1 The acceptance script, from a story and a build record, with the report shape and a checker.
 M2 Recording results with evidence, and classifying failures.

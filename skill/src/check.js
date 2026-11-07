@@ -3,16 +3,19 @@
 // With --story it also checks that every acceptance criterion appears exactly once.
 // With --story and no --record, it holds the script to the rules for "no record was given".
 // With --risks, a risk map ({"risks": [{"from", "risk", "criteria"}]}), no criterion a risk names can be verified.
+//   node check.js REVIEW_RESULTS_OR_LESSON
+// A script review, hand check results or a lesson is checked against its own shape (followup.js), with no options.
 // Prints one line per problem and exits 1, or prints "Checked with Node VERSION." and exits 0.
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkFollowup, followupKind } from './followup.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const shape = JSON.parse(readFileSync(join(here, '..', 'spec', 'script-shape.json'), 'utf8'));
 const re = (pattern, flags = '') => new RegExp(pattern, flags);
-const isVerdict = (line) => re(shape.banned.verdict, 'i').test(line);
-const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, k) => String(vars[k]));
+export const isVerdict = (line) => re(shape.banned.verdict, 'i').test(line);
+export const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, k) => String(vars[k]));
 // A Confirm source phrase as a whole-text pattern: "criterion N leaves this open" takes any number for N.
 const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const sourcePattern = (phrase) => re(`^${escape(phrase).replace(/\bN\b/g, '\\d+')}$`);
@@ -70,14 +73,9 @@ export function readRisks(text) {
   return risks;
 }
 
-export function check(text, { story = null, record = null, risks = null } = {}) {
-  const lines = text.replace(/\n+$/, '').split('\n');
-  const problems = [];
-  const add = (line, rule, key, vars = {}) =>
-    problems.push({ line, rule, message: fill(shape.messages[key] ?? key, vars) });
-
-  // The four top lines, each with a blank line after it.
-  // Found in the README: without the blank lines, Markdown runs the four lines together into one paragraph.
+// The four top lines, each with a blank line after it.
+// Found in the README: without the blank lines, Markdown runs the four lines together into one paragraph.
+export function readTop(lines, add) {
   const head = { text: [], line: [], title: 1 }; // title: the line the title should be on
   shape.top.forEach((top, k) => {
     const n = head.title;
@@ -90,8 +88,11 @@ export function check(text, { story = null, record = null, risks = null } = {}) 
       if (shape.blankAfterTop || k === shape.top.length - 1) add(n, 'top-spacing', 'topSpacing');
     }
   });
+  return head;
+}
 
-  // Banned anywhere: dashes, double hyphens used as dashes, verdict fields, the team's own words.
+// Banned anywhere: dashes, double hyphens used as dashes, the team's own words, and verdict fields after line `after`.
+export function checkWords(lines, after, add) {
   const dashes = shape.banned.dashes.map(([code, name]) => [String.fromCodePoint(code), name]);
   lines.forEach((line, i) => {
     for (const [char, name] of dashes) if (line.includes(char)) add(i + 1, 'dash', 'dash', { name });
@@ -100,8 +101,18 @@ export function check(text, { story = null, record = null, risks = null } = {}) 
       const found = line.match(re(w.pattern, w.flags));
       if (found) add(i + 1, 'team-words', 'teamWords', { found: found[0], instead: w.instead });
     }
-    if (i + 1 > head.line.at(-1) && isVerdict(line)) add(i + 1, 'verdict', 'verdict');
+    if (i + 1 > after && isVerdict(line)) add(i + 1, 'verdict', 'verdict');
   });
+}
+
+export function check(text, { story = null, record = null, risks = null } = {}) {
+  const lines = text.replace(/\n+$/, '').split('\n');
+  const problems = [];
+  const add = (line, rule, key, vars = {}) =>
+    problems.push({ line, rule, message: fill(shape.messages[key] ?? key, vars) });
+
+  const head = readTop(lines, add);
+  checkWords(lines, head.line.at(-1), add);
 
   const title = lines[head.title - 1] ?? '';
   const kind = re(shape.script.title).test(title) ? 'script' : re(shape.notReady.title).test(title) ? 'notReady' : null;
@@ -121,7 +132,7 @@ export function check(text, { story = null, record = null, risks = null } = {}) 
   return sorted(problems);
 }
 
-const short = (text) => (text.length > 120 ? `${text.slice(0, 117).trimEnd()}...` : text);
+export const short = (text) => (text.length > 120 ? `${text.slice(0, 117).trimEnd()}...` : text);
 const sorted = (problems) => problems.sort((a, b) => a.line - b.line);
 
 export function parseSections(lines, head, defs, add) {
@@ -369,17 +380,26 @@ export function main(args) {
     if (['--story', '--record', '--risks'].includes(args[i])) opts[args[i].slice(2)] = args[++i];
     else files.push(args[i]);
   }
-  if (files.length !== 1 || Object.values(opts).some((v) => !v)) {
+  const usage = () => {
     console.error('Usage: node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER] [--risks FILE]');
+    console.error('       node check.js REVIEW_RESULTS_OR_LESSON');
     return 2;
-  }
+  };
+  if (files.length !== 1 || Object.values(opts).some((v) => !v)) return usage();
   let problems;
   try {
-    problems = check(readFileSync(files[0], 'utf8'), {
-      story: opts.story ? readStory(readFileSync(opts.story, 'utf8')) : null,
-      record: opts.record ? readRecord(opts.record) : null,
-      risks: opts.risks ? readRisks(readFileSync(opts.risks, 'utf8')) : null,
-    });
+    const text = readFileSync(files[0], 'utf8');
+    if (followupKind(text)) {
+      // A review, results or lesson file names its own inputs, so it takes no options.
+      if (Object.keys(opts).length) return usage();
+      problems = checkFollowup(text, { dir: dirname(resolve(files[0])) });
+    } else {
+      problems = check(text, {
+        story: opts.story ? readStory(readFileSync(opts.story, 'utf8')) : null,
+        record: opts.record ? readRecord(opts.record) : null,
+        risks: opts.risks ? readRisks(readFileSync(opts.risks, 'utf8')) : null,
+      });
+    }
   } catch (err) {
     console.error(`Not checked: ${err.message}`);
     return 2;

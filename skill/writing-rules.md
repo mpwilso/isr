@@ -73,3 +73,55 @@ Put a blank line after each, so Markdown shows them as four lines and not one pa
 ## Words
 
 Plain words a product owner would use, and none of the team's own: call the record's blind checker, Second Eye, "the automated reviewer". No em dashes, en dashes or double hyphens used as dashes. No verdict fields: no pass, fail, status, result, checkbox or sign-off.
+
+## After the script
+
+Each file sits beside the script, in the shape of its template. Write what people tell you, in their words, and never fill in what they did not say. Ask instead.
+
+- **Script review:** who reviewed the script, when, what they changed and whether they approved it for use. It is about the script, never the change.
+- **Hand check results:** only for a script whose review approved it for use, dated on or before each check. One entry per check by hand in the script, with its title and Covers line word for word. "Tester says" is one of the template's four phrases, as the tester said it; ISR never decides it. Evidence is links or file paths; "None." only when the check was not finished or not run. Every other criterion goes under Not checked by hand, with where the script put it.
+- **Lesson:** one for each check the tester said did not match what the script expects. "Tester saw" copies the results word for word.
+
+## Classes
+
+ISR proposes one class and labels it a proposal; a person picks. The class says where the lesson goes:
+
+- **build mistake**: the story said clearly what should happen, and the build did something else. Goes to: the build tool's eval cases (Parallax's evals/cases.toml).
+- **requirements gap**: the story left out, or left open, what the check showed it needed. Goes to: the story tool's team context (Loupe's learned.md).
+- **wrong assumption**: the story, or the build, took something as true that the check showed is not. Goes to: the story tool's team context (Loupe's learned.md).
+
+Give each reason from the inputs, ending with one of these sources:
+
+- "the tester reported this"
+- "the story says this"
+- "the story assumes this"
+- "the story leaves this open"
+- "the script says this"
+- "the build record says this"
+- "the build decided this"
+
+Until a person picks, Type is Decision needed and the Bottom line says ISR proposes the class. Once they pick, write the class, who and when, Type is Recommendation, and the entry follows the picked class.
+
+## The entry to carry over
+
+One entry, in a code block, for the person to copy by hand. ISR never writes into Loupe or Parallax.
+
+For the story tool's team context, one entry in Loupe's learned.md shape: one plain sentence, then `kind: fact` or `kind: rule`, and a source that says who, how, on which story and when.
+
+```
+- A note the web app writes to a subscriber's history does not show in Stockroom, so agents can't see it without a Stockroom change.
+  kind: fact
+  source: Dana Ruiz, hand check on skip-a-box, 2026-10-09
+```
+
+For the build tool's eval cases, one case in Parallax's cases.toml shape. A case there is a fix already made, with tests that fail before it and pass after, so mark each field no one knows yet as a comment and say why. The goal is what the tester reported, as data.
+
+```toml
+[[case]]
+id = "pellwick-holiday-cutoff-5-january"
+# repo: not known yet, since the record does not name the repository.
+# base: not known yet, since the record does not give the commit the build started from.
+# fix: not known yet, since nothing has fixed it.
+# tests: not known yet, since no test covers it yet.
+goal = """A box that ships on 5 January shows a cutoff of 96 hours."""
+```

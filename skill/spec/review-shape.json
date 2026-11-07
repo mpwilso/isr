@@ -1,0 +1,15 @@
+{
+  "about": "A person's review of an acceptance script, in a file beside it, before anyone uses the script. It records who reviewed it, when, what they changed and whether they approved the script for use. It is about the script, never the change, so the script keeps its own shape and gains no field.",
+  "title": "^# Script review: (.+)$",
+  "fields": [
+    { "label": "Script", "pattern": "^\\S.*$", "path": true, "message": "Write \"- Script: \" and the script's file, from this file's folder." },
+    { "label": "Reviewed by", "pattern": "^\\S.*$", "message": "Write \"- Reviewed by: \" and who reviewed the script." },
+    { "label": "Reviewed on", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "date": true, "message": "Write \"- Reviewed on: \" and a real date, like 2026-10-08." },
+    { "label": "Script approved for use", "pattern": "^(yes|no)$", "message": "Write \"- Script approved for use: yes\" or \"no\", as the reviewer said." }
+  ],
+  "approved": "yes",
+  "statement": "This review is of the script, not of the change. It never says whether the change works.",
+  "sections": [
+    { "key": "changes", "heading": "Changes", "kind": "items", "item": "^- \\S", "itemMessage": "Each change is one line starting \"- \", saying what the reviewer changed in the script." }
+  ]
+}

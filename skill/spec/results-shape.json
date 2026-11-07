@@ -1,0 +1,57 @@
+{
+  "about": "What each person reported for each check by hand, with evidence, traced to the story's criteria. ISR writes down what the person says. It never decides whether a check passed or failed.",
+  "title": "^# Hand check results: (.+)$",
+  "fields": [
+    { "label": "Story", "pattern": "^\\S.*$", "path": true, "message": "Write \"- Story: \" and the story's file, from this file's folder." },
+    { "label": "Script", "pattern": "^\\S.*$", "path": true, "message": "Write \"- Script: \" and the script's file, from this file's folder." },
+    { "label": "Review", "pattern": "^\\S.*$", "path": true, "message": "Write \"- Review: \" and the script review's file, from this file's folder." }
+  ],
+  "statement": "ISR wrote down what each tester reported. It never decides whether a check passed or failed, and it does not accept the change.",
+  "sections": [
+    { "key": "checks", "heading": "Checks by hand", "kind": "checks" },
+    { "key": "others", "heading": "Not checked by hand", "kind": "items",
+      "item": "^- Criteri(?:on|a) \\d[^:]*: \\S",
+      "itemMessage": "Each line reads \"Criterion N: \" and where the script put it, like \"Criterion 1: the script lists it as already verified.\"" }
+  ],
+  "check": {
+    "title": "^### (\\d+)\\. (.+)$",
+    "fields": [
+      { "label": "Covers", "covers": true, "message": "the check's Covers line, as the script has it" },
+      { "label": "Checked by", "pattern": "^[^,]+, (\\d{4}-\\d{2}-\\d{2})$", "date": true, "message": "who checked it and the date, like \"Dana Ruiz, 2026-10-09\"" },
+      { "label": "Did", "pattern": "^\\S", "message": "what the tester did, in their words" },
+      { "label": "Saw", "pattern": "^\\S", "message": "what the tester saw, in their words" },
+      { "label": "Evidence", "pattern": "^\\S", "message": "links or file paths, joined by \"; \"" },
+      { "label": "Tester says", "pattern": "^(.+)\\.$", "message": "one of the phrases the template lists, ending with a period" }
+    ]
+  },
+  "outcomes": [
+    { "phrase": "matched what the script expects", "evidence": true },
+    { "phrase": "did not match what the script expects", "evidence": true, "lesson": true },
+    { "phrase": "could not finish", "evidence": false },
+    { "phrase": "did not run it", "evidence": false }
+  ],
+  "evidence": {
+    "separator": "; ",
+    "none": "None.",
+    "part": "^(?:https?://\\S+|\\S*/\\S*|\\S+\\.[A-Za-z0-9]{1,5})(?: \\([^()]+\\))?$"
+  },
+  "messages": {
+    "checkField": "Check {n} is missing \"{label}\", or it is out of order. Each check has, in order: {order}.",
+    "checkValue": "Check {n}'s \"{label}:\" needs {what}.",
+    "checkNumber":"Number the checks as the script does: expected \"### {expected}.\"",
+    "notInScript": "The script has no check {n} to report on. Each check here is one of the script's checks by hand, by its number.",
+    "scriptTitle": "Check {n} is \"{title}\" in the script. Use the script's title, word for word.",
+    "scriptCovers": "Check {n}'s Covers line differs from the script's. Copy it word for word: \"{covers}\".",
+    "missingCheck": "The script's check {n}, \"{title}\", has no entry. Record what the tester reports for it, or \"Tester says: did not run it.\"",
+    "outcome": "\"Tester says:\" takes one of these, as the tester said it: {phrases}. If the tester didn't say, ask; never decide it for them.",
+    "evidencePart": "Each piece of evidence is a link or a file path, joined by \"; \", with what it shows in parentheses if needed, like \"evidence/stockroom-history.png (the subscriber's history in Stockroom)\".",
+    "evidenceNone": "\"{outcome}\" needs evidence: links or file paths. \"None.\" is for a check that was not finished or not run.",
+    "notApproved": "The review says the script is not approved for use, so no check should be run from it yet.",
+    "reviewLater": "The review is dated {reviewed}, after this check on {checked}. A person reviews the script before anyone uses it.",
+    "reviewOther": "The review is of another script. It must name the same script as this file.",
+    "storyNotReady": "The story it names is not ready to build from, so it has no criteria to trace to.",
+    "coverageMissing": "Criterion {n} is missing. Every criterion in the story appears once: under a check's Covers, or under Not checked by hand.",
+    "coverageDuplicate": "Criterion {n} appears more than once. It belongs in one place only.",
+    "coverageUnknown": "The story has no criterion {n}; it has {count}."
+  }
+}
