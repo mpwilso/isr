@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-[![CI](https://github.com/mpwilso/isr/actions/workflows/ci.yml/badge.svg)](https://github.com/mpwilso/isr/actions/workflows/ci.yml)
+<p align="center"><a href="https://github.com/mpwilso/isr/actions/workflows/ci.yml"><img src="https://github.com/mpwilso/isr/actions/workflows/ci.yml/badge.svg" alt="CI"></a></p>
 
 <p align="center"><b>Writes the sign-off checklist for an AI-built change: what the build proved, what a person still has to check, and what the business has to decide.</b></p>
 

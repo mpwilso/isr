@@ -2,6 +2,10 @@
 
 Each release is on GitHub with its full notes: [releases](https://github.com/mpwilso/isr/releases).
 
+## Unreleased
+
+- The README's CI badge is centered, like the other tools' READMEs. The docs lint now allows the `a` tag, with the owner's approval, so the badge's link passes; `tests/lint-docs.test.js` checks that a link passes and a bare placeholder still fails.
+
 ## [v0.2.2](https://github.com/mpwilso/isr/releases/tag/v0.2.2), 2026-11-06
 
 - README cut to about half. The top now reads lockup, CI badge, tagline, what ISR is, status, then the example. The six-tool paragraph moved to The other tools, the example's requirements to [examples/parallax-40171b/README.md](examples/parallax-40171b/README.md), and the full list of limits to [docs/limits.md](docs/limits.md). A new test, `tests/readme.test.js`, holds the README to its rules: under 155 shown lines, no dashes, links that resolve, no bare placeholders, no overclaiming words.

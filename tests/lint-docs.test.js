@@ -28,7 +28,7 @@ test('flags angle-bracket placeholders outside code', () => {
   assert.deepEqual(lines('a.md', 'See <https://example.com>. <!-- a comment -->'), []);
 });
 
-test('allows the HTML tags p, picture, source, img and b, with their attributes, and nothing else', () => {
+test('allows the HTML tags p, picture, source, img, b and a, with their attributes, and nothing else', () => {
   const html = [
     '<p align="center">',
     '  <picture>',
@@ -37,8 +37,10 @@ test('allows the HTML tags p, picture, source, img and b, with their attributes,
     '  </picture>',
     '</p>',
     '<p align="center"><b>Bold words.</b></p>',
+    '<p align="center"><a href="https://example.com/ci.yml"><img src="https://example.com/badge.svg" alt="CI"></a></p>',
   ].join('\n');
   assert.deepEqual(lines('a.md', html), []);
+  assert.deepEqual(lines('a.md', '<a href="https://example.com">a link</a>\nSave it as <placeholder>.'), [2]);
   assert.deepEqual(lines('a.md', 'Save it as <name>.\nRun it on <path>.\n<p align="center"><name></p>\n<div align="center">'), [1, 2, 3, 4]);
 });
 

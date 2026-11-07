@@ -81,7 +81,7 @@ test('the README opens with the lockup, the CI badge, the tagline, what ISR is, 
   const order = [
     '<source media="(prefers-color-scheme: dark)" srcset="docs/brand/lockup-dark.svg">',
     '<img src="docs/brand/lockup-light.svg" alt="ISR: a radar scope with three blips" height="72">',
-    '[![CI](https://github.com/mpwilso/isr/actions/workflows/ci.yml/badge.svg)](https://github.com/mpwilso/isr/actions/workflows/ci.yml)',
+    '<p align="center"><a href="https://github.com/mpwilso/isr/actions/workflows/ci.yml"><img src="https://github.com/mpwilso/isr/actions/workflows/ci.yml/badge.svg" alt="CI"></a></p>',
     '<p align="center"><b>Writes the sign-off checklist for an AI-built change',
     'ISR, short for intelligence, surveillance and reconnaissance, scouts a change before people accept it. It is a Claude Code skill. Give it a user story and the record that Parallax, the AI build tool, keeps of what it built and tested, and it writes an acceptance script: the checklist the person signing off works through. It never passes or fails anything; the person does.',
     'Status: a portfolio project, built to show how I design, test and judge an AI tool. ',
