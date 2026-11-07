@@ -2,10 +2,11 @@
 
 Each release is on GitHub with its full notes: [releases](https://github.com/mpwilso/isr/releases).
 
-## Unreleased
+## [v0.3.0](https://github.com/mpwilso/isr/releases/tag/v0.3.0), 2026-11-07
 
 - Steps 5 to 7 of docs/direction.md are built, with invented examples and no live runs yet. After the script, ISR keeps three files beside it, each with its shape in `skill/spec/` (`review-shape.json`, `results-shape.json`, `lesson-shape.json`), a template and the same checker, `node skill/src/check.js FILE`. A review records who reviewed the script, when, what they changed and whether they approved it for use; the script's own shape is unchanged. Results record what each tester did and saw, with evidence links or file paths, traced to every criterion in the story; they need a review that approved the script, dated on or before each check, and ISR never decides pass or fail. A lesson, for a check the tester said did not match, proposes a build mistake, a requirements gap or a wrong assumption with its reasons, and holds one entry for Parallax's eval cases or Loupe's learned file, for the person to carry over by hand. 28 new tests, no model calls.
 - The README's CI badge is centered, like the other tools' READMEs. The docs lint now allows the `a` tag, with the owner's approval, so the badge's link passes; `tests/lint-docs.test.js` checks that a link passes and a bare placeholder still fails.
+- Also: the README says again that every run is summarized in the run log. 149 tests, no model calls.
 
 ## [v0.2.2](https://github.com/mpwilso/isr/releases/tag/v0.2.2), 2026-11-06
 
