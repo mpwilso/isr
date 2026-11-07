@@ -11,7 +11,7 @@
 
 ISR, short for intelligence, surveillance and reconnaissance, scouts a change before people accept it. It is a Claude Code skill. Give it a user story and the record that Parallax, the AI build tool, keeps of what it built and tested, and it writes an acceptance script: the checklist the person signing off works through. It never passes or fails anything; the person does.
 
-Status: a portfolio project, built to show how I design, test and judge an AI tool. Tried 20 times on 4 real changes. In one, the story was written before the build started, as intended. Every run is in [the run log](docs/run-log.md), including the misses.
+Status: a portfolio project, built to show how I design, test and judge an AI tool. Tried 20 times on 4 real changes. In one, the story was written before the build started, as intended. Every run is summarized in [the run log](docs/run-log.md), including the misses.
 
 In that one, a person checking by hand found that the change broke something that used to work. The build's 37 passing tests, its automated reviewer and ISR all missed it, but ISR's top risk pointed the check there: [that run](docs/run-log.md#the-first-story-first-run-on-a-real-parallax-change-e3108e-2026-10-05).
 
