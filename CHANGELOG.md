@@ -2,7 +2,7 @@
 
 Each release is on GitHub with its full notes: [releases](https://github.com/mpwilso/isr/releases).
 
-## Unreleased
+## [v0.4.1](https://github.com/mpwilso/isr/releases/tag/v0.4.1), 2026-11-07
 
 - Fixes to the ledger section, from a review, each with a test that failed first:
   - Hold reasons are read by Polarizer's own wording, anchored: at most one host and one path in each, only where Polarizer puts them. A URL reason is no longer read as a path, and a path an agent chose can no longer make ISR name paths or hosts no call touched. A reason ISR can't read one way only names nothing, and the script says so under Not looked at.
