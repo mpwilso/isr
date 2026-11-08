@@ -2,6 +2,17 @@
 
 Each release is on GitHub with its full notes: [releases](https://github.com/mpwilso/isr/releases).
 
+## Unreleased
+
+- Fixes to the ledger section, from a review, each with a test that failed first:
+  - Hold reasons are read by Polarizer's own wording, anchored: at most one host and one path in each, only where Polarizer puts them. A URL reason is no longer read as a path, and a path an agent chose can no longer make ISR name paths or hosts no call touched. A reason ISR can't read one way only names nothing, and the script says so under Not looked at.
+  - A path named in a denied hold and in a retry that was forwarded is marked forwarded.
+  - A hold counts as a planted test call only when its first reveal checks against its commitment, by Polarizer's MEASURE-SPEC.md, section 8. A reveal that does not check hides no hold, and a hold without a commitment is never counted as planted.
+  - "ran" is now "forwarded", with the outcomes the ledger records, since Polarizer writes a call down before it sends it.
+  - A ledger checked with no head file says so under Not looked at, whatever its file name.
+  - An empty tool name prints as `""`, which the checker accepts, and a line nested too deep for ISR's checks reads as invalid, not unreadable.
+- The shape file's reason wording, the section's item wording and two Not looked at rules change with them. 226 tests, no model calls.
+
 ## [v0.4.0](https://github.com/mpwilso/isr/releases/tag/v0.4.0), 2026-11-07
 
 - With a Polarizer ledger from the run, the script ends with a new section, Tool calls in the ledger: each tool the build's agents called through Polarizer, how many calls ran, how many were held, denied or refused, and the paths and hosts the ledger names in its holds, so the person accepting the change knows where to look. `node skill/src/ledger.js LEDGER` prints it, and `node skill/src/check.js SCRIPT --ledger LEDGER` checks it word for word; without `--ledger`, a script can't have it. ISR verifies the chain first, with its own code, by version 1 of Polarizer's docs/LEDGER-SPEC.md, and a ledger that does not verify names nothing and says why. It reads the ledger rather than `polarizer export --ocsf`, because the export leaves out hold reasons, where the ledger names paths and hosts. The shape file gains the section, its fixed wording and two Not looked at rules. Tested on Polarizer's conformance ledgers, copied at Polarizer commit 700498a, and on invented ledgers; no real run has been read. 218 tests, no model calls.

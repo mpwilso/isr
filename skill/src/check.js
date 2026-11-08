@@ -11,7 +11,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkFollowup, followupKind } from './followup.js';
-import { readLedger } from './ledger.js';
+import { notes, readLedger } from './ledger.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const shape = JSON.parse(readFileSync(join(here, '..', 'spec', 'script-shape.json'), 'utf8'));
@@ -244,6 +244,7 @@ function checkLedger(lines, head, data, ledger, add) {
   }
   const said = ledger.tools ? shape.ledger.said.every((p) => re(p, 'i').test(head.text[2])) : re(shape.ledger.saidNone, 'i').test(head.text[2]);
   if (!said) add(head.line[2], 'ledger-said', ledger.tools ? 'ledgerSaid' : 'ledgerSaidNone');
+  for (const [pattern, message] of notes(ledger)) if (!re(pattern, 'i').test(head.text[2])) add(head.line[2], 'ledger-said', message, ledger);
 }
 
 function checkScript(head, sections, { story, record, riskMap }, add) {

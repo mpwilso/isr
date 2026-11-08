@@ -2,9 +2,10 @@
 //   node ledger.js LEDGER
 // LEDGER is a ledger.jsonl file, or the folder that holds one. A head file beside it (NAME.head for
 // NAME.jsonl) is checked too. Prints the section, as the checker expects it word for word, and exits 0.
+// What Not looked at must also say, like that no head file was checked, goes to stderr.
 // The chain is verified first, with ISR's own code, by the rules of the ledger spec named in the shape
 // file. A ledger that does not verify names no calls. Everything in the ledger is data: ISR reads fixed
-// fields, and paths and hosts only by the fixed patterns in the shape file.
+// fields, and paths and hosts only by Polarizer's reason wording, as the shape file gives it.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -136,79 +137,148 @@ export function verify(bytes, head = null) {
     const e = p?.value;
     if (i === 0 && isObject(e) && !has(e, 'v')) return { status: 'version 0', line: 1, seq: null };
     const at = (status) => ({ status, line: i + 1, seq: isObject(e) && typeOf(e.seq) === 'integer' ? e.seq : null });
-    const structure = isObject(e) && lines[i].length + 1 <= MAX_LINE && typed(e, KEYS) && e.v === 1 && inSubset(p.text, e)
-      && (i === 0 ? e.kind === 'ledger.genesis' && typeof e.data.chain_id === 'string' && HEX32.test(e.data.chain_id) : e.kind !== 'ledger.genesis');
-    if (!structure) return at('invalid');
-    if (e.seq !== i) return at('tampered');
-    if (e.prev !== (i ? entries[i - 1].hash : ZERO)) return at('tampered');
-    if (e.hash !== entryHash(e)) return at('tampered');
-    if (Buffer.compare(Buffer.from(canonical(e)), lines[i]) !== 0) return at('not canonical');
+    const problem = tooDeepIsInvalid(() => {
+      const structure = isObject(e) && lines[i].length + 1 <= MAX_LINE && typed(e, KEYS) && e.v === 1 && inSubset(p.text, e)
+        && (i === 0 ? e.kind === 'ledger.genesis' && typeof e.data.chain_id === 'string' && HEX32.test(e.data.chain_id) : e.kind !== 'ledger.genesis');
+      if (!structure) return 'invalid';
+      if (e.seq !== i) return 'tampered';
+      if (e.prev !== (i ? entries[i - 1].hash : ZERO)) return 'tampered';
+      if (e.hash !== entryHash(e)) return 'tampered';
+      if (Buffer.compare(Buffer.from(canonical(e)), lines[i]) !== 0) return 'not canonical';
+      return null;
+    });
+    if (problem) return at(problem);
     entries.push(e);
   }
   const last = { line: entries.length, seq: entries.length ? entries.length - 1 : null };
   const headProblem = head && checkHead(head, entries);
   if (headProblem) return headProblem;
   if (end < bytes.length) return { status: 'torn tail', ...last };
-  return { status: 'intact', ...last, entries };
+  return { status: 'intact', ...last, entries, head: Boolean(head) };
 }
 
-// Each tool's calls: how many ran, how many did not and why, and the paths and hosts its holds name.
-// A hold Polarizer revealed as planted was never the agents' call, so it is left out.
+// A line nested deeper than ISR's checks can recurse is invalid, as one too deep for Polarizer's parser is.
+function tooDeepIsInvalid(checks) {
+  try {
+    return checks();
+  } catch (err) {
+    if (err instanceof RangeError) return 'invalid';
+    throw err;
+  }
+}
+
+// A hold reason's values, by Polarizer's wording (HOLD-SPEC.md, section 4; TAINT-SPEC.md, sections 3 and 5):
+// at most one host, in a URL reason at the start, and one path, between "argument NAME: " and the phrase
+// that ends it. The path counts only when that phrase is the one such phrase there, so a path that holds
+// one can't move where it ends. A reason 1 KiB long may have been cut. Returns the values, or null when
+// the reason has a path or host ISR could not read one way only.
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const R = L.reason;
+const PHRASES = [...R.ends, R.matches];
+const REASON = new RegExp(`${R.start}(?:(${R.path}(?:${R.ends.map(escape).join('|')}|${escape(R.matches)}.+)))?$`, 's');
+const CLAUSE = new RegExp(R.clause, 's');
+const hits = (text) => PHRASES.reduce((n, p) => {
+  for (let i = text.indexOf(p); i !== -1; i = text.indexOf(p, i + 1)) n++;
+  return n;
+}, 0);
+
+function reasonValues(reason) {
+  const m = Buffer.byteLength(reason) < R.maxBytes ? REASON.exec(reason) : null;
+  if (m && (m[2] === undefined || hits(m[2]) === 1)) return [m[1], m[3]].filter((v) => v !== undefined);
+  return CLAUSE.test(reason) ? null : [];
+}
+
+// MEASURE-SPEC.md, section 8: a reveal checks when sha256 of the prefix, its salt's 32 bytes and its label
+// is the hold's plant_commit.
+const PLANT_PREFIX = 'POLARIZER-PLANT/1\n';
+function revealChecks(commit, { label, salt }) {
+  if (typeof commit !== 'string' || !['real', 'planted'].includes(label) || !/^[0-9a-fA-F]{64}$/.test(salt)) return false;
+  return createHash('sha256').update(PLANT_PREFIX).update(Buffer.from(salt, 'hex')).update(label).digest('hex') === commit;
+}
+
+// Polarizer may have planted a hold that has plant_commit. Its first reveal says which, if it checks, as
+// Polarizer's hold fold and stats read it. A hold that was forwarded was real: a planted one never is.
+function planted(h, reveal) {
+  if (h.forwarded || !h.plant) return 'real';
+  if (!reveal) return 'maybe';
+  return revealChecks(h.commit, reveal) ? reveal.label : 'unchecked';
+}
+
+// Each tool's calls: how many were forwarded and their outcomes, how many were not and why, and the paths
+// and hosts its holds name. A hold Polarizer revealed as planted was never the agents' call, so it is
+// left out. Also how many hold reasons had a value ISR could not read.
 export function tally(entries) {
   const tools = new Map();
   const holds = new Map();
+  const reveals = new Map();
+  const calls = new Map(); // a call.sent's seq, until its first call.returned: its tool
   const tool = (name) => {
     name = String(name);
-    if (!tools.has(name)) tools.set(name, { name, ran: 0, notRun: new Map(), named: new Map() });
+    if (!tools.has(name)) tools.set(name, { name, forwarded: 0, outcomes: new Map(), notRun: new Map(), named: new Map() });
     return tools.get(name);
   };
-  const bump = (t, label) => t.notRun.set(label, (t.notRun.get(label) ?? 0) + 1);
-  for (const { kind, data } of entries) {
+  const bump = (map, key) => map.set(key, (map.get(key) ?? 0) + 1);
+  for (const { seq, kind, data } of entries) {
     const hold = typeof data.hold === 'string' ? holds.get(data.hold) : undefined;
     if (kind === 'hold.created' && typeof data.hold === 'string' && !hold) {
-      holds.set(data.hold, { tool: data.tool, reason: String(data.reason ?? ''), plant: has(data, 'plant_commit'), ending: null, label: null, ran: false });
+      holds.set(data.hold, { id: data.hold, tool: data.tool, reason: String(data.reason ?? ''), plant: has(data, 'plant_commit'), commit: data.plant_commit, ending: null, forwarded: false });
     } else if (hold && ['hold.decided', 'hold.expired', 'hold.abandoned'].includes(kind)) {
       hold.ending ??= kind === 'hold.decided' ? data.decision : 'undecided';
-    } else if (hold && kind === 'hold.revealed') hold.label = data.label;
-    else if (kind === 'call.sent') {
-      tool(data.tool).ran++;
-      if (hold) hold.ran = true;
-    } else if (kind === 'call.refused' && !hold) bump(tool(data.tool), L.notRun.refused);
+    } else if (kind === 'hold.revealed' && typeof data.hold === 'string' && typeof data.label === 'string' && typeof data.salt === 'string') {
+      if (!reveals.has(data.hold)) reveals.set(data.hold, data);
+    } else if (kind === 'call.sent') {
+      const t = tool(data.tool);
+      t.forwarded++;
+      calls.set(seq, t);
+      if (hold) hold.forwarded = true;
+    } else if (kind === 'call.returned' && calls.has(data.call_seq)) {
+      if (typeof data.outcome === 'string' && has(L.outcomes, data.outcome)) bump(calls.get(data.call_seq).outcomes, data.outcome);
+      calls.delete(data.call_seq);
+    } else if (kind === 'call.refused' && !hold) bump(tool(data.tool).notRun, L.notRun.refused);
   }
+  let unread = 0;
   for (const h of holds.values()) {
-    if (h.label === 'planted') continue;
+    const state = planted(h, reveals.get(h.id));
+    if (state === 'planted') continue;
     const t = tool(h.tool);
-    const maybePlanted = h.plant && h.label !== 'real' && !h.ran;
-    if (!h.ran) bump(t, L.notRun[maybePlanted ? 'maybePlanted' : h.ending === 'deny' ? 'denied' : h.ending === 'allow' ? 'allowed' : 'undecided']);
-    if (maybePlanted) continue;
-    for (const pattern of [L.paths, L.hosts]) {
-      for (const m of h.reason.matchAll(new RegExp(pattern, 'gs'))) if (!t.named.has(m[1])) t.named.set(m[1], h.ran ? 'ran' : 'not run');
-    }
+    if (!h.forwarded) bump(t.notRun, L.notRun[state === 'maybe' ? 'maybePlanted' : state === 'unchecked' ? 'didNotCheck' : h.ending === 'deny' ? 'denied' : h.ending === 'allow' ? 'allowed' : 'undecided']);
+    if (state !== 'real') continue;
+    const values = reasonValues(h.reason);
+    if (!values) unread++;
+    // A value named in any hold that was forwarded is marked forwarded.
+    for (const v of values ?? []) if (h.forwarded || !t.named.has(v)) t.named.set(v, h.forwarded ? 'forwarded' : 'not run');
   }
   const notRun = (t) => [...t.notRun.values()].reduce((a, n) => a + n, 0);
-  return [...tools.values()].sort((a, b) => b.ran - a.ran || notRun(b) - notRun(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const sorted = [...tools.values()].sort((a, b) => b.forwarded - a.forwarded || notRun(b) - notRun(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  return { tools: sorted, unread };
 }
 
-// A ledger value as a code span, so it reads as data. Anything outside printable ASCII, and the
-// characters Markdown or the checker would read as structure, are written as JSON escapes.
+// A ledger value as a code span, so it reads as data. Anything outside printable ASCII, the characters
+// Markdown or the checker would read as structure, and quotes are written as JSON escapes, so an empty
+// value can be written "" and nothing else is.
 export function code(value) {
   let text = '';
   for (const c of String(value)) {
     const n = c.codePointAt(0);
-    if (n >= 0x20 && n <= 0x7e && !'`;[]'.includes(c)) text += c;
+    if (n >= 0x20 && n <= 0x7e && !'`;[]"'.includes(c)) text += c;
     else for (const unit of c.length === 2 ? [c.charCodeAt(0), c.charCodeAt(1)] : [n]) text += `\\u${unit.toString(16).padStart(4, '0')}`;
   }
   if (text.length > 200) text = `${text.slice(0, 197)}...`;
-  return `\`${text}\``;
+  return `\`${text || '""'}\``;
 }
 
 function item(t) {
   const parts = [];
-  if (t.ran) parts.push(`${t.ran} ran`);
+  if (t.forwarded) {
+    const counts = Object.entries(L.outcomes).filter(([k]) => t.outcomes.has(k)).map(([k, words]) => `${t.outcomes.get(k)} ${words}`);
+    const unknown = t.forwarded - [...t.outcomes.values()].reduce((a, n) => a + n, 0);
+    if (unknown) counts.push(`${unknown} ${L.noOutcome}`);
+    parts.push(`${t.forwarded} forwarded (${counts.join(', ')})`);
+  }
   const reasons = [...t.notRun];
   const notRun = reasons.reduce((a, [, n]) => a + n, 0);
   if (notRun) parts.push(`${notRun} not run (${reasons.map(([label, n]) => `${n} ${label}`).join(', ')})`);
-  // "1 call ran, 2 not run": the first count names the calls.
+  // "1 call forwarded (1 ok), 2 not run": the first count names the calls.
   let line = `- ${code(t.name)}: ${parts.join(', ').replace(/^(\d+) /, (_, n) => `${n} ${n === '1' ? 'call' : 'calls'} `)}.`;
   const named = [...t.named];
   if (named.length) {
@@ -221,20 +291,28 @@ function item(t) {
 
 const why = (r) => fill(r.line === null ? L.why.head : r.status === 'torn tail' ? L.why.torn : L.why.line, r);
 
-// The section's lines, and how many tools it names.
+// The section's lines, how many tools it names, and how many hold reasons it could not read.
 export function section(result) {
-  const none = (text) => ({ lines: [`## ${HEADING} (0)`, text], tools: 0 });
+  const none = (text) => ({ lines: [`## ${HEADING} (0)`, text], tools: 0, unread: 0 });
   if (result.status === 'unreadable') return none(fill(L.none.unreadable, result));
   if (result.status === 'empty') return none(L.none.empty);
   if (result.status === 'version 0') return none(L.none.version0);
   if (result.status !== 'intact') return none(fill(L.none.broken, { why: why(result) }));
-  const tools = tally(result.entries);
+  const { tools, unread } = tally(result.entries);
   if (!tools.length) return none(L.none.intact);
   const max = shape.maxItems;
   const shown = tools.slice(0, max);
   const lines = [`## ${HEADING} (${tools.length}${tools.length > max ? `, ${max} shown` : ''})`, ...shown.map(item)];
   if (tools.length > max) lines.push(`Not shown (${tools.length - max}): ${tools.slice(max).map((t) => code(t.name)).join(shape.notShown.separator)}`);
-  return { lines, tools: tools.length };
+  return { lines, tools: tools.length, unread };
+}
+
+// What Not looked at must also say about a ledger, as [the shape's said pattern, its message].
+export function notes(ledger) {
+  const out = [];
+  if (ledger.status === 'intact' && !ledger.head) out.push([L.saidAlso.noHead, 'ledgerNoHead']);
+  if (ledger.unread) out.push([L.saidAlso.unread, 'ledgerUnread']);
+  return out;
 }
 
 // A path to a ledger file or its folder. A file that can't be read is reported in the section, not thrown.
@@ -255,7 +333,9 @@ export function main(args) {
     console.error('Usage: node ledger.js LEDGER');
     return 2;
   }
-  console.log(readLedger(args[0]).lines.join('\n'));
+  const ledger = readLedger(args[0]);
+  console.log(ledger.lines.join('\n'));
+  for (const [, message] of notes(ledger)) console.error(fill(shape.messages[message], ledger));
   return 0;
 }
 

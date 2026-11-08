@@ -63,7 +63,7 @@ The reader never sees the story's section names, such as "Questions before build
 
 ## Tool calls in the ledger
 
-When there is a ledger, the script ends with this section, exactly as `ledger.js` prints it: each tool the agents called, how many calls ran, and how many did not and why, with the paths and hosts the ledger names. It tells the person accepting the change where to look; it is not a finding. Don't reword, reorder or explain it, and don't draw checks or Confirm items from it. Under Not looked at, say what it can't show: "the ledger names no paths or hosts for calls that ran without a hold, and ISR did not check it against a checkpoint". When it names no calls, say why, like "the agents' ledger did not verify, so ISR names none of their tool calls".
+When there is a ledger, the script ends with this section, exactly as `ledger.js` prints it: each tool the agents called, how many calls Polarizer forwarded and what came back, and how many did not run and why, with the paths and hosts the ledger names. It tells the person accepting the change where to look; it is not a finding. Don't reword, reorder or explain it, and don't draw checks or Confirm items from it. Under Not looked at, say what it can't show: "the ledger names no paths or hosts for calls forwarded without a hold, and ISR did not check it against a checkpoint". Add what `ledger.js` notes on stderr, like "ISR checked no head file with the ledger". When it names no calls, say why, like "the agents' ledger did not verify, so ISR names none of their tool calls".
 
 ## The four top lines
 

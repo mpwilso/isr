@@ -30,8 +30,8 @@ Next: Decide what agents should see for a paused subscriber, then give check 1 t
 - Criterion 3: moved to Confirm, since the story does not say what an agent should see.
 
 ## Tool calls in the ledger (6, 5 shown)
-- `fs__move_file`: 1 call ran.
-- `fs__read_text_file`: 1 call ran.
+- `fs__move_file`: 1 call forwarded (1 ok).
+- `fs__read_text_file`: 1 call forwarded (1 outcome unknown).
 - `fs__delete`: 1 call not run (1 refused by Polarizer).
 - `fs__edit_file`: 1 call not run (1 held and never decided). Named in its holds: `/etc/hosts` (not run).
 - `fs__write_file`: 1 call not run (1 denied by a person).

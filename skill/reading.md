@@ -45,6 +45,6 @@ Match each criterion to the build's outcomes and the tests that cover them. A cr
 
 ## The ledger
 
-A Polarizer ledger (`ledger.jsonl`, or the folder that holds it) records each tool call the build's agents made through Polarizer, the proxy that holds risky calls for a person: which tool, and whether the call ran, was held, denied or refused. Read it through `src/ledger.js`, never by hand. It verifies the hash chain first and names nothing from a ledger that does not verify.
+A Polarizer ledger (`ledger.jsonl`, or the folder that holds it) records each tool call the build's agents made through Polarizer, the proxy that holds risky calls for a person: which tool, and whether the call was forwarded, held, denied or refused. Read it through `src/ledger.js`, never by hand. It verifies the hash chain first and names nothing from a ledger that does not verify.
 
-The ledger names paths and hosts in the reasons Polarizer gave for holding a call, and nowhere else. For a call that ran without a hold, it keeps a commitment to the arguments, and the argument files beside it can hold secrets, so ISR never opens them. With no ledger, the script has no ledger section.
+The ledger names paths and hosts in the reasons Polarizer gave for holding a call, and nowhere else. For a call forwarded without a hold, it keeps a commitment to the arguments, and the argument files beside it can hold secrets, so ISR never opens them. With no ledger, the script has no ledger section.

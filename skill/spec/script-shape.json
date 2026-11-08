@@ -27,7 +27,7 @@
         "item": "^- Criteri(?:on|a) \\d[^:]*: \\S",
         "itemMessage": "Each Not covered item reads \"Criterion N: the reason\"." },
       { "key": "ledger", "heading": "Tool calls in the ledger", "required": false, "data": true,
-        "item": "^- `[^`]+`: \\d+ calls? (?:ran|not run)\\b",
+        "item": "^- `[^`]+`: \\d+ calls? (?:forwarded|not run)\\b",
         "itemMessage": "Each item is a tool, as node SKILL/src/ledger.js prints it." }
     ],
     "check": {
@@ -129,12 +129,21 @@
       "allowed": "allowed but never forwarded",
       "undecided": "held and never decided",
       "maybePlanted": "held, and may be a test call Polarizer planted",
+      "didNotCheck": "held, and may be a test call Polarizer planted, since its reveal did not check",
       "refused": "refused by Polarizer"
     },
+    "outcomes": { "ok": "ok", "tool-error": "tool error", "protocol-error": "protocol error", "transport-error": "transport error", "cancelled": "cancelled", "unsupported": "unsupported" },
+    "noOutcome": "outcome unknown",
     "named": "Named in its holds:",
     "maxNamed": 3,
-    "paths": "argument \"(?:[^\"\\\\]|\\\\.)*\": (.+?) (?:is inside Polarizer's ledger directory|is Polarizer's config file|is outside every workspace root|matches )",
-    "hosts": "argument \"(?:[^\"\\\\]|\\\\.)*\": host (\\S+) is not in this tool's domains",
+    "reason": {
+      "maxBytes": 1024,
+      "start": "^(?:session tainted by \\S+ at \\S+ \\(seq \\d+\\); )?(?:(?:class (?:destructive|egress) is held on every call|argument \"[^\"]*\": host ([a-z0-9_-]+(?:\\.[a-z0-9_-]+)*) is not in this tool's domains)(?:; (?=argument \")|$))?",
+      "path": "argument \"[^\"]*\": ((?:[/\\\\]|[A-Za-z]:[/\\\\]).*?)",
+      "ends": [" is inside Polarizer's ledger directory", " is Polarizer's config file", " is outside every workspace root"],
+      "matches": " matches ",
+      "clause": "argument \"[^\"]*\": (?:[/\\\\]|[A-Za-z]:[/\\\\]|host )"
+    },
     "none": {
       "intact": "None. The ledger verified intact and records no tool calls.",
       "broken": "None. The ledger did not verify ({why}), so ISR names no calls from it.",
@@ -143,8 +152,9 @@
       "unreadable": "None. ISR could not read the ledger ({why}), so it names no calls from it."
     },
     "why": { "line": "{status} at line {line}", "torn": "a torn tail after line {line}", "head": "{status}, from its head file" },
-    "said": ["\\bno paths or hosts for calls that ran without a hold\\b", "\\bcheckpoint\\b"],
-    "saidNone": "\\bledger\\b"
+    "said": ["\\bno paths or hosts for calls forwarded without a hold\\b", "\\bcheckpoint\\b"],
+    "saidNone": "\\bledger\\b",
+    "saidAlso": { "noHead": "\\bno head file\\b", "unread": "\\bcould not read\\b" }
   },
 
   "messages": {
@@ -204,7 +214,9 @@
     "ledgerNotGiven": "No ledger was given, so the script can't name tool calls. Leave this section out, or pass --ledger.",
     "ledgerMissing": "A ledger was given, so end the script with what node SKILL/src/ledger.js prints for it.",
     "ledgerSection": "This section must be what node SKILL/src/ledger.js prints for the ledger, word for word. Expected here: \"{expected}\"",
-    "ledgerSaid": "The ledger names tool calls. Say what it can't show under Not looked at, like \"the ledger names no paths or hosts for calls that ran without a hold, and ISR did not check it against a checkpoint\".",
+    "ledgerSaid": "The ledger names tool calls. Say what it can't show under Not looked at, like \"the ledger names no paths or hosts for calls forwarded without a hold, and ISR did not check it against a checkpoint\".",
+    "ledgerNoHead": "No head file was checked with the ledger, so a lost tail would not show. Say so under Not looked at, like \"ISR checked no head file with the ledger\".",
+    "ledgerUnread": "Some hold reasons ({unread}) name a path or host ISR could not read one way only, so it names nothing from them. Say so under Not looked at, like \"ISR could not read the paths in some hold reasons for certain\".",
     "ledgerSaidNone": "ISR names no tool calls from the ledger. Say so under Not looked at, like \"the agents' ledger did not verify, so ISR names none of their tool calls\".",
 
     "followTitle": "Put the title on line {n}, after the four top lines.",
