@@ -1,1 +1,1 @@
-Invented test data for the checker. `good.script.md` passes against `story.md` and `record.md`, and each file in `bad/` breaks exactly the rule its name starts with.
+Invented test data for the checker. `good.script.md` passes against `story.md` and `record.md`, and each file in `bad/` breaks exactly the rule its name starts with. `polarizer/` is the exception: copied from Polarizer, as its README says.

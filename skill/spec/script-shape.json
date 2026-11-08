@@ -25,7 +25,10 @@
         "itemMessage": "Each Confirm item asks a question and ends with where it came from in parentheses, like \"(open in the story)\" or \"(the build decided this)\"." },
       { "key": "notCovered", "heading": "Not covered", "required": false, "criteria": true,
         "item": "^- Criteri(?:on|a) \\d[^:]*: \\S",
-        "itemMessage": "Each Not covered item reads \"Criterion N: the reason\"." }
+        "itemMessage": "Each Not covered item reads \"Criterion N: the reason\"." },
+      { "key": "ledger", "heading": "Tool calls in the ledger", "required": false, "data": true,
+        "item": "^- `[^`]+`: \\d+ calls? (?:ran|not run)\\b",
+        "itemMessage": "Each item is a tool, as node SKILL/src/ledger.js prints it." }
     ],
     "check": {
       "title": "^### (\\d+)\\. \\S",
@@ -118,6 +121,32 @@
   "noRecord": "\\bno (?:build )?record\\b",
   "risks": { "from": { "plan": "the build's plan", "record": "the build record" } },
 
+  "ledger": {
+    "spec": "Polarizer's docs/LEDGER-SPEC.md, version 1, read at Polarizer commit 700498a",
+    "folderFile": "ledger.jsonl",
+    "notRun": {
+      "denied": "denied by a person",
+      "allowed": "allowed but never forwarded",
+      "undecided": "held and never decided",
+      "maybePlanted": "held, and may be a test call Polarizer planted",
+      "refused": "refused by Polarizer"
+    },
+    "named": "Named in its holds:",
+    "maxNamed": 3,
+    "paths": "argument \"(?:[^\"\\\\]|\\\\.)*\": (.+?) (?:is inside Polarizer's ledger directory|is Polarizer's config file|is outside every workspace root|matches )",
+    "hosts": "argument \"(?:[^\"\\\\]|\\\\.)*\": host (\\S+) is not in this tool's domains",
+    "none": {
+      "intact": "None. The ledger verified intact and records no tool calls.",
+      "broken": "None. The ledger did not verify ({why}), so ISR names no calls from it.",
+      "version0": "None. The ledger is not in Polarizer's version 1 format, so ISR names no calls from it.",
+      "empty": "None. The ledger file is empty, so it records no calls.",
+      "unreadable": "None. ISR could not read the ledger ({why}), so it names no calls from it."
+    },
+    "why": { "line": "{status} at line {line}", "torn": "a torn tail after line {line}", "head": "{status}, from its head file" },
+    "said": ["\\bno paths or hosts for calls that ran without a hold\\b", "\\bcheckpoint\\b"],
+    "saidNone": "\\bledger\\b"
+  },
+
   "messages": {
     "topSpacing": "Leave a blank line after each of the four top lines, so Markdown shows them as four lines and not one paragraph.",
     "layout": "Put a blank line before every heading.",
@@ -172,6 +201,11 @@
     "namedRisk": "Criterion {n} is under Already verified, but {where} names a risk against it: \"{risk}\". Put it under Check by hand. If the risk is a question for the business, ask it under Confirm and list the criterion under Not covered with \"moved to Confirm\".",
     "planTestsNotSaid": "The record shows only the plan's tests ran, not the full suite. Say so under Not looked at, like \"the record shows only the plan's tests, not the full suite\".",
     "skippedNotSaid": "The record says {skipped}. A Verified by that counts passing tests also says how many were skipped.",
+    "ledgerNotGiven": "No ledger was given, so the script can't name tool calls. Leave this section out, or pass --ledger.",
+    "ledgerMissing": "A ledger was given, so end the script with what node SKILL/src/ledger.js prints for it.",
+    "ledgerSection": "This section must be what node SKILL/src/ledger.js prints for the ledger, word for word. Expected here: \"{expected}\"",
+    "ledgerSaid": "The ledger names tool calls. Say what it can't show under Not looked at, like \"the ledger names no paths or hosts for calls that ran without a hold, and ISR did not check it against a checkpoint\".",
+    "ledgerSaidNone": "ISR names no tool calls from the ledger. Say so under Not looked at, like \"the agents' ledger did not verify, so ISR names none of their tool calls\".",
 
     "followTitle": "Put the title on line {n}, after the four top lines.",
     "followStray": "This line doesn't belong here. The template shows what goes where.",

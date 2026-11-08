@@ -37,6 +37,8 @@ You get one script, always in the same shape: four top lines (Type, Bottom line,
 
 After the script, ISR keeps three short files beside it, each in a shape the checker enforces. A review says who reviewed the script, when, what they changed and whether they approved it for use. Results record, for each check by hand, what the person did and saw, with evidence, traced to the story's criteria. ISR writes down what the person reports and never decides whether a check passed. For a check that did not match, a lesson proposes a build mistake, a requirements gap or a wrong assumption, labeled as a proposal, and drafts an entry for Parallax's eval cases or Loupe's team context. The person picks the class and carries the entry over by hand. Examples, all invented: [examples/pellwick](examples/pellwick/).
 
+When the build's agents made their tool calls through [Polarizer](https://github.com/mpwilso/polarizer), give ISR that run's ledger, Polarizer's hash-chained log of every call. ISR checks the chain with its own code, then ends the script with each tool the agents called: how many calls ran, how many were held, denied or refused, and the paths and hosts the ledger names. That tells the person accepting the change where to look. A ledger that does not verify names nothing, and the script says why. ISR reads the ledger itself, not `polarizer export --ocsf`, because the export leaves out the reasons Polarizer gives for holding a call, the one place the ledger names paths and hosts.
+
 The shape, as data: [skill/spec/script-shape.json](skill/spec/script-shape.json). The template and the rules for each section: [skill/templates/acceptance-script.md](skill/templates/acceptance-script.md) and [skill/writing-rules.md](skill/writing-rules.md). How ISR reads the story and the record: [skill/reading.md](skill/reading.md).
 
 ## What it must not do
@@ -84,7 +86,7 @@ To check a script yourself, from the root of this repo:
 node skill/src/check.js script.md --story story.md --record record
 ```
 
-Leave out `--record` when there is no record. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0. On bad usage, or a file it cannot read, it exits 2.
+Leave out `--record` when there is no record. With a Polarizer ledger, `node skill/src/ledger.js ledger.jsonl` prints the script's last section, and `--ledger ledger.jsonl` has the checker verify the ledger again and compare. It prints one line per problem and exits 1, or prints `Checked with Node` and the version and exits 0. On bad usage, or a file it cannot read, it exits 2.
 
 To run it from a script with no one at the keyboard (a headless run), and a loop that sends the writer back until the checker passes, see [docs/headless-runs.md](docs/headless-runs.md).
 
@@ -103,6 +105,7 @@ Full detail, run by run: [docs/run-log.md](docs/run-log.md).
 - Checks by hand have been run on one change, the one with the story written before the build. They found what the change broke, but not every check could be finished: one would have stopped at an earlier screen, and half of another had nothing real to test against.
 - Tested in Claude Code, nowhere else.
 - The review, results and lesson files have been tried on invented examples, not yet with a real person or a live model run.
+- The ledger section has been tried on Polarizer's own test ledgers and invented ones, not yet on a real run's. For calls that ran without a hold, the ledger names no paths or hosts.
 - Not shown yet: use by a team, or a time saving. Those need real users.
 
 The full list: [docs/limits.md](docs/limits.md).

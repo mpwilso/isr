@@ -26,3 +26,6 @@ Next: [One action for the product owner.]
 
 ## Not covered ([N])
 - Criterion [N]: [the reason. Leave this section out when every criterion lands above.]
+
+## Tool calls in the ledger ([N])
+- [What ledger.js prints for the ledger, word for word. Leave this section out when no ledger was given.]

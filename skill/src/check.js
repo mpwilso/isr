@@ -3,6 +3,7 @@
 // With --story it also checks that every acceptance criterion appears exactly once.
 // With --story and no --record, it holds the script to the rules for "no record was given".
 // With --risks, a risk map ({"risks": [{"from", "risk", "criteria"}]}), no criterion a risk names can be verified.
+// With --ledger, a Polarizer ledger, the script ends with what ledger.js prints for it; without, it names no tool calls.
 //   node check.js REVIEW_RESULTS_OR_LESSON
 // A script review, hand check results or a lesson is checked against its own shape (followup.js), with no options.
 // Prints one line per problem and exits 1, or prints "Checked with Node VERSION." and exits 0.
@@ -10,6 +11,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkFollowup, followupKind } from './followup.js';
+import { readLedger } from './ledger.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const shape = JSON.parse(readFileSync(join(here, '..', 'spec', 'script-shape.json'), 'utf8'));
@@ -92,9 +94,11 @@ export function readTop(lines, add) {
 }
 
 // Banned anywhere: dashes, double hyphens used as dashes, the team's own words, and verdict fields after line `after`.
-export function checkWords(lines, after, add) {
+// Lines in `skip` ([from, to) indexes) are ledger data, which ISR quotes in code spans and never rewords.
+export function checkWords(lines, after, add, skip = null) {
   const dashes = shape.banned.dashes.map(([code, name]) => [String.fromCodePoint(code), name]);
   lines.forEach((line, i) => {
+    if (skip && i >= skip[0] && i < skip[1]) return;
     for (const [char, name] of dashes) if (line.includes(char)) add(i + 1, 'dash', 'dash', { name });
     if (re(shape.banned.doubleHyphen).test(line)) add(i + 1, 'dash', 'doubleHyphen');
     for (const w of shape.banned.teamWords) {
@@ -105,14 +109,26 @@ export function checkWords(lines, after, add) {
   });
 }
 
-export function check(text, { story = null, record = null, risks = null } = {}) {
+// The ledger section's lines, as [from, to) indexes: its heading up to the next heading or the end.
+function dataRange(lines, from) {
+  const heading = shape.script.sections.find((s) => s.data).heading;
+  const start = lines.findIndex((l, i) => i >= from && l.match(re(shape.heading))?.[1] === heading);
+  if (start === -1) return null;
+  const next = lines.findIndex((l, i) => i > start && /^#/.test(l));
+  let end = next === -1 ? lines.length : next;
+  while (end > start + 1 && lines[end - 1] === '') end--;
+  return [start, end];
+}
+
+export function check(text, { story = null, record = null, risks = null, ledger = null } = {}) {
   const lines = text.replace(/\n+$/, '').split('\n');
   const problems = [];
   const add = (line, rule, key, vars = {}) =>
     problems.push({ line, rule, message: fill(shape.messages[key] ?? key, vars) });
 
   const head = readTop(lines, add);
-  checkWords(lines, head.line.at(-1), add);
+  const data = dataRange(lines, head.title);
+  checkWords(lines, head.line.at(-1), add, data && [data[0] + 1, data[1]]);
 
   const title = lines[head.title - 1] ?? '';
   const kind = re(shape.script.title).test(title) ? 'script' : re(shape.notReady.title).test(title) ? 'notReady' : null;
@@ -124,8 +140,10 @@ export function check(text, { story = null, record = null, risks = null } = {}) 
   const sections = parseSections(lines, head, defs, add);
 
   for (const [key, s] of Object.entries(sections)) checkCounts(s, add);
-  if (kind === 'script') checkScript(head, sections, { story, record, riskMap: risks }, add);
-  else {
+  if (kind === 'script') {
+    checkScript(head, sections, { story, record, riskMap: risks }, add);
+    checkLedger(lines, head, data, ledger, add);
+  } else {
     if (!re(shape.notReady.next).test(head.text[3])) add(head.line[3], 'not-ready', 'notReadyNext');
     if (story && !story.notReady) add(head.title, 'not-ready', 'storyReady');
   }
@@ -208,6 +226,24 @@ export function refs(text) {
   const out = [];
   for (const m of text.matchAll(re(shape.criterionRef, 'gi'))) out.push(...m[1].split(/\D+/).filter(Boolean).map(Number));
   return out;
+}
+
+// The ledger section is what ledger.js prints for the ledger given, word for word, so every name in it comes
+// from a chain ISR verified. Not looked at says what the ledger can't show, or that it named no calls.
+function checkLedger(lines, head, data, ledger, add) {
+  if (!ledger) {
+    if (data) add(data[0] + 1, 'ledger', 'ledgerNotGiven');
+    return;
+  }
+  if (!data) add(head.title, 'ledger', 'ledgerMissing');
+  else {
+    const got = lines.slice(data[0], data[1]);
+    const i = ledger.lines.findIndex((line, k) => got[k] !== line);
+    const at = i === -1 && got.length > ledger.lines.length ? ledger.lines.length : i;
+    if (at !== -1) add(data[0] + at + 1, 'ledger', 'ledgerSection', { expected: short(ledger.lines[at] ?? 'nothing more') });
+  }
+  const said = ledger.tools ? shape.ledger.said.every((p) => re(p, 'i').test(head.text[2])) : re(shape.ledger.saidNone, 'i').test(head.text[2]);
+  if (!said) add(head.line[2], 'ledger-said', ledger.tools ? 'ledgerSaid' : 'ledgerSaidNone');
 }
 
 function checkScript(head, sections, { story, record, riskMap }, add) {
@@ -377,11 +413,11 @@ export function main(args) {
   const opts = {};
   const files = [];
   for (let i = 0; i < args.length; i++) {
-    if (['--story', '--record', '--risks'].includes(args[i])) opts[args[i].slice(2)] = args[++i];
+    if (['--story', '--record', '--risks', '--ledger'].includes(args[i])) opts[args[i].slice(2)] = args[++i];
     else files.push(args[i]);
   }
   const usage = () => {
-    console.error('Usage: node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER] [--risks FILE]');
+    console.error('Usage: node check.js SCRIPT [--story FILE] [--record FILE_OR_TASK_FOLDER] [--risks FILE] [--ledger LEDGER]');
     console.error('       node check.js REVIEW_RESULTS_OR_LESSON');
     return 2;
   };
@@ -398,6 +434,7 @@ export function main(args) {
         story: opts.story ? readStory(readFileSync(opts.story, 'utf8')) : null,
         record: opts.record ? readRecord(opts.record) : null,
         risks: opts.risks ? readRisks(readFileSync(opts.risks, 'utf8')) : null,
+        ledger: opts.ledger ? readLedger(opts.ledger) : null,
       });
     }
   } catch (err) {

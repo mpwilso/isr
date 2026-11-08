@@ -38,7 +38,7 @@ test('SKILL.md stays under 500 lines and every file it points to exists', () => 
 });
 
 test('the skill folder is self-contained: the checker imports only Node and its own folder', () => {
-  for (const file of ['check.js', 'followup.js']) {
+  for (const file of ['check.js', 'followup.js', 'ledger.js']) {
     const imports = [...read(`skill/src/${file}`).matchAll(/^import .+ from '([^']+)';$/gm)].map((m) => m[1]);
     for (const name of imports) assert.match(name, /^(?:node:|\.\/[\w-]+\.js$)/, `${file}: ${name}`);
   }

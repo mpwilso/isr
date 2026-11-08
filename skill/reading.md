@@ -42,3 +42,9 @@ Match each criterion to the build's outcomes and the tests that cover them. A cr
 **Other records** (a CI log, a pull request description, pasted notes): read them the same way. Count something as verified only when the record shows an automated check covered it and passed. If you can't tell, count it as not checked and say so under Not looked at.
 
 **No record:** everything goes to Check by hand or Not covered, Already verified is "None.", and Not looked at says "no build record was given".
+
+## The ledger
+
+A Polarizer ledger (`ledger.jsonl`, or the folder that holds it) records each tool call the build's agents made through Polarizer, the proxy that holds risky calls for a person: which tool, and whether the call ran, was held, denied or refused. Read it through `src/ledger.js`, never by hand. It verifies the hash chain first and names nothing from a ledger that does not verify.
+
+The ledger names paths and hosts in the reasons Polarizer gave for holding a call, and nowhere else. For a call that ran without a hold, it keeps a commitment to the arguments, and the argument files beside it can hold secrets, so ISR never opens them. With no ledger, the script has no ledger section.

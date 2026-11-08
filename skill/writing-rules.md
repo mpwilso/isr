@@ -61,6 +61,10 @@ The reader never sees the story's section names, such as "Questions before build
 - A heading's count includes hidden items. When some are hidden, the heading also says how many it shows, like "## Confirm (8, 5 shown)", and the Not shown line stays. This applies to every list. An empty list says "None." with a count of (0). Leave out Not covered when nothing lands there.
 - The Bottom line gives the counts: "N verified, N to check by hand, N to confirm", plus ", N not covered" when that section is there.
 
+## Tool calls in the ledger
+
+When there is a ledger, the script ends with this section, exactly as `ledger.js` prints it: each tool the agents called, how many calls ran, and how many did not and why, with the paths and hosts the ledger names. It tells the person accepting the change where to look; it is not a finding. Don't reword, reorder or explain it, and don't draw checks or Confirm items from it. Under Not looked at, say what it can't show: "the ledger names no paths or hosts for calls that ran without a hold, and ISR did not check it against a checkpoint". When it names no calls, say why, like "the agents' ledger did not verify, so ISR names none of their tool calls".
+
 ## The four top lines
 
 Put a blank line after each, so Markdown shows them as four lines and not one paragraph.

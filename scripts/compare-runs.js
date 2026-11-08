@@ -6,7 +6,8 @@ import { readFileSync, realpathSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { parseSections, refs, shape } from '../skill/src/check.js';
 
-const defs = shape.script.sections;
+// The ledger section is printed by code, the same in every run on the same ledger, so it is left out.
+const defs = shape.script.sections.filter((d) => !d.data);
 const NOT_A_SCRIPT = 'not a script';
 
 // One run: its Type, the count each section's heading gives, and the section each criterion is in.
