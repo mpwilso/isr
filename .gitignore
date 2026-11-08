@@ -3,6 +3,7 @@ node_modules/
 
 # Test output
 test-output.txt
+.isr-test.txt
 
 # Runner output, as the docs name it and as scripts/variance.sh does
 isr-run-*/
